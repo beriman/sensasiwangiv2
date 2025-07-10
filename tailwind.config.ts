@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        body: ['"PT Sans"', 'sans-serif'],
+        headline: ['"PT Sans"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -55,21 +55,18 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
-        sidebar: {
-          DEFAULT: 'hsl(var(--sidebar-background))',
-          foreground: 'hsl(var(--sidebar-foreground))',
-          primary: 'hsl(var(--sidebar-primary))',
-          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-          accent: 'hsl(var(--sidebar-accent))',
-          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-          border: 'hsl(var(--sidebar-border))',
-          ring: 'hsl(var(--sidebar-ring))',
-        },
       },
       borderRadius: {
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        md: 'calc(var(--radius) - 4px)',
+        sm: 'calc(var(--radius) - 6px)',
+        xl: 'calc(var(--radius) + 4px)',
+        '2xl': 'calc(var(--radius) + 8px)',
+      },
+      boxShadow: {
+        'neumorphic': '8px 8px 16px hsl(0 0% 88%), -8px -8px 16px hsl(0 0% 100%)',
+        'neumorphic-inset': 'inset 6px 6px 12px hsl(0 0% 88%), inset -6px -6px 12px hsl(0 0% 100%)',
+        'neumorphic-active': 'inset 3px 3px 7px hsl(0 0% 88%), inset -3px -3px 7px hsl(0 0% 100%)',
       },
       keyframes: {
         'accordion-down': {
