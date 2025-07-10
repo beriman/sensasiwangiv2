@@ -1,63 +1,92 @@
+
 'use client';
 
-import { Leaf, FlaskConical, Wrench, Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from 'react';
+import Link from 'next/link';
+import { Menu, X, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 
-interface AppHeaderProps {
-  category: string;
-  setCategory: (category: string) => void;
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-}
-
-const categories = [
-  { name: 'Parfum', icon: Leaf },
-  { name: 'Raw Material', icon: FlaskConical },
-  { name: 'Tools', icon: Wrench },
+const navLinks = [
+  { href: '#', label: 'Marketplace' },
+  { href: '#', label: 'Community' },
+  { href: '#', label: 'School' },
+  { href: '#', label: 'Database' },
+  { href: '#', label: 'Profile' },
 ];
 
-export function AppHeader({
-  category,
-  setCategory,
-  searchTerm,
-  setSearchTerm,
-}: AppHeaderProps) {
+export function AppHeader() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
     <header className="sticky top-0 z-10 w-full border-b border-border/60 bg-background/80 shadow-neumorphic backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
-        <h1 className="text-2xl font-bold tracking-tight text-foreground/80">
+        <Link href="/" className="text-2xl font-bold tracking-tight text-foreground/80">
           sensasiwangi.id
-        </h1>
-        <div className="flex flex-1 items-center justify-center">
-          <Tabs value={category} onValueChange={setCategory} className="w-auto">
-            <TabsList className="h-12 rounded-xl bg-transparent p-1 shadow-neumorphic-inset">
-              {categories.map((cat) => (
-                <TabsTrigger
-                  key={cat.name}
-                  value={cat.name}
-                  className={cn(
-                    'h-full rounded-lg px-4 py-2 text-foreground/70 transition-all duration-300 data-[state=active]:shadow-neumorphic-active data-[state=active]:text-accent-foreground data-[state=active]:bg-accent/50',
-                    'hover:bg-background/50 hover:shadow-neumorphic-active'
-                  )}
-                >
-                  <cat.icon className="mr-2 h-5 w-5 text-accent-foreground/80" />
-                  {cat.name}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden items-center gap-6 md:flex">
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className="text-base font-medium text-foreground/70 transition-colors hover:text-accent-foreground"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="hidden items-center gap-4 md:flex">
+            <Button 
+              onClick={() => setIsLoggedIn(!isLoggedIn)}
+              className="rounded-xl px-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active"
+            >
+              {isLoggedIn ? 'Logout' : 'Login'}
+            </Button>
         </div>
-        <div className="relative w-full max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-12 rounded-xl border-none bg-background pl-10 text-base shadow-neumorphic-inset focus:ring-2 focus:ring-ring"
-          />
+
+        {/* Mobile Navigation */}
+        <div className="md:hidden">
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+              <nav className="flex h-full flex-col p-6">
+                <Link href="/" className="mb-8 text-2xl font-bold tracking-tight text-foreground/80">
+                  sensasiwangi.id
+                </Link>
+                <div className="flex flex-1 flex-col gap-4">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      className="rounded-lg p-3 text-lg font-medium text-foreground/80 transition-colors hover:bg-accent/50"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+                <Button 
+                    onClick={() => {
+                        setIsLoggedIn(!isLoggedIn);
+                        setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full rounded-xl py-6 text-lg shadow-neumorphic"
+                    >
+                    {isLoggedIn ? 'Logout' : 'Login'}
+                </Button>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -7,6 +8,17 @@ import { AppHeader } from '@/components/header';
 import { Filters } from '@/components/filters';
 import { ProductGrid } from '@/components/product-grid';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Leaf, FlaskConical, Wrench, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+
+
+const categories = [
+  { name: 'Parfum', icon: Leaf },
+  { name: 'Raw Material', icon: FlaskConical },
+  { name: 'Tools', icon: Wrench },
+];
 
 export default function Home() {
   const [category, setCategory] = useState<string>('Parfum');
@@ -59,25 +71,52 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background font-body">
-      <AppHeader
-        category={category}
-        setCategory={setCategory}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-      />
-      <div className="container relative mx-auto grid grid-cols-1 gap-8 px-4 py-8 md:grid-cols-4">
-        <aside className="md:col-span-1">
-          <Filters
-            category={category}
-            products={productsForFilter}
-            activeFilters={filters}
-            onFilterChange={handleFilterChange}
-          />
-        </aside>
-        <main className="md:col-span-3">
-          <ProductGrid products={filteredProducts} />
-        </main>
-        <PersonalizedRecommendations category={category} activeFilters={filters} />
+      <AppHeader />
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8 flex flex-col items-center justify-between gap-6 md:flex-row">
+            <Tabs value={category} onValueChange={setCategory} className="w-full md:w-auto">
+              <TabsList className="h-12 w-full rounded-xl bg-transparent p-1 shadow-neumorphic-inset md:w-auto">
+                {categories.map((cat) => (
+                  <TabsTrigger
+                    key={cat.name}
+                    value={cat.name}
+                    className={cn(
+                      'h-full flex-1 rounded-lg px-4 py-2 text-foreground/70 transition-all duration-300 data-[state=active]:bg-accent/50 data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active',
+                      'hover:bg-background/50 hover:shadow-neumorphic-active'
+                    )}
+                  >
+                    <cat.icon className="mr-2 h-5 w-5 text-accent-foreground/80" />
+                    {cat.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+            <div className="relative w-full max-w-xs">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-12 w-full rounded-xl border-none bg-background pl-10 text-base shadow-neumorphic-inset focus:ring-2 focus:ring-ring"
+              />
+            </div>
+        </div>
+
+        <div className="relative grid grid-cols-1 gap-8 md:grid-cols-4">
+          <aside className="md:col-span-1">
+            <Filters
+              category={category}
+              products={productsForFilter}
+              activeFilters={filters}
+              onFilterChange={handleFilterChange}
+            />
+          </aside>
+          <main className="md:col-span-3">
+            <ProductGrid products={filteredProducts} />
+          </main>
+          <PersonalizedRecommendations category={category} activeFilters={filters} />
+        </div>
       </div>
     </div>
   );
