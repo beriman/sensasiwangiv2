@@ -11,9 +11,9 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <Card className="group flex h-full transform-gpu flex-col overflow-hidden rounded-2xl border-none bg-transparent shadow-neumorphic transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-lg">
+    <Card className="group flex h-full transform-gpu flex-col overflow-hidden rounded-2xl border-none bg-transparent shadow-neumorphic transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg">
       <CardHeader className="p-0">
-        <div className="relative h-64 w-full">
+        <div className="relative h-48 w-full">
           <Image
             src={product.imageUrl}
             alt={product.name}
@@ -23,17 +23,17 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         </div>
       </CardHeader>
-      <CardContent className="flex-grow p-6">
+      <CardContent className="flex-grow p-4">
         <Badge variant="secondary" className="mb-2 rounded-md bg-accent/50 text-accent-foreground">
           {product.category}
         </Badge>
-        <CardTitle className="text-2xl font-bold text-foreground/90">{product.name}</CardTitle>
-        <CardDescription className="mt-2 text-base text-muted-foreground">
+        <CardTitle className="text-lg font-bold text-foreground/90">{product.name}</CardTitle>
+        <CardDescription className="mt-1 text-sm text-muted-foreground">
           {product.description}
         </CardDescription>
       </CardContent>
-      <CardFooter className="p-6 pt-0">
-        <p className="text-2xl font-bold text-foreground/80">${product.price.toFixed(2)}</p>
+      <CardFooter className="p-4 pt-0">
+        <p className="text-lg font-bold text-foreground/80">${product.price.toFixed(2)}</p>
       </CardFooter>
     </Card>
   );
