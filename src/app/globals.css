@@ -20,13 +20,14 @@ body {
     --secondary-foreground: 240 5% 35%;
     --muted: 0 0% 90%;
     --muted-foreground: 0 0% 55%;
-    --accent: 60 67.7% 90.2%;
-    --accent-foreground: 240 5% 35%;
+    /* Updated accent for gradient compatibility */
+    --accent: 173 58% 39%; /* Teal as a solid fallback */
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 88%;
     --input: 0 0% 88%;
-    --ring: 60 67.7% 90.2%;
+    --ring: 34 92% 62%; /* Using orange for ring */
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -47,13 +48,13 @@ body {
     --secondary-foreground: 0 0% 98%;
     --muted: 240 4% 15%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 60 67.7% 90.2%;
-    --accent-foreground: 240 5% 20%;
+    --accent: 173 58% 45%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 4% 15%;
     --input: 240 4% 15%;
-    --ring: 60 67.7% 90.2%;
+    --ring: 34 92% 62%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -68,5 +69,15 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Custom utility for the gradient background */
+@layer utilities {
+  .bg-accent-gradient {
+    @apply bg-gradient-to-br from-orange-400 to-teal-500;
+  }
+  .bg-accent-gradient-active {
+    @apply bg-gradient-to-br from-orange-500 to-teal-600;
   }
 }

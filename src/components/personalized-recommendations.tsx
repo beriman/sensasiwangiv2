@@ -104,7 +104,7 @@ export function PersonalizedRecommendations({ category, activeFilters }: Persona
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-20 h-16 w-16 rounded-full bg-accent shadow-neumorphic transition-all duration-300 ease-in-out hover:bg-accent/80 hover:shadow-lg"
+        className="fixed bottom-6 right-6 z-20 h-16 w-16 rounded-full bg-accent-gradient shadow-neumorphic transition-all duration-300 ease-in-out hover:shadow-lg hover:bg-accent-gradient-active"
         aria-label="Get Personalized Recommendations"
       >
         <WandSparkles className="h-8 w-8 text-accent-foreground" />
@@ -167,7 +167,7 @@ export function PersonalizedRecommendations({ category, activeFilters }: Persona
                   )}
                 />
                 <DialogFooter>
-                    <Button type="submit" disabled={isLoading} className="h-12 rounded-xl bg-accent px-6 font-bold text-accent-foreground shadow-neumorphic transition-all duration-300 ease-in-out hover:bg-accent/80 hover:shadow-lg">
+                    <Button type="submit" disabled={isLoading} className="h-12 rounded-xl bg-accent-gradient px-6 font-bold text-accent-foreground shadow-neumorphic transition-all duration-300 ease-in-out hover:shadow-lg hover:bg-accent-gradient-active">
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <WandSparkles className="mr-2 h-5 w-5" />}
                     Get Recommendations
                     </Button>

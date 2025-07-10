@@ -81,11 +81,12 @@ export default function Home() {
                     key={cat.name}
                     value={cat.name}
                     className={cn(
-                      'h-full flex-1 rounded-lg px-4 py-2 text-foreground/70 transition-all duration-300 data-[state=active]:bg-accent/50 data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active',
+                      'h-full flex-1 rounded-lg px-4 py-2 text-foreground/70 transition-all duration-300 data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active',
+                      'data-[state=active]:bg-accent-gradient',
                       'hover:bg-background/50 hover:shadow-neumorphic-active'
                     )}
                   >
-                    <cat.icon className="mr-2 h-5 w-5 text-accent-foreground/80" />
+                    <cat.icon className="mr-2 h-5 w-5 text-current/80" />
                     {cat.name}
                   </TabsTrigger>
                 ))}
