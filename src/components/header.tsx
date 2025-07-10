@@ -28,7 +28,7 @@ export function AppHeader({
     <header className="sticky top-0 z-10 w-full border-b border-border/60 bg-background/80 shadow-neumorphic backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <h1 className="text-2xl font-bold tracking-tight text-foreground/80">
-          Scent Emporium
+          sensasiwangi.id
         </h1>
         <div className="flex flex-1 items-center justify-center">
           <Tabs value={category} onValueChange={setCategory} className="w-auto">

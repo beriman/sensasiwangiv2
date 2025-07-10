@@ -10,7 +10,7 @@ const ptSans = PT_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'Scent Emporium',
+  title: 'sensasiwangi.id',
   description: 'Discover your signature scent.',
 };
 
