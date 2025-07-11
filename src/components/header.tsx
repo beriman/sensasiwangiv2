@@ -17,6 +17,7 @@ import {
 import { Cart } from '@/components/cart';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Badge } from './ui/badge';
 
 
 const navLinks = [
@@ -64,8 +65,9 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-10 w-full border-b border-border/60 bg-background/80 shadow-neumorphic backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
-        <Link href="/" className="text-2xl font-bold tracking-tight text-foreground/80">
-          sensasiwangi.id
+        <Link href="/" className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground/80">
+          <span>sensasiwangi.id</span>
+          <Badge variant="outline" className="border-accent text-xs font-bold text-accent">BETA</Badge>
         </Link>
 
         {/* Desktop Navigation */}
@@ -110,8 +112,9 @@ export function AppHeader() {
                 <SheetTitle className="sr-only">Menu</SheetTitle>
               </SheetHeader>
               <nav className="flex h-full flex-col p-6">
-                <Link href="/" className="mb-8 text-2xl font-bold tracking-tight text-foreground/80">
-                  sensasiwangi.id
+                <Link href="/" className="mb-8 flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground/80">
+                  <span>sensasiwangi.id</span>
+                  <Badge variant="outline" className="border-accent text-xs font-bold text-accent">BETA</Badge>
                 </Link>
                 <div className="flex flex-1 flex-col gap-4">
                   {navLinks.map((link) => (
