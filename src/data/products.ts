@@ -207,16 +207,6 @@ export const products: Product[] = [
     properties: { 'Product Type': 'Ticket', 'Event Date': '2024-12-15' },
   },
   {
-    id: 'm2',
-    name: 'School: Advanced Formulations Module',
-    description: 'Unlock exclusive access to our advanced video module on complex scent formulations. Lifetime access.',
-    price: 1750000,
-    category: 'Misc',
-    imageUrl: 'https://placehold.co/600x600.png',
-    imageHint: 'online course',
-    properties: { 'Product Type': 'Digital Access' },
-  },
-  {
     id: 'm3',
     name: 'Premium Member Tier Upgrade',
     description: 'Upgrade to a Premium Member for one year. Get early access to new products, exclusive discounts, and a special badge on your profile.',
