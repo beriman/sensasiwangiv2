@@ -143,7 +143,6 @@ export default function ProductDetailPage() {
     if (isSambatan) {
       return (
         <div className="mt-4">
-            <span className="text-xl text-muted-foreground line-through">{formatRupiah(product.price)}</span>
             <p className="text-3xl font-bold text-accent">{formatRupiah(product.sambatan.sambatanPrice)} <span className="text-lg font-normal text-muted-foreground">/ slot</span></p>
             <Badge variant="secondary" className="mt-2 bg-accent/20 text-accent">Harga Sambatan</Badge>
         </div>

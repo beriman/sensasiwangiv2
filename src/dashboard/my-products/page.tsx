@@ -149,10 +149,7 @@ export default function MyProductsPage() {
                   </TableCell>
                   <TableCell className="font-medium text-foreground/80">
                     {product.sambatan?.isActive ? (
-                        <div className="flex flex-col">
-                            <span className="text-xs text-muted-foreground line-through">{formatRupiah(product.price)}</span>
-                            <span className="text-accent">{formatRupiah(product.sambatan.sambatanPrice)}</span>
-                        </div>
+                        <span className="text-accent">{formatRupiah(product.sambatan.sambatanPrice)}</span>
                     ) : (
                         formatRupiah(product.price)
                     )}

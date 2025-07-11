@@ -47,7 +47,6 @@ export function ProductCard({ product }: ProductCardProps) {
         <CardFooter className="p-4 pt-0">
           {isSambatan ? (
              <div className="flex w-full flex-col">
-              <span className="text-sm text-muted-foreground line-through">{formatRupiah(product.price)}</span>
               <p className="text-lg font-bold text-accent">{formatRupiah(product.sambatan.sambatanPrice)}</p>
             </div>
           ) : (
