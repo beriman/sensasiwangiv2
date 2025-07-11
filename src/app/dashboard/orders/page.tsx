@@ -1,4 +1,3 @@
-
 // src/app/dashboard/orders/page.tsx
 'use client';
 
@@ -30,43 +29,83 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
   } from '@/components/ui/dropdown-menu';
+import { OrderDetailsDialog } from '@/components/dashboard/order-details-dialog';
+import type { Order } from '@/lib/types';
+import { differenceInHours, parseISO } from 'date-fns';
 
+const addDays = (date: Date, days: number): Date => {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
 
-type OrderStatus = 'Pending' | 'Fulfilled' | 'Disputed';
-
-const initialOrders = [
+const initialOrders: Order[] = [
   {
     id: '#3210',
-    customer: 'Olivia Martin',
-    status: 'Pending' as OrderStatus,
-    date: '2023-02-01',
+    customer: {
+      name: 'Olivia Martin',
+      address: 'Jl. Merdeka No. 17, Jakarta Pusat, DKI Jakarta',
+      email: 'olivia.martin@email.com',
+    },
+    status: 'Pending',
+    date: new Date('2023-02-01').toISOString(),
+    shippingDeadline: addDays(new Date('2023-02-01'), 2).toISOString(),
     total: 450000,
+    items: [
+        { id: 'p3', name: 'Zeste d\'Agrumes', quantity: 1, price: 950000/2 },
+        { id: 't3', name: 'Perfume Testing Strips', quantity: 1, price: 150000/2 },
+    ]
   },
-    {
+  {
     id: '#3208',
-    customer: 'Alex Doe', // This is actually the customer's name
-    status: 'Pending' as OrderStatus,
-    date: '2023-01-30',
+    customer: {
+      name: 'Alex Doe',
+      address: 'Jl. Cendana No. 8, Menteng, Jakarta Pusat, DKI Jakarta',
+      email: 'alex.doe@example.com',
+    },
+    status: 'Pending',
+    date: new Date().toISOString(), // Today's order
+    shippingDeadline: addDays(new Date(), 1).toISOString(), // Deadline is tomorrow
     total: 1200000,
+    items: [
+        { id: 'p1', name: 'Eau de Lumière', quantity: 1, price: 1200000 },
+    ]
   },
   {
     id: '#3201',
-    customer: 'Emma Brown',
-    status: 'Fulfilled' as OrderStatus,
-    date: '2023-01-25',
+    customer: {
+      name: 'Emma Brown',
+      address: 'Jl. Gajah Mada No. 101, Semarang, Jawa Tengah',
+      email: 'emma.brown@email.com',
+    },
+    status: 'Fulfilled',
+    date: new Date('2023-01-25').toISOString(),
+    shippingDeadline: addDays(new Date('2023-01-25'), 2).toISOString(),
     total: 750000,
+    items: [
+      { id: 't2', name: 'Digital Perfumer\'s Scale', quantity: 1, price: 750000 },
+    ]
   },
-   {
+  {
     id: '#3204',
-    customer: 'Michael Johnson',
-    status: 'Disputed' as OrderStatus,
-    date: '2023-01-28',
+    customer: {
+      name: 'Michael Johnson',
+      address: 'Jl. Pahlawan No. 45, Surabaya, Jawa Timur',
+      email: 'michael.johnson@email.com',
+    },
+    status: 'Disputed',
+    date: new Date('2023-01-28').toISOString(),
+    shippingDeadline: addDays(new Date('2023-01-28'), 2).toISOString(),
     total: 250000,
+    items: [
+      { id: 'rm3', name: 'Bulgarian Rose Absolute (5g)', quantity: 1, price: 250000 },
+    ]
   },
 ];
 
 export default function SellerOrdersPage() {
     const [orders, setOrders] = useState(initialOrders);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const { toast } = useToast();
 
     const handleMarkAsFulfilled = (orderId: string) => {
@@ -79,13 +118,20 @@ export default function SellerOrdersPage() {
         });
     };
 
-    const getStatusStyles = (status: string) => {
+    const getStatusStyles = (status: Order['status']) => {
         switch (status) {
             case 'Fulfilled': return 'bg-green-100 text-green-800';
             case 'Pending': return 'bg-yellow-100 text-yellow-800';
             case 'Disputed': return 'bg-orange-200 text-orange-800 border-orange-400';
             default: return '';
         }
+    };
+    
+    const getDeadlineStyles = (deadline: string) => {
+        const hoursLeft = differenceInHours(parseISO(deadline), new Date());
+        if (hoursLeft < 0) return "text-destructive font-bold";
+        if (hoursLeft < 24) return "text-orange-600 font-semibold";
+        return "text-muted-foreground";
     };
 
 
@@ -95,7 +141,7 @@ export default function SellerOrdersPage() {
       <CardHeader>
         <CardTitle>Manage Incoming Orders</CardTitle>
         <CardDescription>
-          Review and process orders for your products.
+          Review and process orders for your products. Fulfill them before the deadline.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -106,23 +152,29 @@ export default function SellerOrdersPage() {
               <TableHead>Customer</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Batas Kirim</TableHead>
               <TableHead className="text-right">Total</TableHead>
               <TableHead className="text-center">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id} className={cn(order.status === 'Disputed' && 'bg-orange-50')}>
+              <TableRow key={order.id} className={cn(order.status === 'Disputed' && 'bg-orange-50/50')}>
                 <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.customer}</TableCell>
-                <TableCell>{order.date}</TableCell>
+                <TableCell>{order.customer.name}</TableCell>
+                <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Badge 
-                    variant={order.status === 'Fulfilled' ? 'default' : order.status === 'Pending' ? 'secondary' : 'destructive'}
                     className={cn("font-semibold", getStatusStyles(order.status))}
                   >
                     {order.status}
                   </Badge>
+                </TableCell>
+                <TableCell className={cn("flex items-center gap-2", getDeadlineStyles(order.shippingDeadline))}>
+                    {differenceInHours(parseISO(order.shippingDeadline), new Date()) < 24 && (
+                        <AlertCircle className="h-4 w-4" />
+                    )}
+                    {new Date(order.shippingDeadline).toLocaleDateString()}
                 </TableCell>
                 <TableCell className="text-right">{formatRupiah(order.total)}</TableCell>
                 <TableCell className="text-center">
@@ -132,7 +184,6 @@ export default function SellerOrdersPage() {
                             aria-haspopup="true"
                             size="icon"
                             variant="ghost"
-                            disabled={order.status !== 'Pending'}
                         >
                             <MoreHorizontal className="h-4 w-4" />
                             <span className="sr-only">Toggle menu</span>
@@ -140,6 +191,9 @@ export default function SellerOrdersPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => setSelectedOrder(order)}>
+                            View Details
+                        </DropdownMenuItem>
                         <DropdownMenuItem 
                             onClick={() => handleMarkAsFulfilled(order.id)}
                             disabled={order.status !== 'Pending'}
@@ -158,7 +212,17 @@ export default function SellerOrdersPage() {
         </Table>
       </CardContent>
     </Card>
+    
+    <OrderDetailsDialog
+        order={selectedOrder}
+        isOpen={!!selectedOrder}
+        onOpenChange={(isOpen) => {
+            if (!isOpen) {
+                setSelectedOrder(null);
+            }
+        }}
+        onMarkAsFulfilled={handleMarkAsFulfilled}
+    />
     </>
   );
 }
-

@@ -35,3 +35,27 @@ export interface CartItem extends Product {
   quantity: number;
   variant: ProductVariant; // Add selected variant to cart item
 }
+
+// Order Management Types
+export interface OrderItem {
+    id: string;
+    name: string;
+    quantity: number;
+    price: number;
+}
+
+export interface OrderCustomer {
+    name: string;
+    email: string;
+    address: string;
+}
+
+export interface Order {
+    id: string;
+    customer: OrderCustomer;
+    status: 'Pending' | 'Fulfilled' | 'Disputed' | 'Cancelled';
+    date: string; // ISO 8601
+    shippingDeadline: string; // ISO 8601
+    total: number;
+    items: OrderItem[];
+}
