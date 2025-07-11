@@ -51,7 +51,10 @@ const productThreads: Thread[] = products
       posts: [
         {
           author: 'Alex Doe',
-          content: `I've just tried this one! The opening is a beautiful blast of jasmine. Has anyone else noticed the subtle green note in the dry-down?`,
+          content: `I've just tried this one! The opening is a beautiful blast of jasmine. Has anyone else noticed the subtle green note in the dry-down?
+
+I found a great review of it here: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+`,
         },
         {
             author: 'Antoine Leduc',

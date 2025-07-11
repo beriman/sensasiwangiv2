@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { ContentRenderer } from '@/components/content-renderer';
 
 export default function ThreadPage() {
   const params = useParams();
@@ -52,7 +53,7 @@ export default function ThreadPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-base text-foreground/80 whitespace-pre-wrap">{thread.content}</p>
+              <ContentRenderer content={thread.content} />
             </CardContent>
           </Card>
 
@@ -69,7 +70,7 @@ export default function ThreadPage() {
                 </CardHeader>
               </CardHeader>
               <CardContent>
-                <p className="text-base text-foreground/80 whitespace-pre-wrap">{post.content}</p>
+                <ContentRenderer content={post.content} />
               </CardContent>
             </Card>
           ))}
@@ -82,7 +83,7 @@ export default function ThreadPage() {
                 <CardContent>
                     <form className="space-y-4">
                         <Textarea
-                            placeholder="Write your reply here..."
+                            placeholder="Write your reply here... You can paste links from YouTube, TikTok, or Instagram."
                             className="min-h-[120px] rounded-xl border-none bg-background text-base shadow-neumorphic-inset focus:ring-2 focus:ring-ring"
                         />
                         <Button className="rounded-xl bg-accent-gradient px-8 py-6 text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active">
