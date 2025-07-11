@@ -13,11 +13,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus, MessageSquare } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus, MessageSquare, Heart } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 import { formatRupiah, cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useWishlist } from '@/hooks/use-wishlist';
 
 const scentProfileIcons: { [key: string]: React.ElementType } = {
   Floral: Leaf,
@@ -82,7 +83,13 @@ export default function ProductDetailPage() {
   const product = products.find((p) => p.id === productId);
   
   const [slotQuantity, setSlotQuantity] = useState(1);
-  
+  const { toggleWishlist, isInWishlist } = useWishlist();
+
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     if (product?.sambatan) {
       setSlotQuantity(product.sambatan.minOrder);
@@ -95,6 +102,7 @@ export default function ProductDetailPage() {
   
   const isSambatan = product.sambatan?.isActive;
   const sambatanProgress = isSambatan ? (product.sambatan.currentParticipants / product.sambatan.targetParticipants) * 100 : 0;
+  const inWishlist = isClient && isInWishlist(product.id);
 
   const handleJoinSambatan = () => {
     toast({
@@ -254,10 +262,15 @@ export default function ProductDetailPage() {
                     </Button>
                 </>
               ) : (
-                <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => addItem(product)}>
-                    <ShoppingCart className="mr-2 h-6 w-6" />
-                    Add to Cart
-                </Button>
+                <>
+                  <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => addItem(product)}>
+                      <ShoppingCart className="mr-2 h-6 w-6" />
+                      Add to Cart
+                  </Button>
+                  <Button size="lg" variant="outline" className="h-14 w-14 rounded-xl p-0 shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => toggleWishlist(product)}>
+                      <Heart className={cn("h-6 w-6", inWishlist && "fill-destructive text-destructive")} />
+                  </Button>
+                </>
               )}
             </div>
             {!isSambatan && product.category === 'Parfum' && (
