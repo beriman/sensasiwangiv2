@@ -10,7 +10,8 @@ import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditProfileDialog, type ProfileData } from '@/components/edit-profile-dialog';
-import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck } from 'lucide-react';
+import { CurationDialog } from '@/components/curation-dialog';
+import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck, Ribbon } from 'lucide-react';
 import { Badge as UiBadge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
@@ -28,7 +29,8 @@ export default function ProfilePage() {
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCurationDialogOpen, setIsCurationDialogOpen] = useState(false);
 
   useEffect(() => {
     const foundProfile = profiles.find((p) => p.slug === slug);
@@ -50,7 +52,7 @@ export default function ProfilePage() {
       };
       setProfile(updatedProfile);
     }
-    setIsDialogOpen(false);
+    setIsEditDialogOpen(false);
   };
 
   if (!profile) {
@@ -67,118 +69,134 @@ export default function ProfilePage() {
     ...profile,
     profilePicture: profile.profilePicture || 'https://placehold.co/128x128.png',
   };
+  
+  const canApplyForCuration = !profile.curation?.isCurated && (profile.type === 'Brand' || profile.type === 'Perfumer');
 
   return (
-    <div className="min-h-screen bg-background font-body">
-      <AppHeader />
-      <main className="container mx-auto px-4 py-8">
-        <Card className="mx-auto max-w-2xl rounded-2xl border-none bg-transparent shadow-neumorphic">
-          <CardContent className="p-6 md:p-10">
-            <div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left">
-              <div className="relative mb-4 h-24 w-24 shrink-0 sm:mb-0 sm:mr-8 md:h-32 md:w-32">
-                <Image
-                  src={profile.profilePicture || 'https://placehold.co/128x128.png'}
-                  alt="Profile picture"
-                  width={128}
-                  height={128}
-                  className="rounded-full shadow-neumorphic-inset"
-                  data-ai-hint={profile.imageHint}
-                />
-              </div>
-              <div className="flex-grow">
-                <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-start">
-                  <div className="flex items-center gap-3">
-                      <h1 className="text-2xl font-bold text-foreground md:text-3xl">{profile.name}</h1>
-                      <UiBadge variant="outline">{profile.type}</UiBadge>
+    <>
+      <div className="min-h-screen bg-background font-body">
+        <AppHeader />
+        <main className="container mx-auto px-4 py-8">
+          <Card className="mx-auto max-w-2xl rounded-2xl border-none bg-transparent shadow-neumorphic">
+            <CardContent className="p-6 md:p-10">
+              <div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left">
+                <div className="relative mb-4 h-24 w-24 shrink-0 sm:mb-0 sm:mr-8 md:h-32 md:w-32">
+                  <Image
+                    src={profile.profilePicture || 'https://placehold.co/128x128.png'}
+                    alt="Profile picture"
+                    width={128}
+                    height={128}
+                    className="rounded-full shadow-neumorphic-inset"
+                    data-ai-hint={profile.imageHint}
+                  />
+                </div>
+                <div className="flex-grow">
+                  <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-start">
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-bold text-foreground md:text-3xl">{profile.name}</h1>
+                        <UiBadge variant="outline">{profile.type}</UiBadge>
+                    </div>
+                    {profile.curation?.isCurated && (
+                      <div className="flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
+                        <BadgeCheck className="h-4 w-4" />
+                        Terverifikasi oleh Nusantarum
+                      </div>
+                    )}
                   </div>
-                  {profile.curation?.isCurated && (
-                    <div className="flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
-                      <BadgeCheck className="h-4 w-4" />
-                      Terverifikasi oleh Nusantarum
-                    </div>
-                  )}
-                </div>
-                <p className="text-md text-muted-foreground">{profile.username}</p>
-                 {profile.type === 'Perfumer' && (
-                    <div className="mt-3 flex justify-center gap-4 text-sm sm:justify-start">
-                    <div className="text-foreground/90">
-                        <span className="font-bold">{profile.followers?.toLocaleString()}</span>
-                        <span className="text-muted-foreground"> Followers</span>
-                    </div>
-                    <div className="text-foreground/90">
-                        <span className="font-bold">{profile.following?.toLocaleString()}</span>
-                        <span className="text-muted-foreground"> Following</span>
-                    </div>
-                    </div>
-                 )}
-                <div className="mt-4 flex flex-wrap justify-center gap-4 sm:justify-start">
-                  {profile.socials.twitter && (
-                    <a href={profile.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
-                      <Twitter className="h-6 w-6" />
-                    </a>
-                  )}
-                  {profile.socials.instagram && (
-                    <a href={profile.socials.instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
-                      <Instagram className="h-6 w-6" />
-                    </a>
-                  )}
-                  {profile.socials.tiktok && (
-                    <a href={profile.socials.tiktok} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
-                        <TikTokIcon />
-                    </a>
-                  )}
-                  {profile.socials.youtube && (
-                    <a href={profile.socials.youtube} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
-                        <Youtube className="h-6 w-6" />
-                    </a>
-                  )}
-                  {profile.socials.facebook && (
-                    <a href={profile.socials.facebook} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
-                        <Facebook className="h-6 w-6" />
-                    </a>
-                  )}
-                  {profile.socials.website && (
-                    <a href={profile.socials.website} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
-                      <LinkIcon className="h-6 w-6" />
-                    </a>
-                  )}
+                  <p className="text-md text-muted-foreground">{profile.username}</p>
+                   {profile.type === 'Perfumer' && (
+                      <div className="mt-3 flex justify-center gap-4 text-sm sm:justify-start">
+                      <div className="text-foreground/90">
+                          <span className="font-bold">{profile.followers?.toLocaleString()}</span>
+                          <span className="text-muted-foreground"> Followers</span>
+                      </div>
+                      <div className="text-foreground/90">
+                          <span className="font-bold">{profile.following?.toLocaleString()}</span>
+                          <span className="text-muted-foreground"> Following</span>
+                      </div>
+                      </div>
+                   )}
+                  <div className="mt-4 flex flex-wrap justify-center gap-4 sm:justify-start">
+                    {profile.socials.twitter && (
+                      <a href={profile.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
+                        <Twitter className="h-6 w-6" />
+                      </a>
+                    )}
+                    {profile.socials.instagram && (
+                      <a href={profile.socials.instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
+                        <Instagram className="h-6 w-6" />
+                      </a>
+                    )}
+                    {profile.socials.tiktok && (
+                      <a href={profile.socials.tiktok} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
+                          <TikTokIcon />
+                      </a>
+                    )}
+                    {profile.socials.youtube && (
+                      <a href={profile.socials.youtube} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
+                          <Youtube className="h-6 w-6" />
+                      </a>
+                    )}
+                    {profile.socials.facebook && (
+                      <a href={profile.socials.facebook} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
+                          <Facebook className="h-6 w-6" />
+                      </a>
+                    )}
+                    {profile.socials.website && (
+                      <a href={profile.socials.website} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
+                        <LinkIcon className="h-6 w-6" />
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-            <p className="mt-6 text-base text-foreground/80">{profile.bio}</p>
-            {profile.curation?.isCurated && (
-                <p className="mt-4 text-center text-xs text-muted-foreground sm:text-left">
-                    Disetujui pada: {format(new Date(profile.curation.curatedAt), 'dd MMMM yyyy')}
-                </p>
-            )}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <Button onClick={() => setIsDialogOpen(true)} variant="outline" className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
-                Edit Profile
-              </Button>
-              <Button asChild className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
-                <Link href="/dashboard/messages">
-                    <MessageSquare className="mr-2" /> Message
-                </Link>
-              </Button>
-              {profile.type === 'Perfumer' && (
-                <Button
-                    onClick={() => setIsFollowing(!isFollowing)}
-                    className="rounded-xl bg-accent-gradient px-8 py-6 text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
-                >
-                    {isFollowing ? <UserCheck className="mr-2" /> : <UserPlus className="mr-2" />}
-                    {isFollowing ? 'Following' : 'Follow'}
-                </Button>
+              <p className="mt-6 text-base text-foreground/80">{profile.bio}</p>
+              {profile.curation?.isCurated && (
+                  <p className="mt-4 text-center text-xs text-muted-foreground sm:text-left">
+                      Disetujui pada: {format(new Date(profile.curation.curatedAt), 'dd MMMM yyyy')}
+                  </p>
               )}
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <Button onClick={() => setIsEditDialogOpen(true)} variant="outline" className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+                  Edit Profile
+                </Button>
+                {canApplyForCuration && (
+                    <Button onClick={() => setIsCurationDialogOpen(true)} variant="outline" className="rounded-xl border-blue-500/50 px-8 py-6 text-blue-700 shadow-neumorphic transition-all hover:border-blue-500 hover:shadow-neumorphic-active">
+                      <Ribbon className="mr-2" /> Ajukan Kurasi
+                    </Button>
+                )}
+                <Button asChild className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+                  <Link href="/dashboard/messages">
+                      <MessageSquare className="mr-2" /> Message
+                  </Link>
+                </Button>
+                {profile.type === 'Perfumer' && (
+                  <Button
+                      onClick={() => setIsFollowing(!isFollowing)}
+                      className="rounded-xl bg-accent-gradient px-8 py-6 text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
+                  >
+                      {isFollowing ? <UserCheck className="mr-2" /> : <UserPlus className="mr-2" />}
+                      {isFollowing ? 'Following' : 'Follow'}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+
       <EditProfileDialog
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
         profileData={profileDataForDialog}
         onSave={handleProfileSave}
       />
-    </div>
+      
+      <CurationDialog
+        isOpen={isCurationDialogOpen}
+        onOpenChange={setIsCurationDialogOpen}
+        profileName={profile.name}
+      />
+    </>
   );
 }
