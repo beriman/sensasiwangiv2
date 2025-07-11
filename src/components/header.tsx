@@ -12,7 +12,7 @@ const navLinks = [
   { href: '/', label: 'Marketplace' },
   { href: '#', label: 'Community' },
   { href: '#', label: 'School' },
-  { href: '#', label: 'Database' },
+  { href: '/database', label: 'Database' },
   { href: '/profile', label: 'Profile' },
 ];
 

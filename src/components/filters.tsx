@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo } from 'react';
@@ -24,6 +25,7 @@ export function Filters({ category, products, activeFilters, onFilterChange }: F
     switch (category) {
       case 'Parfum':
         return {
+          'Brand': getUniqueProperties(products, 'Brand'),
           'Scent Profile': getUniqueProperties(products, 'Scent Profile'),
           'Concentration': getUniqueProperties(products, 'Concentration'),
         };

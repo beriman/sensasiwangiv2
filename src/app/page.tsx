@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import type { Product } from '@/lib/types';
 import { products as allProducts } from '@/data/products';
 import { AppHeader } from '@/components/header';
@@ -21,9 +22,19 @@ const categories = [
 ];
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  const brandQuery = searchParams.get('brand');
+
   const [category, setCategory] = useState<string>('Parfum');
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<Record<string, string[]>>({});
+
+  useEffect(() => {
+    if (brandQuery) {
+      setCategory('Parfum'); // Assume brands are for perfumes
+      setFilters(prev => ({ ...prev, 'Brand': [brandQuery] }));
+    }
+  }, [brandQuery]);
 
   const handleFilterChange = (filterType: string, value: string) => {
     setFilters((prevFilters) => {
@@ -57,6 +68,7 @@ export default function Home() {
         if (values.length === 0) return true;
         const productValue = product.properties[key];
         if (!productValue) return false;
+        if(key === 'Brand' && product.category !== 'Parfum') return true;
         return values.includes(productValue);
       });
 
