@@ -120,8 +120,11 @@ export default function Home() {
         </div>
 
         <div className="relative grid grid-cols-1 gap-8 md:grid-cols-4">
-          <Collapsible asChild open={isFiltersOpen} onOpenChange={setIsFiltersOpen} className="md:col-span-1 md:block">
-            <>
+          <Collapsible
+            open={isFiltersOpen}
+            onOpenChange={setIsFiltersOpen}
+            className="md:col-span-1 md:block"
+          >
             <div className="mb-4 flex justify-between items-center md:hidden">
               <h2 className="text-lg font-bold">Filters</h2>
               <CollapsibleTrigger asChild>
@@ -141,7 +144,6 @@ export default function Home() {
                 />
               </aside>
             </CollapsibleContent>
-            </>
           </Collapsible>
 
           <main className={cn(
