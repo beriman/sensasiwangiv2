@@ -49,6 +49,15 @@ const initialOrders = [
     date: '2023-01-31',
     total: 350000,
   },
+    {
+    id: '#3208',
+    customer: 'Alex Doe', // For user view
+    email: 'alex.doe@example.com',
+    type: 'Sale',
+    status: 'Pending' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    date: '2023-01-30',
+    total: 1200000,
+  },
   {
     id: '#3204',
     customer: 'Michael Johnson',
@@ -75,6 +84,15 @@ const initialOrders = [
     status: 'Pending' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
     date: '2023-01-26',
     total: 150000,
+  },
+    {
+    id: '#3201',
+    customer: 'Alex Doe', // For user view
+    email: 'alex.doe@example.com',
+    type: 'Sale',
+    status: 'Fulfilled' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    date: '2023-01-25',
+    total: 750000,
   },
 ];
 
