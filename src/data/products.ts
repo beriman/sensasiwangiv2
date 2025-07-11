@@ -18,7 +18,7 @@ export const products: Product[] = [
       'Brand': 'Maison de Rêve',
       'Perfumer': 'Alex Doe',
     },
-    perfumerProfileSlug: 'alex-doe',
+    perfumerProfileSlug: 'maison-de-reve', // Sold by the brand profile
     isListed: true,
     variants: [
       { id: 'p1-50', name: '50ml', price: 1200000, stock: 15 },
@@ -38,7 +38,7 @@ export const products: Product[] = [
       'Brand': 'Forêt Noire Parfums',
       'Perfumer': 'Antoine Leduc',
     },
-    perfumerProfileSlug: 'antoine-leduc',
+    perfumerProfileSlug: 'foret-noire-parfums',
     isListed: true,
     variants: [{ id: 'p2-vial', name: '10ml Vial', price: 1350000, stock: 1 }], // Price here is original price, sambatan price is separate
     sambatan: {
@@ -61,9 +61,10 @@ export const products: Product[] = [
     properties: { 
       'Scent Profile': 'Citrus', 
       'Concentration': 'EDT',
-      'Brand': 'Soleil Levant',
+      'Brand': 'Maison de Rêve',
       'Perfumer': 'Isabelle Martin',
     },
+    perfumerProfileSlug: 'maison-de-reve',
     isListed: true,
     variants: [
       { id: 'p3-100', name: '100ml', price: 950000, stock: 25 },
@@ -82,6 +83,7 @@ export const products: Product[] = [
       'Brand': 'Nuit Étoilée',
       'Perfumer': 'François Dubois',
     },
+    perfumerProfileSlug: 'foret-noire-parfums',
     isListed: true,
     variants: [
       { id: 'p4-50', name: '50ml', price: 1500000, stock: 0 },
@@ -135,6 +137,7 @@ export const products: Product[] = [
     imageHint: 'oil bottle',
     properties: { 'Material Type': 'Essential Oil', 'Origin': 'India' },
     isListed: true,
+    perfumerProfileSlug: 'alex-doe',
     variants: [
       { id: 'rm1-10', name: '10g', price: 800000, stock: 50 },
       { id: 'rm1-50', name: '50g', price: 3500000, stock: 10 },
@@ -149,6 +152,7 @@ export const products: Product[] = [
     imageHint: 'chemical bottle',
     properties: { 'Material Type': 'Aroma Chemical', 'Origin': 'Synthetic' },
     isListed: true,
+    perfumerProfileSlug: 'antoine-leduc',
     variants: [
       { id: 'rm2-50', name: '50g', price: 450000, stock: 100 },
     ]
@@ -162,6 +166,7 @@ export const products: Product[] = [
     imageHint: 'rose oil',
     properties: { 'Material Type': 'Absolute', 'Origin': 'Bulgaria' },
     isListed: true,
+    perfumerProfileSlug: 'alex-doe',
     variants: [
       { id: 'rm3-5', name: '5g', price: 2500000, stock: 5 },
     ]
@@ -175,6 +180,7 @@ export const products: Product[] = [
     imageHint: 'dark oil bottle',
     properties: { 'Material Type': 'Absolute', 'Origin': 'Indonesia' },
     isListed: true,
+    perfumerProfileSlug: 'antoine-leduc',
     variants: [{ id: 'rm4-1ml', name: '1ml Decant', price: 4500000, stock: 1 }],
     sambatan: {
       isActive: true,
@@ -196,6 +202,7 @@ export const products: Product[] = [
     imageHint: 'lab beakers',
     properties: { 'Tool Type': 'Glassware', 'Material': 'Borosilicate Glass' },
     isListed: true,
+    perfumerProfileSlug: 'alex-doe',
     variants: [{ id: 't1-set', name: 'Set of 3', price: 350000, stock: 40 }]
   },
   {
@@ -207,6 +214,7 @@ export const products: Product[] = [
     imageHint: 'digital scale',
     properties: { 'Tool Type': 'Measurement', 'Material': 'Stainless Steel' },
     isListed: true,
+    perfumerProfileSlug: 'antoine-leduc',
     variants: [{ id: 't2-scale', name: 'Single Scale', price: 750000, stock: 20 }]
   },
   {
@@ -218,6 +226,7 @@ export const products: Product[] = [
     imageHint: 'perfume strips',
     properties: { 'Tool Type': 'Evaluation', 'Material': 'Paper' },
     isListed: true,
+    perfumerProfileSlug: 'alex-doe',
     variants: [{ id: 't3-pack', name: 'Pack of 100', price: 150000, stock: 200 }]
   },
   // Misc
@@ -230,6 +239,7 @@ export const products: Product[] = [
     imageHint: 'membership card',
     properties: { 'Product Type': 'Subscription' },
     isListed: true,
+    perfumerProfileSlug: 'alex-doe',
     variants: [{ id: 'm3-1y', name: '1 Year', price: 500000, stock: 9999 }]
   },
 ];

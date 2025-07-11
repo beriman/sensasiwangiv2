@@ -2,6 +2,11 @@
 
 export type ProfileType = 'Perfumer' | 'Brand' | 'Store';
 
+export interface CurationInfo {
+  isCurated: boolean;
+  curatedAt: string; // ISO 8601 date string
+}
+
 export interface Profile {
     slug: string;
     type: ProfileType;
@@ -10,8 +15,8 @@ export interface Profile {
     bio: string;
     profilePicture?: string;
     imageHint: string;
-    followers?: number; // Optional, may not apply to brands
-    following?: number; // Optional, may not apply to brands
+    followers?: number;
+    following?: number;
     socials: {
       twitter?: string;
       instagram?: string;
@@ -20,6 +25,7 @@ export interface Profile {
       youtube?: string;
       facebook?: string;
     };
+    curation?: CurationInfo;
   };
   
   export const profiles: Profile[] = [
@@ -68,6 +74,22 @@ export interface Profile {
       socials: {
         instagram: 'https://instagram.com/maisonderêve',
         website: 'https://maisonderêve.com',
+      },
+      curation: {
+        isCurated: true,
+        curatedAt: new Date('2024-05-15T00:00:00Z').toISOString(),
+      }
+    },
+    {
+      slug: 'foret-noire-parfums',
+      type: 'Brand',
+      name: 'Forêt Noire Parfums',
+      username: '@foretnoire',
+      bio: 'Exploring the darker, mystical side of perfumery with a focus on woody, resinous, and spicy notes. Our scents are for the bold and the introspective.',
+      profilePicture: 'https://placehold.co/128x128.png',
+      imageHint: 'dark mysterious logo',
+      socials: {
+        instagram: 'https://instagram.com/foretnoire',
       },
     },
   ];

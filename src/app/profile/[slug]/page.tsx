@@ -10,8 +10,9 @@ import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditProfileDialog, type ProfileData } from '@/components/edit-profile-dialog';
-import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, Badge } from 'lucide-react';
+import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck } from 'lucide-react';
 import { Badge as UiBadge } from '@/components/ui/badge';
+import { format } from 'date-fns';
 
 const TikTokIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
@@ -85,9 +86,17 @@ export default function ProfilePage() {
                 />
               </div>
               <div className="flex-grow">
-                <div className="flex items-center justify-center sm:justify-start gap-3">
-                    <h1 className="text-2xl font-bold text-foreground md:text-3xl">{profile.name}</h1>
-                    <UiBadge variant="outline">{profile.type}</UiBadge>
+                <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-start">
+                  <div className="flex items-center gap-3">
+                      <h1 className="text-2xl font-bold text-foreground md:text-3xl">{profile.name}</h1>
+                      <UiBadge variant="outline">{profile.type}</UiBadge>
+                  </div>
+                  {profile.curation?.isCurated && (
+                    <div className="flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
+                      <BadgeCheck className="h-4 w-4" />
+                      Terverifikasi oleh Nusantarum
+                    </div>
+                  )}
                 </div>
                 <p className="text-md text-muted-foreground">{profile.username}</p>
                  {profile.type === 'Perfumer' && (
@@ -137,6 +146,11 @@ export default function ProfilePage() {
               </div>
             </div>
             <p className="mt-6 text-base text-foreground/80">{profile.bio}</p>
+            {profile.curation?.isCurated && (
+                <p className="mt-4 text-center text-xs text-muted-foreground sm:text-left">
+                    Disetujui pada: {format(new Date(profile.curation.curatedAt), 'dd MMMM yyyy')}
+                </p>
+            )}
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Button onClick={() => setIsDialogOpen(true)} variant="outline" className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
                 Edit Profile

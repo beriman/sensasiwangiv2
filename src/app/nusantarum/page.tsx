@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 const uniqueBrands = [...new Set(products.map(p => p.properties.Brand).filter(Boolean))];
 const allParfums = products.filter(p => p.category === 'Parfum');
 const allPerfumers = profiles.filter(p => p.type === 'Perfumer');
+const allBrands = profiles.filter(p => p.type === 'Brand');
 
 function PerfumerCard({ perfumer }: { perfumer: Profile }) {
   return (
@@ -83,23 +84,11 @@ export default function NusantarumPage() {
           </TabsContent>
           
           <TabsContent value="brands" className="mt-8">
-             <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
-                <CardHeader>
-                    <CardTitle className="text-xl font-bold text-foreground/80">All Brands</CardTitle>
-                    <CardDescription>A list of all brands available on the platform.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                        {uniqueBrands.map(brand => (
-                           <Link key={brand} href={`/?brand=${encodeURIComponent(brand)}`} passHref>
-                             <div className="rounded-lg p-4 text-center font-semibold text-foreground/90 shadow-neumorphic-inset transition-all hover:shadow-neumorphic-active hover:text-accent cursor-pointer">
-                                {brand}
-                            </div>
-                           </Link>
-                        ))}
-                    </div>
-                </CardContent>
-             </Card>
+             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {allBrands.map(brand => (
+                <PerfumerCard key={brand.slug} perfumer={brand} />
+              ))}
+            </div>
           </TabsContent>
 
           <TabsContent value="parfums" className="mt-8">

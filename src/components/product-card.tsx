@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Product } from '@/lib/types';
+import { profiles } from '@/data/profiles';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatRupiah, cn } from '@/lib/utils';
-import { Users, Heart } from 'lucide-react';
+import { Users, Heart, BadgeCheck } from 'lucide-react';
 import { useWishlist } from '@/hooks/use-wishlist';
 
 
@@ -19,6 +20,8 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const isSambatan = product.sambatan?.isActive;
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const sellerProfile = profiles.find(p => p.slug === product.perfumerProfileSlug);
+  const isCurated = sellerProfile?.curation?.isCurated;
 
   // Client-side check to avoid hydration mismatch
   const [isClient, setIsClient] = useState(false);
@@ -72,6 +75,12 @@ export function ProductCard({ product }: ProductCardProps) {
               >
                   <Heart className={cn("h-5 w-5 text-muted-foreground", inWishlist && "fill-destructive text-destructive")} />
               </Button>
+            )}
+             {isCurated && (
+              <div className="absolute bottom-2 left-2 flex items-center gap-1.5 rounded-full bg-blue-100/80 px-2 py-1 text-xs font-semibold text-blue-800 backdrop-blur-sm">
+                <BadgeCheck className="h-4 w-4" />
+                Terverifikasi
+              </div>
             )}
           </div>
         </CardHeader>
