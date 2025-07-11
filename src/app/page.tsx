@@ -3,6 +3,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import type { Product } from '@/lib/types';
 import { products as allProducts } from '@/data/products';
 import { AppHeader } from '@/components/header';
