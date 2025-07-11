@@ -83,32 +83,32 @@ export default function ProfilePage() {
                 <p className="text-md text-muted-foreground">{profile.username}</p>
                 <div className="mt-4 flex flex-wrap justify-center gap-4 sm:justify-start">
                   {profile.socials.twitter && (
-                    <a href={profile.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent-foreground">
+                    <a href={profile.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
                       <Twitter className="h-6 w-6" />
                     </a>
                   )}
                   {profile.socials.instagram && (
-                    <a href={profile.socials.instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent-foreground">
+                    <a href={profile.socials.instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
                       <Instagram className="h-6 w-6" />
                     </a>
                   )}
                   {profile.socials.tiktok && (
-                    <a href={profile.socials.tiktok} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent-foreground">
+                    <a href={profile.socials.tiktok} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
                         <TikTokIcon />
                     </a>
                   )}
                   {profile.socials.youtube && (
-                    <a href={profile.socials.youtube} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent-foreground">
+                    <a href={profile.socials.youtube} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
                         <Youtube className="h-6 w-6" />
                     </a>
                   )}
                   {profile.socials.facebook && (
-                    <a href={profile.socials.facebook} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent-foreground">
+                    <a href={profile.socials.facebook} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
                         <Facebook className="h-6 w-6" />
                     </a>
                   )}
                   {profile.socials.website && (
-                    <a href={profile.socials.website} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent-foreground">
+                    <a href={profile.socials.website} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
                       <LinkIcon className="h-6 w-6" />
                     </a>
                   )}
