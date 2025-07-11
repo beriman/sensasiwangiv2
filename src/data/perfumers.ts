@@ -5,6 +5,8 @@ export type PerfumerProfile = {
     bio: string;
     profilePicture?: string;
     imageHint: string;
+    followers: number;
+    following: number;
     socials: {
       twitter?: string;
       instagram?: string;
@@ -23,6 +25,8 @@ export type PerfumerProfile = {
       bio: 'Perfumery enthusiast & scent explorer. Sharing my journey through the world of fragrances. Collector of rare materials. Founder of sensasiwangi.id.',
       profilePicture: 'https://placehold.co/128x128.png',
       imageHint: 'profile picture person',
+      followers: 12500,
+      following: 350,
       socials: {
         twitter: 'https://twitter.com/alexdoe',
         instagram: 'https://instagram.com/alexdoe',
@@ -38,6 +42,8 @@ export type PerfumerProfile = {
         bio: 'French perfumer with 20 years of experience in crafting woody and spicy scents. My creations are a tribute to nature\'s raw elegance.',
         profilePicture: 'https://placehold.co/128x128.png',
         imageHint: 'professional perfumer',
+        followers: 8900,
+        following: 120,
         socials: {
           twitter: 'https://twitter.com/leducparfums',
           website: 'https://leducparfums.com',

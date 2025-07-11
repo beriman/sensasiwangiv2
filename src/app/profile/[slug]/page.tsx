@@ -41,7 +41,12 @@ export default function ProfilePage() {
     if (profile) {
       // In a real app, you would send this data to your backend to save.
       // For this demo, we'll just update the local state.
-      setProfile({ ...profile, ...newProfileData });
+      const updatedProfile = {
+        ...profile,
+        ...newProfileData,
+        // Since followers/following aren't in ProfileData, we keep the existing ones
+      };
+      setProfile(updatedProfile);
     }
     setIsDialogOpen(false);
   };
@@ -81,6 +86,16 @@ export default function ProfilePage() {
               <div className="flex-grow">
                 <h1 className="text-2xl font-bold text-foreground md:text-3xl">{profile.name}</h1>
                 <p className="text-md text-muted-foreground">{profile.username}</p>
+                 <div className="mt-3 flex justify-center gap-4 text-sm sm:justify-start">
+                  <div className="text-foreground/90">
+                    <span className="font-bold">{profile.followers.toLocaleString()}</span>
+                    <span className="text-muted-foreground"> Followers</span>
+                  </div>
+                  <div className="text-foreground/90">
+                    <span className="font-bold">{profile.following.toLocaleString()}</span>
+                    <span className="text-muted-foreground"> Following</span>
+                  </div>
+                </div>
                 <div className="mt-4 flex flex-wrap justify-center gap-4 sm:justify-start">
                   {profile.socials.twitter && (
                     <a href={profile.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">

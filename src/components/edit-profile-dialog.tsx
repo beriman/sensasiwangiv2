@@ -70,10 +70,10 @@ export function EditProfileDialog({ isOpen, onOpenChange, profileData, onSave }:
 
   const onSubmit = (values: z.infer<typeof profileFormSchema>) => {
     onSave({
-      ...profileData,
       name: values.name,
       username: values.username,
       bio: values.bio,
+      profilePicture: profileData.profilePicture, // Keep existing picture
       socials: {
         twitter: values.twitter,
         instagram: values.instagram,
