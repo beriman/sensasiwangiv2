@@ -9,7 +9,7 @@ export interface Post {
 
 export interface Thread {
   id: string;
-  categoryId: 'perfumer-corner' | 'ngobrolin-parfum';
+  categoryId: 'perfumer-corner' | 'ngobrolin-parfum' | 'jurnal-platform' | 'arena-komunitas';
   title: string;
   author: string;
   content: string;
@@ -17,7 +17,7 @@ export interface Thread {
 }
 
 export interface ForumCategory {
-  id: 'perfumer-corner' | 'ngobrolin-parfum';
+  id: 'perfumer-corner' | 'ngobrolin-parfum' | 'jurnal-platform' | 'arena-komunitas';
   name: string;
   description: string;
 }
@@ -32,6 +32,16 @@ export const forumCategories: ForumCategory[] = [
     id: 'ngobrolin-parfum',
     name: 'Ngobrolin Parfum',
     description: 'Share your thoughts, reviews, and experiences with various perfumes.',
+  },
+  {
+    id: 'jurnal-platform',
+    name: 'Jurnal Platform',
+    description: 'Ikuti perkembangan terbaru, pembaruan fitur, dan catatan patch dari tim sensasiwangi.id.',
+  },
+  {
+    id: 'arena-komunitas',
+    name: 'Arena Komunitas',
+    description: 'Informasi tentang acara, gathering, bazaar, dan workshop. Ayo bertemu dan berbagi cerita!',
   },
 ];
 
@@ -84,6 +94,27 @@ const manualThreads: Thread[] = [
     title: 'Alternatif Cendana Favorit',
     author: 'Antoine Leduc',
     content: 'Dengan Cendana Mysore yang begitu berharga, apa alternatif pilihan Anda, baik alami maupun sintetis, yang memberikan profil kayu krem yang serupa?',
+    posts: [],
+  },
+  {
+    id: 'patch-1',
+    categoryId: 'jurnal-platform',
+    title: 'Pembaruan Fitur: Wishlist untuk School & Sistem Umpan Balik!',
+    author: 'Admin',
+    content: 'Halo semua!\n\nKami baru saja meluncurkan beberapa fitur baru berdasarkan masukan Anda:\n\n1. **Wishlist untuk School**: Anda sekarang dapat menambahkan kursus ke wishlist Anda, sama seperti produk!\n2. **Sistem Saran & Kritik**: Kami telah menambahkan fitur umpan balik baru di footer. Masukan Anda akan langsung masuk ke kanban board tim kami.\n\nTerima kasih atas dukungan Anda!',
+    posts: [
+        {
+            author: 'Alex Doe',
+            content: 'Fitur wishlist untuk kursus sangat berguna! Terima kasih!'
+        }
+    ],
+  },
+  {
+    id: 'event-1',
+    categoryId: 'arena-komunitas',
+    title: 'Acara Kumpul Komunitas & Bazaar Parfum Lokal - Jakarta, Agustus 2024',
+    author: 'Admin',
+    content: 'Mari bergabung dengan kami untuk acara kumpul komunitas pertama sensasiwangi.id!\n\n**Tanggal**: 17 Agustus 2024\n**Lokasi**: Community Hall, Senayan\n\nAkan ada bazaar dari para perfumer lokal, sesi sharing, dan tentu saja, banyak aroma untuk dijelajahi. Informasi lebih lanjut dan pendaftaran akan segera diumumkan.',
     posts: [],
   },
 ];
