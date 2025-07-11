@@ -66,14 +66,14 @@ export default function MyProductsPage() {
   const handleFormSave = (data: ProductFormData) => {
     if (editingProduct) {
       // Edit logic
-      setProducts(products.map(p => p.id === editingProduct.id ? { ...p, ...data } : p));
+      setProducts(products.map(p => p.id === editingProduct.id ? { ...p, ...data, imageUrl: data.imageUrl || p.imageUrl } : p));
       toast({ title: "Product Updated", description: `${data.name} has been successfully updated.` });
     } else {
       // Add logic
       const newProduct: Product = {
         id: `prod-${Date.now()}`, // simple unique id
         ...data,
-        imageUrl: 'https://placehold.co/600x600.png', // placeholder image
+        imageUrl: data.imageUrl || 'https://placehold.co/600x600.png',
         imageHint: 'perfume bottle', // default hint
         perfumerProfileSlug: MOCK_PERFUMER_PROFILE_SLUG,
       };
