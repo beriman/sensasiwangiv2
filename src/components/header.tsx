@@ -3,17 +3,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
 
 const navLinks = [
-  { href: '#', label: 'Marketplace' },
+  { href: '/', label: 'Marketplace' },
   { href: '#', label: 'Community' },
   { href: '#', label: 'School' },
   { href: '#', label: 'Database' },
-  { href: '#', label: 'Profile' },
+  { href: '/profile', label: 'Profile' },
 ];
 
 export function AppHeader() {
