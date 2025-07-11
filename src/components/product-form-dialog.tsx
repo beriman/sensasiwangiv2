@@ -1,3 +1,4 @@
+
 // src/components/product-form-dialog.tsx
 'use client';
 
@@ -167,6 +168,14 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         }
     }
   }, [productData, form, isOpen]);
+  
+  // Effect to manage stock and price when isSambatan changes
+  useEffect(() => {
+    if (watchedIsSambatan) {
+      form.setValue('stock', 1);
+    }
+  }, [watchedIsSambatan, form]);
+
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -212,7 +221,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         id: productData?.id || `prod-${Date.now()}`,
         name: values.name,
         description: values.description,
-        price: values.price,
+        price: values.isSambatan ? 0 : values.price, // Set price to 0 if sambatan
         stock: values.stock,
         isListed: values.isListed,
         category: values.category,
@@ -318,7 +327,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     <FormItem>
                         <FormLabel>Price (Rp)</FormLabel>
                         <FormControl>
-                        <Input type="number" placeholder="1200000" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                        <Input type="number" placeholder="1200000" {...field} disabled={watchedIsSambatan} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring disabled:opacity-50" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -331,7 +340,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     <FormItem>
                         <FormLabel>Stock</FormLabel>
                         <FormControl>
-                        <Input type="number" placeholder="10" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                        <Input type="number" placeholder="10" {...field} disabled={watchedIsSambatan} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring disabled:opacity-50" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

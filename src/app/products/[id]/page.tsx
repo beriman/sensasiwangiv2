@@ -1,3 +1,4 @@
+
 // src/app/products/[id]/page.tsx
 'use client';
 
@@ -96,11 +97,21 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
+  // Early exit if product not found or not listed
   if (!product || !product.isListed) {
     notFound();
   }
-  
+
   const isSambatan = product.sambatan?.isActive;
+  
+  // If a Sambatan is active, check if its deadline has passed.
+  if (isSambatan) {
+    const deadline = new Date(product.sambatan.deadline);
+    if (deadline < new Date()) {
+      notFound(); // Treat expired Sambatan as not found
+    }
+  }
+
   const sambatanProgress = isSambatan ? (product.sambatan.currentParticipants / product.sambatan.targetParticipants) * 100 : 0;
   const inWishlist = isClient && isInWishlist(product.id);
 

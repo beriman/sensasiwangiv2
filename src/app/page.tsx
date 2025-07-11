@@ -65,6 +65,14 @@ export default function Home() {
       if (!product.isListed) {
         return false;
       }
+      
+      // If a Sambatan is active, check if its deadline has passed.
+      if (product.sambatan?.isActive) {
+        const deadline = new Date(product.sambatan.deadline);
+        if (deadline < new Date()) {
+          return false; // Automatically unlist expired Sambatan
+        }
+      }
 
       const categoryMatch = category === 'All' || product.category === category;
       
