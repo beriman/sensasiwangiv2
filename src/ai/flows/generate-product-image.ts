@@ -5,9 +5,7 @@
  * This file defines a Genkit flow for generating a product image based on its
  * name and description.
  *
- * @interface GenerateProductImageInput - Defines the input schema for the image generation flow.
- * @interface GenerateProductImageOutput - Defines the output schema for the image generation flow.
- * @function generateProductImage - A wrapper function to trigger the image generation flow.
+ * THIS FEATURE IS DEPRECATED AND SHOULD NOT BE USED.
  */
 
 import { ai } from '@/ai/genkit';
@@ -29,33 +27,6 @@ const GenerateProductImageOutputSchema = z.object({
 export type GenerateProductImageOutput = z.infer<typeof GenerateProductImageOutputSchema>;
 
 export async function generateProductImage(input: GenerateProductImageInput): Promise<GenerateProductImageOutput> {
-    return generateProductImageFlow(input);
+    // This feature is deprecated. Throw an error.
+    throw new Error('AI Image Generation is disabled. Please use the manual upload feature.');
 }
-
-const generateProductImageFlow = ai.defineFlow(
-    {
-      name: 'generateProductImageFlow',
-      inputSchema: GenerateProductImageInputSchema,
-      outputSchema: GenerateProductImageOutputSchema,
-    },
-    async (input) => {
-      const { media } = await ai.generate({
-        model: 'googleai/gemini-2.0-flash-preview-image-generation',
-        prompt: `Generate a professional, high-quality e-commerce product photo for a perfume product named "${input.name}".
-
-        Description: "${input.description}".
-
-        The image should be clean, well-lit, and suitable for a luxury brand's online store. Show the perfume bottle attractively, perhaps with subtle props or background elements that match the scent's description. The bottle should be the main focus.
-        `,
-        config: {
-          responseModalities: ['TEXT', 'IMAGE'],
-        },
-      });
-  
-      if (!media?.url) {
-        throw new Error('Image generation failed to return an image.');
-      }
-  
-      return { imageUrl: media.url };
-    }
-);

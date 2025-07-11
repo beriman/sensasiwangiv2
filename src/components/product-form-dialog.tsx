@@ -1,12 +1,12 @@
 // src/components/product-form-dialog.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -15,13 +15,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, WandSparkles } from 'lucide-react';
+import { Loader2, Upload } from 'lucide-react';
 import type { Product, ProductCategory } from '@/lib/types';
-import { generateProductImage } from '@/ai/flows/generate-product-image';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from './ui/skeleton';
 
@@ -48,7 +47,8 @@ interface ProductFormDialogProps {
 }
 
 export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }: ProductFormDialogProps) {
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [isImageLoading, setIsImageLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
   const form = useForm<ProductFormData>({
@@ -64,8 +64,6 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
   });
 
   const watchedImageUrl = useWatch({ control: form.control, name: 'imageUrl' });
-  const watchedName = useWatch({ control: form.control, name: 'name' });
-  const watchedDescription = useWatch({ control: form.control, name: 'description' });
 
   useEffect(() => {
     if (productData) {
@@ -89,39 +87,39 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
     }
   }, [productData, form, isOpen]);
 
-  const handleGenerateImage = async () => {
-    if (!watchedName || !watchedDescription) {
-      toast({
-        variant: 'destructive',
-        title: 'Missing Information',
-        description: 'Please provide a product name and description before generating an image.',
-      });
-      return;
-    }
-    setIsGeneratingImage(true);
-    try {
-      const result = await generateProductImage({
-        name: watchedName,
-        description: watchedDescription,
-      });
-      if (result.imageUrl) {
-        form.setValue('imageUrl', result.imageUrl, { shouldValidate: true });
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 4 * 1024 * 1024) { // 4MB limit
         toast({
-          title: 'Image Generated!',
-          description: 'A new image for your product has been created.',
+          variant: 'destructive',
+          title: 'File is too large',
+          description: 'Please upload an image smaller than 4MB.',
         });
+        return;
       }
-    } catch (error) {
-      console.error('Image generation failed:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Image Generation Failed',
-        description: 'Could not generate an image. Please try again.',
-      });
-    } finally {
-      setIsGeneratingImage(false);
+      setIsImageLoading(true);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        form.setValue('imageUrl', reader.result as string, { shouldValidate: true });
+        setIsImageLoading(false);
+        toast({
+          title: 'Image Uploaded',
+          description: 'Your new product image has been set.',
+        });
+      };
+      reader.onerror = () => {
+        setIsImageLoading(false);
+        toast({
+          variant: 'destructive',
+          title: 'Error reading file',
+          description: 'Could not read the selected image. Please try again.',
+        });
+      };
+      reader.readAsDataURL(file);
     }
   };
+
 
   const onSubmit = (values: ProductFormData) => {
     onSave(values);
@@ -146,7 +144,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2 max-h-[70vh] overflow-y-auto pr-2">
             <div className="space-y-4">
               <div className="relative mx-auto h-48 w-48 shrink-0">
-                {isGeneratingImage ? (
+                {isImageLoading ? (
                   <Skeleton className="h-full w-full rounded-xl" />
                 ) : (
                   <Image
@@ -157,6 +155,25 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                   />
                 )}
               </div>
+                
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    accept="image/png, image/jpeg, image/webp"
+                />
+                <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full rounded-xl shadow-neumorphic transition-all hover:shadow-neumorphic-active"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isImageLoading}
+                >
+                    <Upload className="mr-2 h-5 w-5" />
+                    Change Image
+                </Button>
+
 
               <FormField
                 control={form.control}
@@ -184,17 +201,6 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                   </FormItem>
                 )}
               />
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full rounded-xl shadow-neumorphic transition-all hover:shadow-neumorphic-active"
-                onClick={handleGenerateImage}
-                disabled={isGeneratingImage}
-              >
-                {isGeneratingImage ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <WandSparkles className="mr-2 h-5 w-5" />}
-                {isGeneratingImage ? 'Generating...' : 'Generate Image with AI'}
-              </Button>
 
               <FormField
                 control={form.control}
@@ -234,7 +240,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
             </div>
             <DialogFooter className="pt-4">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-              <Button type="submit" disabled={form.formState.isSubmitting || isGeneratingImage} className="h-12 rounded-xl bg-accent-gradient px-6 font-bold text-accent-foreground shadow-neumorphic transition-all duration-300 ease-in-out hover:shadow-lg hover:bg-accent-gradient-active">
+              <Button type="submit" disabled={form.formState.isSubmitting || isImageLoading} className="h-12 rounded-xl bg-accent-gradient px-6 font-bold text-accent-foreground shadow-neumorphic transition-all duration-300 ease-in-out hover:shadow-lg hover:bg-accent-gradient-active">
                 {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Save Product
               </Button>
