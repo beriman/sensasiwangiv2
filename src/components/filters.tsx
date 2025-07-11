@@ -39,6 +39,10 @@ export function Filters({ category, products, activeFilters, onFilterChange }: F
           'Tool Type': getUniqueProperties(products, 'Tool Type'),
           'Material': getUniqueProperties(products, 'Material'),
         };
+      case 'Misc':
+        return {
+          'Product Type': getUniqueProperties(products, 'Product Type'),
+        };
       default:
         return {};
     }

@@ -10,7 +10,7 @@ import { Filters } from '@/components/filters';
 import { ProductGrid } from '@/components/product-grid';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Leaf, FlaskConical, Wrench, Search, SlidersHorizontal } from 'lucide-react';
+import { Leaf, FlaskConical, Wrench, Search, SlidersHorizontal, ShoppingBag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -21,6 +21,7 @@ const categories = [
   { name: 'Parfum', icon: Leaf },
   { name: 'Raw Material', icon: FlaskConical },
   { name: 'Tools', icon: Wrench },
+  { name: 'Misc', icon: ShoppingBag },
 ];
 
 export default function Home() {

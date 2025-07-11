@@ -195,6 +195,37 @@ export const products: Product[] = [
     imageHint: 'perfume strips',
     properties: { 'Tool Type': 'Evaluation', 'Material': 'Paper' },
   },
+  // Misc
+  {
+    id: 'm1',
+    name: 'Workshop: Intro to Natural Perfumery',
+    description: 'A 2-day hands-on workshop ticket. Learn the basics of natural perfumery with Antoine Leduc. Limited seats available.',
+    price: 2500000,
+    category: 'Misc',
+    imageUrl: 'https://placehold.co/600x600.png',
+    imageHint: 'workshop class',
+    properties: { 'Product Type': 'Ticket', 'Event Date': '2024-12-15' },
+  },
+  {
+    id: 'm2',
+    name: 'School: Advanced Formulations Module',
+    description: 'Unlock exclusive access to our advanced video module on complex scent formulations. Lifetime access.',
+    price: 1750000,
+    category: 'Misc',
+    imageUrl: 'https://placehold.co/600x600.png',
+    imageHint: 'online course',
+    properties: { 'Product Type': 'Digital Access' },
+  },
+  {
+    id: 'm3',
+    name: 'Premium Member Tier Upgrade',
+    description: 'Upgrade to a Premium Member for one year. Get early access to new products, exclusive discounts, and a special badge on your profile.',
+    price: 500000,
+    category: 'Misc',
+    imageUrl: 'https://placehold.co/600x600.png',
+    imageHint: 'membership card',
+    properties: { 'Product Type': 'Subscription' },
+  },
 ];
 
 export type { Product };

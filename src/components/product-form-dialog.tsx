@@ -30,7 +30,7 @@ import { perfumers } from '@/data/perfumers';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
-const productCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools'];
+const productCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools', 'Misc'];
 
 const productFormSchema = z.object({
   name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
@@ -216,6 +216,8 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
             deadline: values.sambatanDetails.deadline.toISOString(),
             sambatanPrice: values.sambatanDetails.sambatanPrice,
             targetParticipants: values.sambatanDetails.targetParticipants,
+            minOrder: 1, // Default, can be customized later
+            maxOrder: 10, // Default, can be customized later
         } : undefined,
     }
 
