@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { Product } from '@/lib/types';
 import { profiles } from '@/data/profiles';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +20,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
   const isSambatan = product.sambatan?.isActive;
   const { toggleWishlist, isInWishlist } = useWishlist();
   const sellerProfile = profiles.find(p => p.slug === product.perfumerProfileSlug);
@@ -38,8 +40,10 @@ export function ProductCard({ product }: ProductCardProps) {
     toggleWishlist(product);
   }
 
-  const handleSellerClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleSellerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
     e.stopPropagation(); // Prevents the main card link from firing
+    router.push(`/?seller=${sellerProfile?.slug}`);
   }
 
   const priceDisplay = () => {
@@ -95,14 +99,16 @@ export function ProductCard({ product }: ProductCardProps) {
           </Badge>
           <CardTitle className="text-lg font-bold text-foreground/90">{product.name}</CardTitle>
           {sellerProfile && (
-            <Link 
-              href={`/?seller=${sellerProfile.slug}`}
+            <div 
+              role="button"
+              tabIndex={0}
               onClick={handleSellerClick}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSellerClick(e as any); }}
               className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-accent hover:underline"
             >
               <Store className="h-3.5 w-3.5" />
               {sellerProfile.name}
-            </Link>
+            </div>
           )}
           <CardDescription className="mt-2 text-sm text-muted-foreground line-clamp-2">
             {product.description}
@@ -117,4 +123,3 @@ export function ProductCard({ product }: ProductCardProps) {
     </Link>
   );
 }
-
