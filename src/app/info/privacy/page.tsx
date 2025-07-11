@@ -9,39 +9,39 @@ export default function PrivacyPolicyPage() {
       <AppHeader />
       <main className="container mx-auto max-w-4xl px-4 py-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-foreground/90">Privacy Policy</h1>
+          <h1 className="text-4xl font-bold text-foreground/90">Kebijakan Privasi</h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            Last updated: {new Date().toLocaleDateString()}
+            Terakhir diperbarui: {new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
 
         <Card className="mt-10 rounded-2xl border-none bg-transparent p-6 shadow-neumorphic md:p-8">
             <CardContent className="prose prose-lg max-w-none text-foreground/80">
-                <h2>1. Introduction</h2>
-                <p>Welcome to sensasiwangi.id. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
+                <h2>1. Pendahuluan</h2>
+                <p>Selamat datang di sensasiwangi.id. Kami berkomitmen untuk melindungi privasi Anda. Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, mengungkapkan, dan menjaga informasi Anda saat Anda mengunjungi situs web kami.</p>
                 
-                <h2>2. Information We Collect</h2>
-                <p>We may collect information about you in a variety of ways. The information we may collect on the Site includes:</p>
+                <h2>2. Informasi yang Kami Kumpulkan</h2>
+                <p>Kami dapat mengumpulkan informasi tentang Anda dengan berbagai cara. Informasi yang dapat kami kumpulkan di Situs termasuk:</p>
                 <ul>
-                    <li><strong>Personal Data:</strong> Personally identifiable information, such as your name, shipping address, email address, and telephone number, that you voluntarily give to us when you register with the Site or when you choose to participate in various activities related to the Site, such as online chat and message boards.</li>
-                    <li><strong>Derivative Data:</strong> Information our servers automatically collect when you access the Site, such as your IP address, your browser type, your operating system, your access times, and the pages you have viewed directly before and after accessing the Site.</li>
+                    <li><strong>Data Pribadi:</strong> Informasi yang dapat diidentifikasi secara pribadi, seperti nama, alamat pengiriman, alamat email, dan nomor telepon, yang Anda berikan secara sukarela kepada kami saat Anda mendaftar di Situs atau saat Anda memilih untuk berpartisipasi dalam berbagai aktivitas yang terkait dengan Situs, seperti obrolan online dan papan pesan.</li>
+                    <li><strong>Data Turunan:</strong> Informasi yang dikumpulkan server kami secara otomatis saat Anda mengakses Situs, seperti alamat IP Anda, jenis browser Anda, sistem operasi Anda, waktu akses Anda, dan halaman yang telah Anda lihat secara langsung sebelum dan sesudah mengakses Situs.</li>
                 </ul>
 
-                <h2>3. Use of Your Information</h2>
-                <p>Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Site to:</p>
+                <h2>3. Penggunaan Informasi Anda</h2>
+                <p>Memiliki informasi yang akurat tentang Anda memungkinkan kami untuk memberikan Anda pengalaman yang lancar, efisien, dan disesuaikan. Secara khusus, kami dapat menggunakan informasi yang dikumpulkan tentang Anda melalui Situs untuk:</p>
                 <ul>
-                    <li>Create and manage your account.</li>
-                    <li>Process your transactions and send you related information, including purchase confirmations and invoices.</li>
-                    <li>Email you regarding your account or order.</li>
-                    <li>Enable user-to-user communications.</li>
-                    <li>Monitor and analyze usage and trends to improve your experience with the Site.</li>
+                    <li>Membuat dan mengelola akun Anda.</li>
+                    <li>Memproses transaksi Anda dan mengirimi Anda informasi terkait, termasuk konfirmasi pembelian dan faktur.</li>
+                    <li>Mengirimi Anda email mengenai akun atau pesanan Anda.</li>
+                    <li>Memungkinkan komunikasi antar pengguna.</li>
+                    <li>Memantau dan menganalisis penggunaan dan tren untuk meningkatkan pengalaman Anda dengan Situs.</li>
                 </ul>
 
-                <h2>4. Security of Your Information</h2>
-                <p>We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.</p>
+                <h2>4. Keamanan Informasi Anda</h2>
+                <p>Kami menggunakan langkah-langkah keamanan administratif, teknis, dan fisik untuk membantu melindungi informasi pribadi Anda. Meskipun kami telah mengambil langkah-langkah yang wajar untuk mengamankan informasi pribadi yang Anda berikan kepada kami, perlu diketahui bahwa terlepas dari upaya kami, tidak ada langkah-langkah keamanan yang sempurna atau tidak dapat ditembus, dan tidak ada metode transmisi data yang dapat dijamin terhadap penyadapan atau jenis penyalahgunaan lainnya.</p>
                 
-                <h2>5. Contact Us</h2>
-                <p>If you have questions or comments about this Privacy Policy, please contact us at support@sensasiwangi.id.</p>
+                <h2>5. Hubungi Kami</h2>
+                <p>Jika Anda memiliki pertanyaan atau komentar tentang Kebijakan Privasi ini, silakan hubungi kami di support@sensasiwangi.id.</p>
             </CardContent>
         </Card>
       </main>
