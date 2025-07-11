@@ -2,6 +2,7 @@
 // src/app/nusantarum/page.tsx
 'use client';
 
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AppHeader } from '@/components/header';
@@ -11,10 +12,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Users, Bot, Building, BadgeCheck } from 'lucide-react';
+import { ArrowRight, Users, Bot, Building, BadgeCheck, Search } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 
-const uniqueBrands = [...new Set(products.map(p => p.properties.Brand).filter(Boolean))];
 const allParfums = products.filter(p => p.category === 'Parfum');
 const allPerfumers = profiles.filter(p => p.type === 'Perfumer');
 const allBrands = profiles.filter(p => p.type === 'Brand');
@@ -57,6 +58,35 @@ function PerfumerCard({ perfumer }: { perfumer: Profile }) {
 }
 
 export default function NusantarumPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredPerfumers = useMemo(() => {
+    if (!searchTerm) return allPerfumers;
+    const lowercasedTerm = searchTerm.toLowerCase();
+    return allPerfumers.filter(p => 
+      p.name.toLowerCase().includes(lowercasedTerm) ||
+      p.username.toLowerCase().includes(lowercasedTerm)
+    );
+  }, [searchTerm]);
+
+  const filteredBrands = useMemo(() => {
+    if (!searchTerm) return allBrands;
+    const lowercasedTerm = searchTerm.toLowerCase();
+    return allBrands.filter(b => 
+      b.name.toLowerCase().includes(lowercasedTerm) ||
+      b.username.toLowerCase().includes(lowercasedTerm)
+    );
+  }, [searchTerm]);
+
+  const filteredParfums = useMemo(() => {
+    if (!searchTerm) return allParfums;
+    const lowercasedTerm = searchTerm.toLowerCase();
+    return allParfums.filter(p => 
+      p.name.toLowerCase().includes(lowercasedTerm) ||
+      p.properties.Brand?.toLowerCase().includes(lowercasedTerm)
+    );
+  }, [searchTerm]);
+
   return (
     <div className="min-h-screen bg-background font-body">
       <AppHeader />
@@ -66,6 +96,19 @@ export default function NusantarumPage() {
           <p className="mt-2 text-lg text-muted-foreground">
             The Encyclopedia of Scents. Discover perfumers, brands, and perfumes in our database.
           </p>
+        </div>
+
+        <div className="mb-8 mx-auto max-w-lg">
+            <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                    type="search"
+                    placeholder="Search for perfumers, brands, or perfumes..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="h-12 w-full rounded-xl border-none bg-background pl-12 text-base shadow-neumorphic-inset focus:ring-2 focus:ring-ring"
+                />
+            </div>
         </div>
 
         <Tabs defaultValue="perfumers" className="w-full">
@@ -86,18 +129,24 @@ export default function NusantarumPage() {
           
           <TabsContent value="perfumers" className="mt-8">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {allPerfumers.map(perfumer => (
+              {filteredPerfumers.map(perfumer => (
                 <PerfumerCard key={perfumer.slug} perfumer={perfumer} />
               ))}
             </div>
+             {filteredPerfumers.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">No perfumers found.</div>
+             )}
           </TabsContent>
           
           <TabsContent value="brands" className="mt-8">
              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {allBrands.map(brand => (
+              {filteredBrands.map(brand => (
                 <PerfumerCard key={brand.slug} perfumer={brand} />
               ))}
             </div>
+             {filteredBrands.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">No brands found.</div>
+             )}
           </TabsContent>
 
           <TabsContent value="parfums" className="mt-8">
@@ -116,7 +165,7 @@ export default function NusantarumPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {allParfums.map(parfum => (
+                            {filteredParfums.map(parfum => (
                             <TableRow key={parfum.id}>
                                 <TableCell className="font-medium">
                                     <Link href={`/products/${parfum.id}`} className="hover:text-accent hover:underline">
@@ -131,6 +180,9 @@ export default function NusantarumPage() {
                             ))}
                         </TableBody>
                     </Table>
+                    {filteredParfums.length === 0 && (
+                        <div className="text-center py-12 text-muted-foreground">No parfums found.</div>
+                    )}
                 </CardContent>
             </Card>
           </TabsContent>
@@ -139,3 +191,4 @@ export default function NusantarumPage() {
     </div>
   );
 }
+
