@@ -1,3 +1,4 @@
+
 // src/app/products/[id]/page.tsx
 'use client';
 
@@ -61,8 +62,6 @@ export default function ProductDetailPage() {
     );
   };
 
-  const productThreadId = `product-${product.id}`;
-
   return (
     <div className="min-h-screen bg-background font-body">
       <AppHeader />
@@ -114,14 +113,6 @@ export default function ProductDetailPage() {
                 <ShoppingCart className="mr-2 h-6 w-6" />
                 Add to Cart
               </Button>
-              {product.category === 'Parfum' && (
-                <Button asChild size="lg" variant="outline" className="h-14 flex-1 rounded-xl px-8 text-lg shadow-neumorphic transition-all hover:shadow-neumorphic-active">
-                  <Link href={`/community/thread/${productThreadId}`}>
-                    <MessageSquare className="mr-2 h-6 w-6" />
-                    Product Discussion
-                  </Link>
-                </Button>
-              )}
             </div>
           </div>
         </div>
