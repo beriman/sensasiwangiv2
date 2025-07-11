@@ -3,7 +3,7 @@
 
 import { create } from 'zustand';
 import type { CartItem, Product } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 interface CartState {
   items: CartItem[];
@@ -26,7 +26,6 @@ export const useCart = create<CartState>((set, get) => ({
   totalPrice: 0,
   
   addItem: (product) => {
-    const { toast } = useToast();
     const { items } = get();
     const existingItem = items.find((item) => item.id === product.id);
 
