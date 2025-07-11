@@ -31,6 +31,13 @@ export const useCart = create<CartState>((set, get) => ({
 
     let updatedItems;
     if (existingItem) {
+      if (product.category === 'Course') {
+        toast({
+          title: 'Already in Cart',
+          description: `${product.name} is already in your cart.`,
+        });
+        return; // Prevent adding more than one of the same course
+      }
       updatedItems = items.map((item) =>
         item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
       );

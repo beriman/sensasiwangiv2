@@ -1,4 +1,3 @@
-
 // src/data/courses.ts
 
 export type LessonType = 'video' | 'text';
@@ -29,6 +28,7 @@ export interface Course {
   imageUrl: string;
   imageHint: string;
   modules: Module[];
+  price?: number; // Optional price for paid courses
 }
 
 export const courses: Course[] = [
@@ -72,6 +72,7 @@ export const courses: Course[] = [
     longDescription: 'This course is for those who have a solid understanding of the basics and want to push their creative boundaries. We will explore advanced layering, the use of nuanced aroma chemicals, and how to create signature scents that truly stand out.',
     imageUrl: 'https://placehold.co/600x400.png',
     imageHint: 'perfume lab chemistry',
+    price: 1500000,
     modules: [
         {
           id: 'm1',
