@@ -23,6 +23,7 @@ import { Loader2, Upload } from 'lucide-react';
 import type { Product, ProductCategory } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from './ui/skeleton';
+import { perfumers } from '@/data/perfumers';
 
 const productCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools'];
 
@@ -35,6 +36,7 @@ const productFormSchema = z.object({
   }),
   imageUrl: z.string().optional(),
   properties: z.record(z.string()).optional().default({}),
+  perfumerProfileSlug: z.string().optional(),
 }).superRefine((data, ctx) => {
     if (data.category === 'Parfum') {
         if (!data.properties?.Brand) {
@@ -44,11 +46,11 @@ const productFormSchema = z.object({
                 path: ['properties.Brand'],
             });
         }
-        if (!data.properties?.Perfumer) {
+        if (!data.perfumerProfileSlug) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message: 'Perfumer is required for Parfum category.',
-                path: ['properties.Perfumer'],
+                path: ['perfumerProfileSlug'],
             });
         }
     }
@@ -76,7 +78,8 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         price: 0,
         category: 'Parfum',
         imageUrl: '',
-        properties: {}
+        properties: {},
+        perfumerProfileSlug: '',
     }
   });
 
@@ -92,6 +95,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         category: productData.category,
         imageUrl: productData.imageUrl,
         properties: productData.properties,
+        perfumerProfileSlug: productData.perfumerProfileSlug,
       });
     } else {
       form.reset({
@@ -101,6 +105,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         category: 'Parfum',
         imageUrl: '',
         properties: {},
+        perfumerProfileSlug: '',
       });
     }
   }, [productData, form, isOpen]);
@@ -140,6 +145,10 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
 
 
   const onSubmit = (values: ProductFormData) => {
+    const perfumer = perfumers.find(p => p.slug === values.perfumerProfileSlug);
+    if(perfumer) {
+        values.properties.Perfumer = perfumer.name;
+    }
     onSave(values);
   };
   
@@ -272,13 +281,22 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     />
                     <FormField
                         control={form.control}
-                        name="properties.Perfumer"
+                        name="perfumerProfileSlug"
                         render={({ field }) => (
                         <FormItem>
                             <FormLabel>Perfumer</FormLabel>
-                            <FormControl>
-                            <Input placeholder="e.g., Alex Doe" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
-                            </FormControl>
+                             <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring">
+                                    <SelectValue placeholder="Select a perfumer" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {perfumers.map(p => (
+                                    <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                                </Select>
                             <FormMessage />
                         </FormItem>
                         )}

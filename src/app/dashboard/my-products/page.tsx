@@ -75,7 +75,7 @@ export default function MyProductsPage() {
         ...data,
         imageUrl: data.imageUrl || 'https://placehold.co/600x600.png',
         imageHint: 'perfume bottle', // default hint
-        perfumerProfileSlug: MOCK_PERFUMER_PROFILE_SLUG,
+        perfumerProfileSlug: data.perfumerProfileSlug || MOCK_PERFUMER_PROFILE_SLUG,
       };
       setProducts([newProduct, ...products]);
       toast({ title: "Product Added", description: `${data.name} has been successfully added.` });
