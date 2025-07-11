@@ -7,7 +7,7 @@ import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { products } from '@/data/products';
-import { perfumers } from '@/data/perfumers';
+import { profiles } from '@/data/profiles';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -85,7 +85,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const productId = Array.isArray(params.id) ? params.id[0] : params.id;
   const product = products.find((p) => p.id === productId);
-  const seller = perfumers.find(p => p.slug === product?.perfumerProfileSlug);
+  const seller = profiles.find(p => p.slug === product?.perfumerProfileSlug);
   
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product?.variants[0]);
   const { toggleWishlist, isInWishlist } = useWishlist();

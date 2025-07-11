@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { AppHeader } from '@/components/header';
 import { products } from '@/data/products';
-import { perfumers, PerfumerProfile } from '@/data/perfumers';
+import { profiles, Profile } from '@/data/profiles';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -15,8 +15,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const uniqueBrands = [...new Set(products.map(p => p.properties.Brand).filter(Boolean))];
 const allParfums = products.filter(p => p.category === 'Parfum');
+const allPerfumers = profiles.filter(p => p.type === 'Perfumer');
 
-function PerfumerCard({ perfumer }: { perfumer: PerfumerProfile }) {
+function PerfumerCard({ perfumer }: { perfumer: Profile }) {
   return (
     <Card className="flex flex-col rounded-2xl border-none bg-transparent shadow-neumorphic transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg">
       <CardHeader className="flex flex-row items-center gap-4">
@@ -34,7 +35,7 @@ function PerfumerCard({ perfumer }: { perfumer: PerfumerProfile }) {
       </CardContent>
       <div className="flex items-center justify-between p-4">
         <div className="text-sm text-muted-foreground">
-            {perfumer.followers.toLocaleString()} Followers
+            {perfumer.followers?.toLocaleString()} Followers
         </div>
         <Link href={`/profile/${perfumer.slug}`} className="flex items-center text-sm font-semibold text-accent hover:underline">
           View Profile
@@ -75,7 +76,7 @@ export default function NusantarumPage() {
           
           <TabsContent value="perfumers" className="mt-8">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {perfumers.map(perfumer => (
+              {allPerfumers.map(perfumer => (
                 <PerfumerCard key={perfumer.slug} perfumer={perfumer} />
               ))}
             </div>
@@ -90,9 +91,11 @@ export default function NusantarumPage() {
                 <CardContent>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                         {uniqueBrands.map(brand => (
-                            <div key={brand} className="rounded-lg p-4 text-center font-semibold text-foreground/90 shadow-neumorphic-inset">
+                           <Link key={brand} href={`/?brand=${encodeURIComponent(brand)}`} passHref>
+                             <div className="rounded-lg p-4 text-center font-semibold text-foreground/90 shadow-neumorphic-inset transition-all hover:shadow-neumorphic-active hover:text-accent cursor-pointer">
                                 {brand}
                             </div>
+                           </Link>
                         ))}
                     </div>
                 </CardContent>

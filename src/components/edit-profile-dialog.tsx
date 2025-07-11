@@ -17,6 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
+import type { ProfileType } from '@/data/profiles';
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -31,6 +32,7 @@ const profileFormSchema = z.object({
 });
 
 export type ProfileData = {
+  type: ProfileType;
   name: string;
   username: string;
   bio: string;
@@ -49,7 +51,7 @@ interface EditProfileDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   profileData: ProfileData;
-  onSave: (data: ProfileData) => void;
+  onSave: (data: Omit<ProfileData, 'type'>) => void;
 }
 
 export function EditProfileDialog({ isOpen, onOpenChange, profileData, onSave }: EditProfileDialogProps) {

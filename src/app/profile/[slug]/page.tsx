@@ -5,12 +5,13 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, useParams } from 'next/navigation';
-import { perfumers, type PerfumerProfile } from '@/data/perfumers';
+import { profiles, type Profile } from '@/data/profiles';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditProfileDialog, type ProfileData } from '@/components/edit-profile-dialog';
-import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook } from 'lucide-react';
+import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, Badge } from 'lucide-react';
+import { Badge as UiBadge } from '@/components/ui/badge';
 
 const TikTokIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
@@ -24,12 +25,12 @@ export default function ProfilePage() {
   const params = useParams();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   
-  const [profile, setProfile] = useState<PerfumerProfile | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    const foundProfile = perfumers.find((p) => p.slug === slug);
+    const foundProfile = profiles.find((p) => p.slug === slug);
     if (foundProfile) {
       setProfile(foundProfile);
     } else {
@@ -41,7 +42,7 @@ export default function ProfilePage() {
     if (profile) {
       // In a real app, you would send this data to your backend to save.
       // For this demo, we'll just update the local state.
-      const updatedProfile = {
+      const updatedProfile: Profile = {
         ...profile,
         ...newProfileData,
         // Since followers/following aren't in ProfileData, we keep the existing ones
@@ -60,7 +61,7 @@ export default function ProfilePage() {
     );
   }
 
-  // This maps the PerfumerProfile to the ProfileData expected by the dialog
+  // This maps the Profile to the ProfileData expected by the dialog
   const profileDataForDialog: ProfileData = {
     ...profile,
     profilePicture: profile.profilePicture || 'https://placehold.co/128x128.png',
@@ -84,18 +85,23 @@ export default function ProfilePage() {
                 />
               </div>
               <div className="flex-grow">
-                <h1 className="text-2xl font-bold text-foreground md:text-3xl">{profile.name}</h1>
-                <p className="text-md text-muted-foreground">{profile.username}</p>
-                 <div className="mt-3 flex justify-center gap-4 text-sm sm:justify-start">
-                  <div className="text-foreground/90">
-                    <span className="font-bold">{profile.followers.toLocaleString()}</span>
-                    <span className="text-muted-foreground"> Followers</span>
-                  </div>
-                  <div className="text-foreground/90">
-                    <span className="font-bold">{profile.following.toLocaleString()}</span>
-                    <span className="text-muted-foreground"> Following</span>
-                  </div>
+                <div className="flex items-center justify-center sm:justify-start gap-3">
+                    <h1 className="text-2xl font-bold text-foreground md:text-3xl">{profile.name}</h1>
+                    <UiBadge variant="outline">{profile.type}</UiBadge>
                 </div>
+                <p className="text-md text-muted-foreground">{profile.username}</p>
+                 {profile.type === 'Perfumer' && (
+                    <div className="mt-3 flex justify-center gap-4 text-sm sm:justify-start">
+                    <div className="text-foreground/90">
+                        <span className="font-bold">{profile.followers?.toLocaleString()}</span>
+                        <span className="text-muted-foreground"> Followers</span>
+                    </div>
+                    <div className="text-foreground/90">
+                        <span className="font-bold">{profile.following?.toLocaleString()}</span>
+                        <span className="text-muted-foreground"> Following</span>
+                    </div>
+                    </div>
+                 )}
                 <div className="mt-4 flex flex-wrap justify-center gap-4 sm:justify-start">
                   {profile.socials.twitter && (
                     <a href={profile.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
@@ -140,13 +146,15 @@ export default function ProfilePage() {
                     <MessageSquare className="mr-2" /> Message
                 </Link>
               </Button>
-              <Button
-                onClick={() => setIsFollowing(!isFollowing)}
-                className="rounded-xl bg-accent-gradient px-8 py-6 text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
-              >
-                {isFollowing ? <UserCheck className="mr-2" /> : <UserPlus className="mr-2" />}
-                {isFollowing ? 'Following' : 'Follow'}
-              </Button>
+              {profile.type === 'Perfumer' && (
+                <Button
+                    onClick={() => setIsFollowing(!isFollowing)}
+                    className="rounded-xl bg-accent-gradient px-8 py-6 text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
+                >
+                    {isFollowing ? <UserCheck className="mr-2" /> : <UserPlus className="mr-2" />}
+                    {isFollowing ? 'Following' : 'Follow'}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

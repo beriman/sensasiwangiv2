@@ -17,17 +17,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { perfumers } from '@/data/perfumers';
+import { profiles } from '@/data/profiles';
 import { Badge } from '@/components/ui/badge';
 import { MoreHorizontal } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 
 const mockUsers = [
-    ...perfumers.map(p => ({ 
+    ...profiles.map(p => ({ 
         name: p.name, 
         email: `${p.slug}@email.com`,
-        role: 'Perfumer',
+        role: p.type,
         status: 'Active',
         avatar: p.profilePicture,
     })),

@@ -1,5 +1,5 @@
 // src/data/messages.ts
-import { perfumers } from './perfumers';
+import { profiles } from './profiles';
 
 export interface Message {
   authorId: string; // Should match a perfumer's slug

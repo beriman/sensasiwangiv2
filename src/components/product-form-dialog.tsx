@@ -28,7 +28,7 @@ import { Loader2, Upload, CalendarIcon } from 'lucide-react';
 import type { Product, ProductCategory, SambatanDetails, ProductVariant } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from './ui/skeleton';
-import { perfumers } from '@/data/perfumers';
+import { profiles } from '@/data/profiles';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
@@ -209,7 +209,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
 
 
   const onSubmit = (values: z.infer<typeof productFormSchema>) => {
-    const perfumer = perfumers.find(p => p.slug === values.perfumerProfileSlug);
+    const perfumer = profiles.find(p => p.slug === values.perfumerProfileSlug);
     if(perfumer) {
         values.properties.Perfumer = perfumer.name;
     }
@@ -397,7 +397,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    {perfumers.map(p => (
+                                    {profiles.filter(p => p.type === 'Perfumer').map(p => (
                                     <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>
                                     ))}
                                 </SelectContent>

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { getThreadById } from '@/data/forum';
-import { perfumers } from '@/data/perfumers';
+import { profiles } from '@/data/profiles';
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 // Helper to get profile pic, can be expanded later
 const getAuthorProfilePic = (authorName: string) => {
-    const perfumer = perfumers.find(p => p.name === authorName);
+    const perfumer = profiles.find(p => p.name === authorName);
     return perfumer?.profilePicture || 'https://placehold.co/48x48.png';
 }
 

@@ -1,6 +1,6 @@
 // src/data/forum.ts
 import { products } from './products';
-import { perfumers } from './perfumers';
+import { profiles } from './profiles';
 
 export interface Post {
   author: string;
@@ -49,7 +49,7 @@ export const forumCategories: ForumCategory[] = [
 const productThreads: Thread[] = products
   .filter(p => p.category === 'Parfum')
   .map(product => {
-    const perfumer = perfumers.find(perf => perf.slug === product.perfumerProfileSlug);
+    const perfumer = profiles.find(perf => perf.slug === product.perfumerProfileSlug);
     const authorName = perfumer ? perfumer.name : 'System';
 
     return {

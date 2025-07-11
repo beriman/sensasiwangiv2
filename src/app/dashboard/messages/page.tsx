@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { conversations as initialConversations, Message } from '@/data/messages';
-import { perfumers } from '@/data/perfumers';
+import { profiles } from '@/data/profiles';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
@@ -59,7 +59,7 @@ export default function MessagesPage() {
           <ScrollArea className="flex-1">
             <div className="space-y-1 p-2">
               {conversations.map(convo => {
-                const otherParticipant = perfumers.find(p => p.slug === convo.participantId);
+                const otherParticipant = profiles.find(p => p.slug === convo.participantId);
                 const lastMessage = convo.messages[convo.messages.length - 1];
 
                 return (
@@ -94,11 +94,11 @@ export default function MessagesPage() {
             <>
               <div className="flex items-center gap-3 border-b p-4">
                 <Avatar>
-                    <AvatarImage src={perfumers.find(p => p.slug === selectedConversation.participantId)?.profilePicture} />
-                    <AvatarFallback>{perfumers.find(p => p.slug === selectedConversation.participantId)?.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={profiles.find(p => p.slug === selectedConversation.participantId)?.profilePicture} />
+                    <AvatarFallback>{profiles.find(p => p.slug === selectedConversation.participantId)?.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <h3 className="text-lg font-semibold text-foreground/80">
-                  {perfumers.find(p => p.slug === selectedConversation.participantId)?.name}
+                  {profiles.find(p => p.slug === selectedConversation.participantId)?.name}
                 </h3>
               </div>
               <ScrollArea className="flex-1 p-4">

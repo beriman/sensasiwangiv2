@@ -4,7 +4,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { perfumers } from '@/data/perfumers'; // We will show the first perfumer as the default
+import { profiles } from '@/data/profiles'; // We will show the first perfumer as the default
 
 export default function ProfileRedirectPage() {
   const router = useRouter();
@@ -12,8 +12,8 @@ export default function ProfileRedirectPage() {
   useEffect(() => {
     // Redirect to the first perfumer's profile, or a default user profile.
     // In a real app, this would redirect to the logged-in user's profile.
-    if (perfumers.length > 0) {
-      router.replace(`/profile/${perfumers[0].slug}`);
+    if (profiles.length > 0) {
+      router.replace(`/profile/${profiles[0].slug}`);
     } else {
       // Fallback if no perfumers exist
       router.replace('/');

@@ -1,12 +1,17 @@
-export type PerfumerProfile = {
+// src/data/profiles.ts
+
+export type ProfileType = 'Perfumer' | 'Brand' | 'Store';
+
+export interface Profile {
     slug: string;
+    type: ProfileType;
     name: string;
     username: string;
     bio: string;
     profilePicture?: string;
     imageHint: string;
-    followers: number;
-    following: number;
+    followers?: number; // Optional, may not apply to brands
+    following?: number; // Optional, may not apply to brands
     socials: {
       twitter?: string;
       instagram?: string;
@@ -17,9 +22,10 @@ export type PerfumerProfile = {
     };
   };
   
-  export const perfumers: PerfumerProfile[] = [
+  export const profiles: Profile[] = [
     {
       slug: 'alex-doe',
+      type: 'Perfumer',
       name: 'Alex Doe',
       username: '@alexdoe',
       bio: 'Perfumery enthusiast & scent explorer. Sharing my journey through the world of fragrances. Collector of rare materials. Founder of sensasiwangi.id.',
@@ -37,6 +43,7 @@ export type PerfumerProfile = {
     },
     {
         slug: 'antoine-leduc',
+        type: 'Perfumer',
         name: 'Antoine Leduc',
         username: '@perfume_maestro',
         bio: 'French perfumer with 20 years of experience in crafting woody and spicy scents. My creations are a tribute to nature\'s raw elegance.',
@@ -49,6 +56,18 @@ export type PerfumerProfile = {
           website: 'https://leducparfums.com',
           facebook: 'https://www.facebook.com/leducparfums',
         },
+    },
+    {
+      slug: 'maison-de-reve',
+      type: 'Brand',
+      name: 'Maison de Rêve',
+      username: '@maisonderêve',
+      bio: 'Artisanal perfume house from Paris, specializing in high-quality floral fragrances. Each bottle is a dream captured in scent. Founded by Alex Doe.',
+      profilePicture: 'https://placehold.co/128x128.png',
+      imageHint: 'brand logo elegant',
+      socials: {
+        instagram: 'https://instagram.com/maisonderêve',
+        website: 'https://maisonderêve.com',
       },
+    },
   ];
-  
