@@ -3,6 +3,7 @@
 
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { products } from '@/data/products';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -31,8 +32,14 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
         {Object.entries(propertiesToShow).map(([key, value]) => (
             <div key={key}>
-            <p className="font-semibold text-muted-foreground">{key}</p>
-            <p className="text-foreground/90">{value}</p>
+              <p className="font-semibold text-muted-foreground">{key}</p>
+              {key === 'Perfumer' && product.perfumerProfileSlug ? (
+                <Link href={`/profile/${product.perfumerProfileSlug}`} className="text-foreground/90 underline hover:text-accent">
+                  {value}
+                </Link>
+              ) : (
+                <p className="text-foreground/90">{value}</p>
+              )}
             </div>
         ))}
         </div>

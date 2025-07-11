@@ -14,9 +14,10 @@ export const products: Product[] = [
       'Scent Profile': 'Floral', 
       'Concentration': 'EDP',
       'Brand': 'Maison de Rêve',
-      'Perfumer': 'Juliette Dubois',
+      'Perfumer': 'Alex Doe',
       'Variant': '50ml / 100ml'
     },
+    perfumerProfileSlug: 'alex-doe',
   },
   {
     id: 'p2',
@@ -33,6 +34,7 @@ export const products: Product[] = [
       'Perfumer': 'Antoine Leduc',
       'Variant': '75ml'
     },
+    perfumerProfileSlug: 'antoine-leduc',
   },
   {
     id: 'p3',

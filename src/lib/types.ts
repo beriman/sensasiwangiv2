@@ -9,6 +9,7 @@ export interface Product {
   imageUrl: string;
   imageHint: string;
   properties: Record<string, string>;
+  perfumerProfileSlug?: string;
 }
 
 export interface CartItem extends Product {
