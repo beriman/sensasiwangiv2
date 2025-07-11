@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, MessageSquare } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 
@@ -59,6 +59,8 @@ export default function ProductDetailPage() {
         </div>
     );
   };
+
+  const productThreadId = `product-${product.id}`;
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -111,9 +113,14 @@ export default function ProductDetailPage() {
                 <ShoppingCart className="mr-2 h-6 w-6" />
                 Add to Cart
               </Button>
-              <Button size="lg" variant="outline" className="h-14 flex-1 rounded-xl px-8 text-lg shadow-neumorphic transition-all hover:shadow-neumorphic-active">
-                Add to Wishlist
-              </Button>
+              {product.category === 'Parfum' && (
+                <Button asChild size="lg" variant="outline" className="h-14 flex-1 rounded-xl px-8 text-lg shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+                  <Link href={`/community/thread/${productThreadId}`}>
+                    <MessageSquare className="mr-2 h-6 w-6" />
+                    Product Discussion
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>
