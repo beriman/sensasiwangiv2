@@ -53,7 +53,7 @@ const curationScreenerPrompt = ai.definePrompt({
 
 You must evaluate the applicant's statement based on the core principles of artisan perfumery: originality, hands-on creation process (not just re-bottling pre-made oils), thoughtful material selection, and a clear artistic vision.
 
-Based on the following statement, provide an assessment. Distinguish clearly between true artisans who formulate from raw materials and those who might just be using fragrance oils or "bibit parfum".
+Based on the following statement, provide an assessment. Distinguish clearly between true artisans who formulate from raw materials and those who might just be using fragrance oils or "bibit parfum". Look for keywords like "meracik dari bahan baku", "formulasi sendiri", "absolut", "minyak atsiri" as positive indicators. Be skeptical of vague language.
 
 Applicant's Statement:
 {{{statement}}}
