@@ -1,3 +1,4 @@
+
 // src/app/dashboard/orders/page.tsx
 'use client';
 
@@ -21,64 +22,61 @@ import { Badge } from '@/components/ui/badge';
 import { formatRupiah, cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, MoreHorizontal } from 'lucide-react';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { buttonVariants } from '@/components/ui/button';
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+  } from '@/components/ui/dropdown-menu';
 
+
+type OrderStatus = 'Pending' | 'Fulfilled' | 'Disputed';
 
 const initialOrders = [
   {
+    id: '#3210',
+    customer: 'Olivia Martin',
+    status: 'Pending' as OrderStatus,
+    date: '2023-02-01',
+    total: 450000,
+  },
+    {
     id: '#3208',
-    status: 'Pending' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    customer: 'Alex Doe', // This is actually the customer's name
+    status: 'Pending' as OrderStatus,
     date: '2023-01-30',
     total: 1200000,
-    isReported: false,
   },
   {
     id: '#3201',
-    status: 'Fulfilled' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    customer: 'Emma Brown',
+    status: 'Fulfilled' as OrderStatus,
     date: '2023-01-25',
     total: 750000,
-    isReported: false,
+  },
+   {
+    id: '#3204',
+    customer: 'Michael Johnson',
+    status: 'Disputed' as OrderStatus,
+    date: '2023-01-28',
+    total: 250000,
   },
 ];
 
-export default function MyOrdersPage() {
+export default function SellerOrdersPage() {
     const [orders, setOrders] = useState(initialOrders);
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
     const { toast } = useToast();
 
-    const handleReportClick = (orderId: string) => {
-        setSelectedOrderId(orderId);
-        setIsConfirmOpen(true);
-    };
-
-    const handleConfirmReport = () => {
-        if (!selectedOrderId) return;
-        
-        // In a real app, this would also update the admin's view via an API call.
-        // For now, we'll just update our local state to reflect the action.
+    const handleMarkAsFulfilled = (orderId: string) => {
         setOrders(orders.map(order => 
-            order.id === selectedOrderId ? { ...order, isReported: true, status: 'Disputed' } : order
+            order.id === orderId ? { ...order, status: 'Fulfilled' } : order
         ));
-        
         toast({
-            title: "Masalah Dilaporkan",
-            description: `Admin telah diberitahu mengenai masalah dengan pesanan ${selectedOrderId}.`,
+            title: "Order Fulfilled",
+            description: `Order ${orderId} has been marked as fulfilled.`,
         });
-
-        setIsConfirmOpen(false);
-        setSelectedOrderId(null);
     };
 
     const getStatusStyles = (status: string) => {
@@ -86,7 +84,6 @@ export default function MyOrdersPage() {
             case 'Fulfilled': return 'bg-green-100 text-green-800';
             case 'Pending': return 'bg-yellow-100 text-yellow-800';
             case 'Disputed': return 'bg-orange-200 text-orange-800 border-orange-400';
-            case 'Declined': return 'bg-red-100 text-red-800';
             default: return '';
         }
     };
@@ -96,9 +93,9 @@ export default function MyOrdersPage() {
     <>
     <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
       <CardHeader>
-        <CardTitle>My Orders</CardTitle>
+        <CardTitle>Manage Incoming Orders</CardTitle>
         <CardDescription>
-          View your order history and report any issues.
+          Review and process orders for your products.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -106,6 +103,7 @@ export default function MyOrdersPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Order</TableHead>
+              <TableHead>Customer</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Total</TableHead>
@@ -116,6 +114,7 @@ export default function MyOrdersPage() {
             {orders.map((order) => (
               <TableRow key={order.id} className={cn(order.status === 'Disputed' && 'bg-orange-50')}>
                 <TableCell className="font-medium">{order.id}</TableCell>
+                <TableCell>{order.customer}</TableCell>
                 <TableCell>{order.date}</TableCell>
                 <TableCell>
                   <Badge 
@@ -127,19 +126,31 @@ export default function MyOrdersPage() {
                 </TableCell>
                 <TableCell className="text-right">{formatRupiah(order.total)}</TableCell>
                 <TableCell className="text-center">
-                    {order.status !== 'Fulfilled' ? (
-                        <Button 
-                            variant="destructive" 
-                            size="sm"
-                            onClick={() => handleReportClick(order.id)}
-                            disabled={order.isReported}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                        <Button
+                            aria-haspopup="true"
+                            size="icon"
+                            variant="ghost"
+                            disabled={order.status !== 'Pending'}
                         >
-                            <AlertCircle className="mr-2 h-4 w-4" />
-                            {order.isReported ? 'Reported' : 'Report Issue'}
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Toggle menu</span>
                         </Button>
-                    ) : (
-                        <Button variant="ghost" size="sm">View Details</Button>
-                    )}
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem 
+                            onClick={() => handleMarkAsFulfilled(order.id)}
+                            disabled={order.status !== 'Pending'}
+                        >
+                            Mark as Fulfilled
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            Contact Customer
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
@@ -147,23 +158,7 @@ export default function MyOrdersPage() {
         </Table>
       </CardContent>
     </Card>
-
-    <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Laporkan Masalah dengan Pesanan?</AlertDialogTitle>
-                <AlertDialogDescription>
-                    Tindakan ini akan memberi tahu admin bahwa ada masalah dengan pesanan Anda. Admin akan meninjau dan mungkin menghubungi Anda dan penjual untuk mediasi. Lanjutkan?
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-                <AlertDialogCancel>Batal</AlertDialogCancel>
-                <AlertDialogAction onClick={handleConfirmReport} className={buttonVariants({ variant: "destructive" })}>
-                    Ya, Laporkan
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
     </>
   );
 }
+
