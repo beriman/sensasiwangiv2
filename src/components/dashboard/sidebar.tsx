@@ -10,7 +10,7 @@ const navLinks = [
     { href: '/dashboard/my-products', icon: Package, label: 'My Products' },
     { href: '/dashboard/messages', icon: MessageSquare, label: 'Messages' },
     { href: '/dashboard/wishlist', icon: Heart, label: 'Wishlist' },
-    { href: '#', icon: Settings, label: 'Account Settings' },
+    { href: '/dashboard/settings', icon: Settings, label: 'Account Settings' },
 ];
 
 export function DashboardSidebar() {
@@ -24,8 +24,7 @@ export function DashboardSidebar() {
                 href={link.href}
                 className={cn(
                     "flex items-center gap-3 rounded-xl p-3 text-lg font-medium text-foreground/70 transition-colors hover:bg-muted/50",
-                    pathname === link.href && "bg-accent/20 text-accent-foreground",
-                    link.href === '#' && "cursor-not-allowed opacity-50"
+                    pathname === link.href && "bg-accent/20 text-accent-foreground"
                 )}
             >
                 <link.icon className="h-6 w-6" />
