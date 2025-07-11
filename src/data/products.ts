@@ -24,8 +24,8 @@ export const products: Product[] = [
   },
   {
     id: 'p2',
-    name: 'Boisé Mystique (SAMBATAN)',
-    description: 'An enchanting woody scent featuring sandalwood, cedar, and a touch of cardamom. Join our group buy to get it at a special price!',
+    name: 'Boisé Mystique (Bagi Sambatan Vial)',
+    description: 'An enchanting woody scent. Join our group buy to get a vial decant at a special price! The seller will purchase a full bottle and share it into smaller vials.',
     price: 1350000,
     category: 'Parfum',
     imageUrl: 'https://placehold.co/600x600.png',
@@ -40,10 +40,10 @@ export const products: Product[] = [
     perfumerProfileSlug: 'antoine-leduc',
     sambatan: {
       isActive: true,
-      targetParticipants: 20,
+      targetParticipants: 10,
       currentParticipants: 7,
       deadline: oneWeekFromNow.toISOString(),
-      sambatanPrice: 999000,
+      sambatanPrice: 150000,
       minOrder: 1,
       maxOrder: 2,
     }

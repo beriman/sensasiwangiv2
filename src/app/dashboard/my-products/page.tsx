@@ -16,7 +16,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Users } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +34,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { ProductFormDialog, ProductFormData } from '@/components/product-form-dialog';
+import { ProductFormDialog } from '@/components/product-form-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { formatRupiah } from '@/lib/utils';
 
@@ -45,7 +45,7 @@ const MOCK_PERFUMER_PROFILE_SLUG = 'alex-doe';
 
 
 export default function MyProductsPage() {
-  const [products, setProducts] = useState(() => initialProducts.filter(p => p.perfumerProfileSlug === MOCK_USER_ID));
+  const [products, setProducts] = useState(() => initialProducts.filter(p => p.perfumerProfileSlug === MOCK_USER_ID || p.properties.Perfumer === 'Alex Doe'));
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
@@ -63,18 +63,15 @@ export default function MyProductsPage() {
     setIsFormOpen(true);
   }
   
-  const handleFormSave = (data: ProductFormData) => {
+  const handleFormSave = (data: Product) => {
     if (editingProduct) {
       // Edit logic
-      setProducts(products.map(p => p.id === editingProduct.id ? { ...p, ...data, imageUrl: data.imageUrl || p.imageUrl } : p));
+      setProducts(products.map(p => p.id === editingProduct.id ? data : p));
       toast({ title: "Product Updated", description: `${data.name} has been successfully updated.` });
     } else {
       // Add logic
       const newProduct: Product = {
-        id: `prod-${Date.now()}`, // simple unique id
         ...data,
-        imageUrl: data.imageUrl || 'https://placehold.co/600x600.png',
-        imageHint: 'perfume bottle', // default hint
         perfumerProfileSlug: data.perfumerProfileSlug || MOCK_PERFUMER_PROFILE_SLUG,
       };
       setProducts([newProduct, ...products]);
@@ -129,6 +126,7 @@ export default function MyProductsPage() {
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Price</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -150,7 +148,23 @@ export default function MyProductsPage() {
                   <TableCell>
                     <Badge variant="secondary">{product.category}</Badge>
                   </TableCell>
-                  <TableCell className="font-medium text-foreground/80">{formatRupiah(product.price)}</TableCell>
+                  <TableCell className="font-medium text-foreground/80">
+                    {product.sambatan?.isActive ? (
+                        <span className="text-accent">{formatRupiah(product.sambatan.sambatanPrice)}</span>
+                    ) : (
+                        formatRupiah(product.price)
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {product.sambatan?.isActive ? (
+                        <Badge className="bg-accent-gradient text-accent-foreground">
+                            <Users className="mr-1.5 h-3 w-3" />
+                            {product.category === 'Parfum' ? 'Bagi Sambatan' : 'Sambatan'}
+                        </Badge>
+                    ) : (
+                        <Badge variant="outline">Listed</Badge>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
