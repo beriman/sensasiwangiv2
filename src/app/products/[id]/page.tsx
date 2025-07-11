@@ -138,11 +138,18 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
         {Object.entries(propertiesToShow).map(([key, value]) => {
             const Icon = key === 'Scent Profile' ? scentProfileIcons[value] : null;
+            const isPerfumerLink = key === 'Perfumer' && product.perfumerProfileSlug;
+            const isBrandLink = key === 'Brand' && product.category === 'Parfum';
+
             return(
                 <div key={key}>
                   <p className="font-semibold text-muted-foreground">{key}</p>
-                  {key === 'Perfumer' && product.perfumerProfileSlug ? (
+                  {isPerfumerLink ? (
                     <Link href={`/profile/${product.perfumerProfileSlug}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
+                      {value}
+                    </Link>
+                  ) : isBrandLink ? (
+                     <Link href={`/?brand=${encodeURIComponent(value)}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
                       {value}
                     </Link>
                   ) : (
