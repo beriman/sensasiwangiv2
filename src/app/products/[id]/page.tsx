@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus, MessageSquare, Heart } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus, MessageSquare, Heart, PackageCheck, PackageX } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 import { formatRupiah, cn } from '@/lib/utils';
@@ -96,7 +96,7 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
-  if (!product) {
+  if (!product || !product.isListed) {
     notFound();
   }
   
@@ -158,6 +158,17 @@ export default function ProductDetailPage() {
     }
     return <p className="mt-4 text-3xl font-bold text-foreground/80">{formatRupiah(product.price)}</p>
   }
+  
+  const renderStockInfo = () => {
+    if (isSambatan) return null; // Stock info not shown for Sambatan
+    if (product.stock > 10) {
+        return <div className="flex items-center gap-2 text-sm text-green-600"><PackageCheck className="h-4 w-4" /> In Stock</div>
+    }
+    if (product.stock > 0) {
+        return <div className="flex items-center gap-2 text-sm text-yellow-600"><PackageCheck className="h-4 w-4" /> {product.stock} items left</div>
+    }
+    return <div className="flex items-center gap-2 text-sm text-destructive"><PackageX className="h-4 w-4" /> Out of Stock</div>
+  }
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -196,13 +207,16 @@ export default function ProductDetailPage() {
             
             {renderPriceSection()}
             
-            <div className="mt-4 flex items-center gap-2">
-                <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                        <Star key={i} className={`h-5 w-5 ${i < 4 ? 'text-yellow-400' : 'text-muted-foreground/50'}`} fill="currentColor" />
-                    ))}
+            <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`h-5 w-5 ${i < 4 ? 'text-yellow-400' : 'text-muted-foreground/50'}`} fill="currentColor" />
+                        ))}
+                    </div>
+                    <span className="text-sm text-muted-foreground">(123 reviews)</span>
                 </div>
-                <span className="text-sm text-muted-foreground">(123 reviews)</span>
+                {renderStockInfo()}
             </div>
 
             <p className="mt-6 text-base text-foreground/80">{product.description}</p>
@@ -263,9 +277,18 @@ export default function ProductDetailPage() {
                 </>
               ) : (
                 <>
-                  <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => addItem(product)}>
-                      <ShoppingCart className="mr-2 h-6 w-6" />
-                      Add to Cart
+                  <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => addItem(product)} disabled={product.stock === 0}>
+                      {product.stock === 0 ? (
+                        <>
+                           <PackageX className="mr-2 h-6 w-6" />
+                           Out of Stock
+                        </>
+                      ) : (
+                        <>
+                            <ShoppingCart className="mr-2 h-6 w-6" />
+                            Add to Cart
+                        </>
+                      )}
                   </Button>
                   <Button size="lg" variant="outline" className="h-14 w-14 rounded-xl p-0 shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => toggleWishlist(product)}>
                       <Heart className={cn("h-6 w-6", inWishlist && "fill-destructive text-destructive")} />

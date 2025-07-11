@@ -36,6 +36,8 @@ const productFormSchema = z.object({
   name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
   price: z.coerce.number().min(0, { message: 'Price must be a positive number.' }),
+  stock: z.coerce.number().int().min(0, { message: 'Stock must be a non-negative number.' }),
+  isListed: z.boolean().default(true),
   category: z.enum(productCategories, {
     required_error: "You need to select a product category.",
   }),
@@ -105,6 +107,8 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         name: '',
         description: '',
         price: 0,
+        stock: 0,
+        isListed: true,
         category: 'Parfum',
         imageUrl: '',
         properties: {},
@@ -129,6 +133,8 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 name: productData.name,
                 description: productData.description,
                 price: productData.price,
+                stock: productData.stock,
+                isListed: productData.isListed,
                 category: productData.category,
                 imageUrl: productData.imageUrl,
                 properties: productData.properties,
@@ -145,6 +151,8 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 name: '',
                 description: '',
                 price: 0,
+                stock: 0,
+                isListed: true,
                 category: 'Parfum',
                 imageUrl: '',
                 properties: {},
@@ -205,6 +213,8 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         name: values.name,
         description: values.description,
         price: values.price,
+        stock: values.stock,
+        isListed: values.isListed,
         category: values.category,
         imageUrl: values.imageUrl || 'https://placehold.co/600x600.png',
         imageHint: 'perfume bottle', // default hint
@@ -300,19 +310,35 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price (Rp)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="1200000" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Price (Rp)</FormLabel>
+                        <FormControl>
+                        <Input type="number" placeholder="1200000" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="stock"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Stock</FormLabel>
+                        <FormControl>
+                        <Input type="number" placeholder="10" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
                 name="category"
@@ -374,6 +400,27 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     />
                 </>
               )}
+
+                <FormField
+                    control={form.control}
+                    name="isListed"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-neumorphic-inset">
+                        <div className="space-y-0.5">
+                            <FormLabel className="text-base">List Product</FormLabel>
+                            <DialogDescription>
+                                Make this product visible in the marketplace.
+                            </DialogDescription>
+                        </div>
+                        <FormControl>
+                            <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                />
               
                 <FormField
                     control={form.control}

@@ -61,6 +61,11 @@ export default function Home() {
 
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
+      // Only show listed products in the marketplace
+      if (!product.isListed) {
+        return false;
+      }
+
       const categoryMatch = category === 'All' || product.category === category;
       
       const searchTermMatch =
@@ -81,7 +86,7 @@ export default function Home() {
   }, [category, searchTerm, filters]);
   
   const productsForFilter = useMemo(() => {
-    return allProducts.filter(p => category === 'All' || p.category === category);
+    return allProducts.filter(p => (category === 'All' || p.category === category) && p.isListed);
   }, [category]);
 
 

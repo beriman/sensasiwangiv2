@@ -21,6 +21,8 @@ export const products: Product[] = [
       'Variant': '50ml / 100ml'
     },
     perfumerProfileSlug: 'alex-doe',
+    stock: 15,
+    isListed: true,
   },
   {
     id: 'p2',
@@ -38,6 +40,8 @@ export const products: Product[] = [
       'Variant': '75ml'
     },
     perfumerProfileSlug: 'antoine-leduc',
+    stock: 1, // Full bottle
+    isListed: true,
     sambatan: {
       isActive: true,
       targetParticipants: 10,
@@ -63,6 +67,8 @@ export const products: Product[] = [
       'Perfumer': 'Isabelle Martin',
       'Variant': '100ml'
     },
+    stock: 25,
+    isListed: true,
   },
   {
     id: 'p4',
@@ -79,6 +85,8 @@ export const products: Product[] = [
       'Perfumer': 'François Dubois',
       'Variant': '50ml'
     },
+    stock: 0,
+    isListed: true,
   },
   {
     id: 'p5',
@@ -96,6 +104,8 @@ export const products: Product[] = [
       'Variant': '120ml'
     },
     perfumerProfileSlug: 'alex-doe',
+    stock: 30,
+    isListed: false,
   },
   {
     id: 'p6',
@@ -113,6 +123,8 @@ export const products: Product[] = [
       'Variant': '75ml'
     },
     perfumerProfileSlug: 'antoine-leduc',
+    stock: 12,
+    isListed: true,
   },
   // Raw Materials
   {
@@ -124,6 +136,8 @@ export const products: Product[] = [
     imageUrl: 'https://placehold.co/600x600.png',
     imageHint: 'oil bottle',
     properties: { 'Material Type': 'Essential Oil', 'Origin': 'India' },
+    stock: 50,
+    isListed: true,
   },
   {
     id: 'rm2',
@@ -134,6 +148,8 @@ export const products: Product[] = [
     imageUrl: 'https://placehold.co/600x600.png',
     imageHint: 'chemical bottle',
     properties: { 'Material Type': 'Aroma Chemical', 'Origin': 'Synthetic' },
+    stock: 100,
+    isListed: true,
   },
   {
     id: 'rm3',
@@ -144,6 +160,8 @@ export const products: Product[] = [
     imageUrl: 'https://placehold.co/600x600.png',
     imageHint: 'rose oil',
     properties: { 'Material Type': 'Absolute', 'Origin': 'Bulgaria' },
+    stock: 5,
+    isListed: true,
   },
   {
     id: 'rm4',
@@ -154,6 +172,8 @@ export const products: Product[] = [
     imageUrl: 'https://placehold.co/600x600.png',
     imageHint: 'dark oil bottle',
     properties: { 'Material Type': 'Absolute', 'Origin': 'Indonesia' },
+    stock: 1, // Full bottle for sambatan
+    isListed: true,
     sambatan: {
       isActive: true,
       targetParticipants: 15,
@@ -174,6 +194,8 @@ export const products: Product[] = [
     imageUrl: 'https://placehold.co/600x600.png',
     imageHint: 'lab beakers',
     properties: { 'Tool Type': 'Glassware', 'Material': 'Borosilicate Glass' },
+    stock: 40,
+    isListed: true,
   },
   {
     id: 't2',
@@ -184,6 +206,8 @@ export const products: Product[] = [
     imageUrl: 'https://placehold.co/600x600.png',
     imageHint: 'digital scale',
     properties: { 'Tool Type': 'Measurement', 'Material': 'Stainless Steel' },
+    stock: 20,
+    isListed: true,
   },
   {
     id: 't3',
@@ -194,18 +218,10 @@ export const products: Product[] = [
     imageUrl: 'https://placehold.co/600x600.png',
     imageHint: 'perfume strips',
     properties: { 'Tool Type': 'Evaluation', 'Material': 'Paper' },
+    stock: 200,
+    isListed: true,
   },
   // Misc
-  {
-    id: 'm1',
-    name: 'Workshop: Intro to Natural Perfumery',
-    description: 'A 2-day hands-on workshop ticket. Learn the basics of natural perfumery with Antoine Leduc. Limited seats available.',
-    price: 2500000,
-    category: 'Misc',
-    imageUrl: 'https://placehold.co/600x600.png',
-    imageHint: 'workshop class',
-    properties: { 'Product Type': 'Ticket', 'Event Date': '2024-12-15' },
-  },
   {
     id: 'm3',
     name: 'Premium Member Tier Upgrade',
@@ -215,6 +231,8 @@ export const products: Product[] = [
     imageUrl: 'https://placehold.co/600x600.png',
     imageHint: 'membership card',
     properties: { 'Product Type': 'Subscription' },
+    stock: 9999, // Essentially unlimited
+    isListed: true,
   },
 ];
 

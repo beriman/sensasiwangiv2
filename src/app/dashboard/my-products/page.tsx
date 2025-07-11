@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, PlusCircle, Users } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Users, CheckCircle, XCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { ProductFormDialog } from '@/components/product-form-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { formatRupiah } from '@/lib/utils';
+import { formatRupiah, cn } from '@/lib/utils';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 
 
@@ -72,6 +72,7 @@ export default function MyProductsPage() {
       // Add logic
       const newProduct: Product = {
         ...data,
+        id: `prod-${Date.now()}`, // Ensure new products get a unique ID
         perfumerProfileSlug: data.perfumerProfileSlug || MOCK_PERFUMER_PROFILE_SLUG,
       };
       setProducts([newProduct, ...products]);
@@ -120,9 +121,9 @@ export default function MyProductsPage() {
                   Image
                 </TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Stock</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -142,7 +143,22 @@ export default function MyProductsPage() {
                   </TableCell>
                   <TableCell className="font-medium text-foreground/90">{product.name}</TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{product.category}</Badge>
+                    {product.sambatan?.isActive ? (
+                        <Badge className="bg-accent-gradient text-accent-foreground">
+                            <Users className="mr-1.5 h-3 w-3" />
+                            Sambatan
+                        </Badge>
+                    ) : product.isListed ? (
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">
+                           <CheckCircle className="mr-1.5 h-3 w-3" />
+                           Listed
+                        </Badge>
+                    ) : (
+                        <Badge variant="outline">
+                           <XCircle className="mr-1.5 h-3 w-3" />
+                           Unlisted
+                        </Badge>
+                    )}
                   </TableCell>
                   <TableCell className="font-medium text-foreground/80">
                     {product.sambatan?.isActive ? (
@@ -152,13 +168,10 @@ export default function MyProductsPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    {product.sambatan?.isActive ? (
-                        <Badge className="bg-accent-gradient text-accent-foreground">
-                            <Users className="mr-1.5 h-3 w-3" />
-                            {product.category === 'Parfum' ? 'Bagi Sambatan' : 'Sambatan'}
-                        </Badge>
+                    {product.stock > 0 ? (
+                        <span className={cn(product.stock < 5 && "text-destructive font-bold")}>{product.stock}</span>
                     ) : (
-                        <Badge variant="outline">Listed</Badge>
+                        <Badge variant="destructive">Out of Stock</Badge>
                     )}
                   </TableCell>
                   <TableCell>

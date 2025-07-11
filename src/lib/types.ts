@@ -21,6 +21,8 @@ export interface Product {
   properties: Record<string, string>;
   perfumerProfileSlug?: string;
   sambatan?: SambatanDetails;
+  stock: number;
+  isListed: boolean;
 }
 
 export interface CartItem extends Product {
