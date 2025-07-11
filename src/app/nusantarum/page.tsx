@@ -83,7 +83,8 @@ export default function NusantarumPage() {
     const lowercasedTerm = searchTerm.toLowerCase();
     return allParfums.filter(p => 
       p.name.toLowerCase().includes(lowercasedTerm) ||
-      p.properties.Brand?.toLowerCase().includes(lowercasedTerm)
+      (p.properties.Brand || '').toLowerCase().includes(lowercasedTerm) ||
+      (p.properties['Scent Profile'] || '').toLowerCase().includes(lowercasedTerm)
     );
   }, [searchTerm]);
 
@@ -191,4 +192,3 @@ export default function NusantarumPage() {
     </div>
   );
 }
-
