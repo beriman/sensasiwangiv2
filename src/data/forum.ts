@@ -45,20 +45,19 @@ const productThreads: Thread[] = products
     return {
       id: `product-${product.id}`,
       categoryId: 'ngobrolin-parfum',
-      title: product.name,
+      title: `Diskusi: ${product.name}`,
       author: product.properties.Perfumer || 'Anonymous Perfumer',
-      content: `This is the official discussion thread for ${product.name} by ${product.properties.Brand}. Share your thoughts, reviews, and scent experiences below!`,
+      content: `Ini adalah thread diskusi resmi untuk ${product.name} oleh ${product.properties.Brand}. Bagikan pemikiran, ulasan, dan pengalaman aroma Anda di bawah ini!`,
       posts: [
         {
           author: 'Alex Doe',
-          content: `I've just tried this one! The opening is a beautiful blast of jasmine. Has anyone else noticed the subtle green note in the dry-down?
+          content: `Saya baru saja mencoba yang ini! Pembukaannya adalah ledakan melati yang indah. Adakah yang memperhatikan aroma hijau yang halus saat kering?
 
-I found a great review of it here: https://www.youtube.com/watch?v=dQw4w9WgXcQ
-`,
+Saya menemukan ulasan yang bagus di sini: https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
         },
         {
             author: 'Antoine Leduc',
-            content: `As the creator of an adjacent fragrance, I appreciate the complexity here. The balance is exquisite.`,
+            content: `Sebagai pencipta wewangian yang bersebelahan, saya menghargai kompleksitas di sini. Keseimbangannya sangat indah.`,
         }
       ],
     };
@@ -69,22 +68,22 @@ const manualThreads: Thread[] = [
   {
     id: 'tech-1',
     categoryId: 'perfumer-corner',
-    title: 'Tips for working with viscous absolutes?',
+    title: 'Tips untuk bekerja dengan absolut kental?',
     author: 'Alex Doe',
-    content: "I'm having trouble getting my jasmine absolute to a workable viscosity without heating it too much. Any advice on gentle warming techniques or safe solvents to use for dilution? Thanks!",
+    content: "Saya kesulitan mendapatkan absolut melati saya ke viskositas yang bisa diterapkan tanpa memanaskannya terlalu banyak. Ada saran tentang teknik pemanasan lembut atau pelarut aman untuk digunakan untuk pengenceran? Terima kasih!",
     posts: [
       {
         author: 'Antoine Leduc',
-        content: 'A water bath is your best friend here. Very gentle, even heat. I also sometimes pre-dilute my absolutes in perfumer\'s alcohol to create a 10% solution which is much easier to work with.',
+        content: 'Water bath adalah teman terbaik Anda di sini. Panas yang sangat lembut dan merata. Saya juga terkadang mengencerkan absolut saya dalam alkohol parfum untuk membuat larutan 10% yang jauh lebih mudah untuk dikerjakan.',
       },
     ],
   },
   {
     id: 'tech-2',
     categoryId: 'perfumer-corner',
-    title: 'Favorite Sandalwood Alternatives',
+    title: 'Alternatif Cendana Favorit',
     author: 'Antoine Leduc',
-    content: 'With Mysore Sandalwood being so precious, what are your go-to alternatives, both natural and synthetic, that provide a similar creamy, woody profile?',
+    content: 'Dengan Cendana Mysore yang begitu berharga, apa alternatif pilihan Anda, baik alami maupun sintetis, yang memberikan profil kayu krem yang serupa?',
     posts: [],
   },
 ];

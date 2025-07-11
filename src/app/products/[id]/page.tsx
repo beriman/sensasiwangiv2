@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus, MessageSquare } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 import { formatRupiah, cn } from '@/lib/utils';
@@ -260,6 +260,14 @@ export default function ProductDetailPage() {
                 </Button>
               )}
             </div>
+            {!isSambatan && product.category === 'Parfum' && (
+                <Button variant="outline" asChild className="mt-4 h-14 rounded-xl shadow-neumorphic">
+                    <Link href={`/community/thread/product-${product.id}`}>
+                        <MessageSquare className="mr-2 h-5 w-5" />
+                        Product Discussion
+                    </Link>
+                </Button>
+            )}
             {!isSambatan && <Separator className="my-6" />}
           </div>
         </div>
