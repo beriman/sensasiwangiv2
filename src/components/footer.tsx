@@ -14,10 +14,10 @@ const footerLinks = {
     { href: '/community', label: 'Community' },
   ],
   support: [
-    { href: '#', label: 'FAQ' },
-    { href: '#', label: 'Contact Us' },
-    { href: '#', label: 'Privacy Policy' },
-    { href: '#', label: 'Terms of Service' },
+    { href: '/info/faq', label: 'FAQ' },
+    { href: '/info/contact', label: 'Contact Us' },
+    { href: '/info/privacy', label: 'Privacy Policy' },
+    { href: '/info/terms', label: 'Terms of Service' },
   ],
 };
 
