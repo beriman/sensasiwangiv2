@@ -8,6 +8,7 @@ export interface Post {
   author: string;
   content: string;
   timestamp: string;
+  votes: number;
 }
 
 export interface Thread {
@@ -70,11 +71,13 @@ const productThreads: Thread[] = products
 
 Saya menemukan ulasan yang bagus di sini: https://www.youtube.com/watch?v=dQw4w9WgXcQ`,
           timestamp: new Date('2024-05-02T11:30:00Z').toISOString(),
+          votes: 15,
         },
         {
             author: 'Antoine Leduc',
             content: `Sebagai pencipta wewangian yang bersebelahan, saya menghargai kompleksitas di sini. Keseimbangannya sangat indah.`,
             timestamp: new Date('2024-05-03T09:15:00Z').toISOString(),
+            votes: 8,
         }
       ],
     };
@@ -94,6 +97,7 @@ const manualThreads: Thread[] = [
         author: 'Antoine Leduc',
         content: 'Water bath adalah teman terbaik Anda di sini. Panas yang sangat lembut dan merata. Saya juga terkadang mengencerkan absolut saya dalam alkohol parfum untuk membuat larutan 10% yang jauh lebih mudah untuk dikerjakan.',
         timestamp: new Date('2024-05-10T16:20:00Z').toISOString(),
+        votes: 22,
       },
     ],
   },
@@ -118,6 +122,7 @@ const manualThreads: Thread[] = [
             author: 'Alex Doe',
             content: 'Fitur wishlist untuk kursus sangat berguna! Terima kasih!',
             timestamp: new Date('2024-05-20T12:00:00Z').toISOString(),
+            votes: 5,
         }
     ],
   },
