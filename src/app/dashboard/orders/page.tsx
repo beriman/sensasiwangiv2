@@ -30,7 +30,8 @@ import {
     DropdownMenuTrigger,
   } from '@/components/ui/dropdown-menu';
 import { OrderDetailsDialog } from '@/components/dashboard/order-details-dialog';
-import type { Order, OrderStatus } from '@/lib/types';
+import { ShippingInfoDialog } from '@/components/dashboard/shipping-info-dialog';
+import type { Order, OrderStatus, ShippingInfo } from '@/lib/types';
 import { differenceInHours, parseISO } from 'date-fns';
 
 const addDays = (date: Date, days: number): Date => {
@@ -84,7 +85,8 @@ const initialOrders: Order[] = [
     total: 750000,
     items: [
       { id: 't2', name: 'Digital Perfumer\'s Scale', quantity: 1, price: 750000 },
-    ]
+    ],
+    shippingInfo: { provider: 'JNE', trackingNumber: 'JN0012345678', shippedOn: new Date('2023-01-26').toISOString() }
   },
   {
     id: '#3204',
@@ -106,14 +108,14 @@ const initialOrders: Order[] = [
 export default function SellerOrdersPage() {
     const [orders, setOrders] = useState(initialOrders);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [isShippingDialogOpen, setIsShippingDialogOpen] = useState(false);
     const { toast } = useToast();
 
-    const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
+    const handleUpdateStatus = (orderId: string, newStatus: OrderStatus, shippingInfo?: ShippingInfo) => {
         setOrders(orders.map(order => {
             if (order.id === orderId) {
-                const updatedOrder = { ...order, status: newStatus };
+                const updatedOrder = { ...order, status: newStatus, shippingInfo: shippingInfo || order.shippingInfo };
                 if (newStatus === 'Dikirim') {
-                    // Set buyer confirmation deadline, e.g., 7 days from now
                     updatedOrder.buyerConfirmationDeadline = addDays(new Date(), 7).toISOString();
                 }
                 return updatedOrder;
@@ -125,6 +127,19 @@ export default function SellerOrdersPage() {
             description: `Pesanan ${orderId} sekarang berstatus "${newStatus}".`,
         });
     };
+
+    const handleOpenShippingDialog = (order: Order) => {
+        setSelectedOrder(order);
+        setIsShippingDialogOpen(true);
+    }
+    
+    const handleSaveShippingInfo = (shippingInfo: ShippingInfo) => {
+        if (selectedOrder) {
+            handleUpdateStatus(selectedOrder.id, 'Dikirim', shippingInfo);
+        }
+        setIsShippingDialogOpen(false);
+        setSelectedOrder(null);
+    }
 
     const getStatusStyles = (status: OrderStatus) => {
         switch (status) {
@@ -206,7 +221,7 @@ export default function SellerOrdersPage() {
                             View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                            onClick={() => handleUpdateStatus(order.id, 'Dikirim')}
+                            onClick={() => handleOpenShippingDialog(order)}
                             disabled={order.status !== 'Pesanan Diterima'}
                         >
                             Kirim Pesanan
@@ -226,13 +241,23 @@ export default function SellerOrdersPage() {
     
     <OrderDetailsDialog
         order={selectedOrder}
-        isOpen={!!selectedOrder}
+        isOpen={!!selectedOrder && !isShippingDialogOpen}
         onOpenChange={(isOpen) => {
             if (!isOpen) {
                 setSelectedOrder(null);
             }
         }}
-        onUpdateStatus={handleUpdateStatus}
+    />
+
+    <ShippingInfoDialog
+        isOpen={isShippingDialogOpen}
+        onOpenChange={(isOpen) => {
+            setIsShippingDialogOpen(isOpen);
+            if (!isOpen) {
+                setSelectedOrder(null);
+            }
+        }}
+        onSave={handleSaveShippingInfo}
     />
     </>
   );

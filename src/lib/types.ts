@@ -52,6 +52,12 @@ export interface OrderCustomer {
 
 export type OrderStatus = 'Pesanan Diterima' | 'Dikirim' | 'Menunggu Konfirmasi' | 'Selesai' | 'Bermasalah' | 'Dibatalkan';
 
+export interface ShippingInfo {
+    provider: string;
+    trackingNumber: string;
+    shippedOn: string; // ISO 8601
+}
+
 export interface Order {
     id: string;
     customer: OrderCustomer;
@@ -61,4 +67,5 @@ export interface Order {
     total: number;
     items: OrderItem[];
     buyerConfirmationDeadline?: string; // Optional: for buyer confirmation window
+    shippingInfo?: ShippingInfo;
 }

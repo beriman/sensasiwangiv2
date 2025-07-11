@@ -16,15 +16,15 @@ import { formatRupiah, cn } from '@/lib/utils';
 import type { Order, OrderStatus } from '@/lib/types';
 import { ScrollArea } from '../ui/scroll-area';
 import { differenceInHours, parseISO } from 'date-fns';
+import { AlertTriangle, Package, Truck } from 'lucide-react';
 
 interface OrderDetailsDialogProps {
   order: Order | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpdateStatus: (orderId: string, newStatus: OrderStatus) => void;
 }
 
-export function OrderDetailsDialog({ order, isOpen, onOpenChange, onUpdateStatus }: OrderDetailsDialogProps) {
+export function OrderDetailsDialog({ order, isOpen, onOpenChange }: OrderDetailsDialogProps) {
   if (!order) {
     return null;
   }
@@ -47,11 +47,6 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange, onUpdateStatus
     if (hoursLeft < 24) return "text-orange-600 font-semibold";
     return "text-muted-foreground";
   };
-  
-  const handleActionClick = () => {
-    onUpdateStatus(order.id, 'Dikirim');
-    onOpenChange(false);
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -84,11 +79,25 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange, onUpdateStatus
                 </div>
             </div>
 
+            {order.shippingInfo && (
+                <div className="rounded-lg border bg-muted/50 p-4">
+                    <h3 className="font-semibold text-foreground/80 flex items-center gap-2 mb-2"><Truck className="h-5 w-5"/>Info Pengiriman</h3>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                        <p className="text-muted-foreground">Jasa Kirim:</p>
+                        <p className="font-medium text-foreground/90">{order.shippingInfo.provider}</p>
+                        <p className="text-muted-foreground">Nomor Resi:</p>
+                        <p className="font-medium text-foreground/90">{order.shippingInfo.trackingNumber}</p>
+                         <p className="text-muted-foreground">Dikirim Pada:</p>
+                        <p className="font-medium text-foreground/90">{new Date(order.shippingInfo.shippedOn).toLocaleDateString()}</p>
+                    </div>
+                </div>
+            )}
+
             <Separator />
 
             {/* Order Items */}
             <div>
-                <h3 className="font-semibold text-foreground/70 mb-2">Produk Dipesan</h3>
+                <h3 className="font-semibold text-foreground/70 mb-2 flex items-center gap-2"><Package className="h-5 w-5" />Produk Dipesan</h3>
                 <div className="space-y-3">
                     {order.items.map((item, index) => (
                         <div key={index} className="flex justify-between items-center text-sm">
@@ -119,18 +128,20 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange, onUpdateStatus
                     <p>{formatRupiah(order.total + 25000)}</p>
                 </div>
             </div>
+            {order.status === 'Bermasalah' && (
+                <div className="flex items-start gap-3 rounded-lg border border-orange-400 bg-orange-50 p-3 text-sm text-orange-800">
+                    <AlertTriangle className="h-5 w-5 mt-0.5"/>
+                    <div className="flex-1">
+                        <p className="font-semibold">Pesanan ini sedang dalam sengketa.</p>
+                        <p>Silakan berkomunikasi dengan pembeli untuk menyelesaikan masalah atau hubungi admin untuk mediasi.</p>
+                    </div>
+                </div>
+            )}
             </div>
         </ScrollArea>
 
         <DialogFooter className="pt-6">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Tutup</Button>
-          <Button 
-            onClick={handleActionClick}
-            disabled={order.status !== 'Pesanan Diterima'}
-            className="bg-accent-gradient text-accent-foreground shadow-neumorphic"
-          >
-            Tandai sebagai Telah Dikirim
-          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
