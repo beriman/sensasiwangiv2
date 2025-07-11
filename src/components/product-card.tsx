@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatRupiah, cn } from '@/lib/utils';
-import { Users, Heart, BadgeCheck } from 'lucide-react';
+import { Users, Heart, BadgeCheck, Store } from 'lucide-react';
 import { useWishlist } from '@/hooks/use-wishlist';
 
 
@@ -35,6 +36,10 @@ export function ProductCard({ product }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     toggleWishlist(product);
+  }
+
+  const handleSellerClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.stopPropagation(); // Prevents the main card link from firing
   }
 
   const priceDisplay = () => {
@@ -89,11 +94,21 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.category}
           </Badge>
           <CardTitle className="text-lg font-bold text-foreground/90">{product.name}</CardTitle>
-          <CardDescription className="mt-1 text-sm text-muted-foreground line-clamp-2">
+          {sellerProfile && (
+            <Link 
+              href={`/?seller=${sellerProfile.slug}`}
+              onClick={handleSellerClick}
+              className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-accent hover:underline"
+            >
+              <Store className="h-3.5 w-3.5" />
+              {sellerProfile.name}
+            </Link>
+          )}
+          <CardDescription className="mt-2 text-sm text-muted-foreground line-clamp-2">
             {product.description}
           </CardDescription>
         </CardContent>
-        <CardFooter className="p-4 pt-0">
+        <CardFooter className="flex items-center justify-between p-4 pt-0">
           <p className={cn("text-lg font-bold", isSambatan ? "text-accent" : "text-foreground/80")}>
             {priceDisplay()}
           </p>
@@ -102,3 +117,4 @@ export function ProductCard({ product }: ProductCardProps) {
     </Link>
   );
 }
+
