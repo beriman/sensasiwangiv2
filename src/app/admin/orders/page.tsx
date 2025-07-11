@@ -117,6 +117,15 @@ export default function AdminOrdersPage() {
             default: return '';
         }
     };
+    
+    const getDescriptiveStatus = (status: OrderStatus) => {
+        switch (status) {
+            case 'Pesanan Diterima': return 'Diterima oleh Penjual';
+            case 'Dikirim': return 'Dikirim oleh Penjual';
+            case 'Selesai': return 'Pesanan Selesai';
+            default: return status;
+        }
+    }
 
 
   return (
@@ -153,7 +162,7 @@ export default function AdminOrdersPage() {
                   <Badge 
                     className={cn("font-semibold", getStatusStyles(order.status))}
                   >
-                    {order.status}
+                    {getDescriptiveStatus(order.status)}
                   </Badge>
                 </TableCell>
                 <TableCell>{order.date}</TableCell>

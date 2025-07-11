@@ -1,4 +1,3 @@
-
 // src/app/dashboard/purchases/page.tsx
 'use client';
 
@@ -106,6 +105,15 @@ export default function MyPurchasesPage() {
             default: return 'bg-muted text-muted-foreground';
         }
     };
+    
+    const getDescriptiveStatus = (status: OrderStatus) => {
+        switch (status) {
+            case 'Pesanan Diterima': return 'Diterima oleh Penjual';
+            case 'Dikirim': return 'Menunggu Konfirmasi Anda';
+            case 'Selesai': return 'Pesanan Selesai';
+            default: return status;
+        }
+    }
 
   return (
     <>
@@ -136,7 +144,7 @@ export default function MyPurchasesPage() {
                   <Badge 
                     className={cn("font-semibold", getStatusStyles(order.status))}
                   >
-                    {order.status}
+                    {getDescriptiveStatus(order.status)}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">{formatRupiah(order.total)}</TableCell>

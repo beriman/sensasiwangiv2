@@ -1,4 +1,3 @@
-
 // src/app/dashboard/orders/page.tsx
 'use client';
 
@@ -126,6 +125,15 @@ export default function MyOrdersPage() {
             default: return 'bg-muted text-muted-foreground';
         }
     };
+
+    const getDescriptiveStatus = (status: OrderStatus) => {
+        switch (status) {
+            case 'Pesanan Diterima': return 'Diterima oleh Penjual';
+            case 'Dikirim': return 'Dikirim oleh Penjual';
+            case 'Selesai': return 'Pesanan Selesai';
+            default: return status;
+        }
+    }
     
     const getDeadlineStyles = (deadline: string) => {
         const hoursLeft = differenceInHours(parseISO(deadline), new Date());
@@ -170,7 +178,7 @@ export default function MyOrdersPage() {
                   <Badge 
                     className={cn("font-semibold", getStatusStyles(order.status))}
                   >
-                    {order.status}
+                    {getDescriptiveStatus(order.status)}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">{formatRupiah(order.total)}</TableCell>

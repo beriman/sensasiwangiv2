@@ -1,4 +1,3 @@
-
 // src/components/dashboard/order-details-dialog.tsx
 'use client';
 
@@ -45,6 +44,15 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange, onConfirmDeliv
     }
   };
 
+  const getDescriptiveStatus = (status: OrderStatus, forSeller: boolean) => {
+    switch (status) {
+        case 'Pesanan Diterima': return 'Diterima oleh Penjual';
+        case 'Dikirim': return forSeller ? 'Dikirim oleh Penjual' : 'Menunggu Konfirmasi Anda';
+        case 'Selesai': return 'Pesanan Selesai';
+        default: return status;
+    }
+  }
+
   const getDeadlineStyles = (deadline: string) => {
     const hoursLeft = differenceInHours(parseISO(deadline), new Date());
     if (hoursLeft < 0) return "text-destructive font-bold";
@@ -77,7 +85,9 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange, onConfirmDeliv
                 </div>
                 <div className="text-right">
                     <h3 className="font-semibold text-foreground/70">Status</h3>
-                    <Badge className={cn("mt-1 font-semibold", getStatusStyles(order.status))}>{order.status}</Badge>
+                    <Badge className={cn("mt-1 font-semibold", getStatusStyles(order.status))}>
+                        {getDescriptiveStatus(order.status, isSellerView)}
+                    </Badge>
                     
                     {isSellerView && (
                         <>
