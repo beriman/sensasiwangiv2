@@ -1,3 +1,4 @@
+
 // src/app/dashboard/my-products/page.tsx
 'use client';
 
@@ -5,7 +6,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { AppHeader } from '@/components/header';
 import { products as initialProducts, Product } from '@/data/products';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Table,
   TableBody,
