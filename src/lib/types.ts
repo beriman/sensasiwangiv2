@@ -6,6 +6,8 @@ export interface SambatanDetails {
   currentParticipants: number;
   deadline: string; // ISO 8601 date string
   sambatanPrice: number;
+  minOrder: number;
+  maxOrder: number;
 }
 
 export interface Product {

@@ -8,11 +8,12 @@ import Link from 'next/link';
 import { products } from '@/data/products';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, MessageSquare, Users, Clock } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 import { formatRupiah, cn } from '@/lib/utils';
@@ -79,6 +80,14 @@ export default function ProductDetailPage() {
   const params = useParams();
   const productId = Array.isArray(params.id) ? params.id[0] : params.id;
   const product = products.find((p) => p.id === productId);
+  
+  const [slotQuantity, setSlotQuantity] = useState(1);
+  
+  useEffect(() => {
+    if (product?.sambatan) {
+      setSlotQuantity(product.sambatan.minOrder);
+    }
+  }, [product]);
 
   if (!product) {
     notFound();
@@ -90,9 +99,18 @@ export default function ProductDetailPage() {
   const handleJoinSambatan = () => {
     toast({
         title: "Bergabung dengan Sambatan!",
-        description: "Fitur pembayaran akan segera hadir. Anda telah dicatat sebagai peminat."
+        description: `Anda telah dicatat sebagai peminat untuk ${slotQuantity} slot. Fitur pembayaran akan segera hadir.`
     })
   }
+  
+  const handleSlotChange = (change: number) => {
+    if (!isSambatan) return;
+    const newQuantity = slotQuantity + change;
+    if (newQuantity >= product.sambatan.minOrder && newQuantity <= product.sambatan.maxOrder) {
+      setSlotQuantity(newQuantity);
+    }
+  }
+
 
   const renderProductProperties = () => {
     const propertiesToShow = { ...product.properties };
@@ -126,7 +144,7 @@ export default function ProductDetailPage() {
       return (
         <div className="mt-4">
             <span className="text-xl text-muted-foreground line-through">{formatRupiah(product.price)}</span>
-            <p className="text-3xl font-bold text-accent">{formatRupiah(product.sambatan.sambatanPrice)}</p>
+            <p className="text-3xl font-bold text-accent">{formatRupiah(product.sambatan.sambatanPrice)} <span className="text-lg font-normal text-muted-foreground">/ slot</span></p>
             <Badge variant="secondary" className="mt-2 bg-accent/20 text-accent">Harga Sambatan</Badge>
         </div>
       )
@@ -199,6 +217,10 @@ export default function ProductDetailPage() {
                             <span className="font-semibold text-muted-foreground">Batas Waktu:</span>
                             <CountdownTimer deadline={product.sambatan.deadline} />
                         </div>
+                        <div className="flex items-center justify-between text-sm">
+                            <span className="font-semibold text-muted-foreground">Order per Pembeli:</span>
+                            <span className="text-foreground/90">{product.sambatan.minOrder} - {product.sambatan.maxOrder} slot</span>
+                        </div>
                     </div>
                 </Card>
             ) : (
@@ -212,10 +234,26 @@ export default function ProductDetailPage() {
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               {isSambatan ? (
-                 <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={handleJoinSambatan}>
-                    <Users className="mr-2 h-6 w-6" />
-                    Gabung Sambatan
-                </Button>
+                <>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="icon" className="h-14 w-14 rounded-xl shadow-neumorphic" onClick={() => handleSlotChange(-1)}>
+                            <Minus />
+                        </Button>
+                        <Input
+                            type="number"
+                            readOnly
+                            value={slotQuantity}
+                            className="h-14 w-20 rounded-xl border-none bg-background text-center text-lg font-bold shadow-neumorphic-inset"
+                        />
+                         <Button variant="outline" size="icon" className="h-14 w-14 rounded-xl shadow-neumorphic" onClick={() => handleSlotChange(1)}>
+                            <Plus />
+                        </Button>
+                    </div>
+                    <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={handleJoinSambatan}>
+                        <Users className="mr-2 h-6 w-6" />
+                        Gabung Sambatan
+                    </Button>
+                </>
               ) : (
                 <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => addItem(product)}>
                     <ShoppingCart className="mr-2 h-6 w-6" />

@@ -43,7 +43,9 @@ export const products: Product[] = [
       targetParticipants: 20,
       currentParticipants: 7,
       deadline: oneWeekFromNow.toISOString(),
-      sambatanPrice: 999000
+      sambatanPrice: 999000,
+      minOrder: 1,
+      maxOrder: 2,
     }
   },
   {
@@ -157,7 +159,9 @@ export const products: Product[] = [
       targetParticipants: 15,
       currentParticipants: 4,
       deadline: oneWeekFromNow.toISOString(),
-      sambatanPrice: 3250000
+      sambatanPrice: 3250000,
+      minOrder: 1,
+      maxOrder: 1,
     }
   },
   // Tools
