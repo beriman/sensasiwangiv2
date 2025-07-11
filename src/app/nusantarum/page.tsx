@@ -1,0 +1,140 @@
+// src/app/nusantarum/page.tsx
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { AppHeader } from '@/components/header';
+import { products } from '@/data/products';
+import { perfumers, PerfumerProfile } from '@/data/perfumers';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { ArrowRight, Users, Bot, Building } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+const uniqueBrands = [...new Set(products.map(p => p.properties.Brand).filter(Boolean))];
+const allParfums = products.filter(p => p.category === 'Parfum');
+
+function PerfumerCard({ perfumer }: { perfumer: PerfumerProfile }) {
+  return (
+    <Card className="flex flex-col rounded-2xl border-none bg-transparent shadow-neumorphic transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg">
+      <CardHeader className="flex flex-row items-center gap-4">
+        <Avatar className="h-16 w-16">
+          <AvatarImage src={perfumer.profilePicture} alt={perfumer.name} data-ai-hint={perfumer.imageHint}/>
+          <AvatarFallback>{perfumer.name.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <div>
+          <CardTitle className="text-xl font-bold text-foreground/80">{perfumer.name}</CardTitle>
+          <CardDescription>{perfumer.username}</CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent className="flex-grow">
+        <p className="text-muted-foreground line-clamp-3">{perfumer.bio}</p>
+      </CardContent>
+      <div className="flex items-center justify-between p-4">
+        <div className="text-sm text-muted-foreground">
+            {perfumer.followers.toLocaleString()} Followers
+        </div>
+        <Link href={`/profile/${perfumer.slug}`} className="flex items-center text-sm font-semibold text-accent hover:underline">
+          View Profile
+          <ArrowRight className="ml-1 h-4 w-4" />
+        </Link>
+      </div>
+    </Card>
+  );
+}
+
+export default function NusantarumPage() {
+  return (
+    <div className="min-h-screen bg-background font-body">
+      <AppHeader />
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-foreground/90">Nusantarum</h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            The Encyclopedia of Scents. Discover perfumers, brands, and perfumes in our database.
+          </p>
+        </div>
+
+        <Tabs defaultValue="perfumers" className="w-full">
+          <TabsList className="mx-auto grid w-full max-w-md grid-cols-3 rounded-xl bg-transparent p-1 shadow-neumorphic-inset">
+            <TabsTrigger value="perfumers" className="h-full rounded-lg text-foreground/70 transition-all duration-300 data-[state=active]:bg-accent-gradient data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active">
+                <Users className="mr-2 h-5 w-5" />
+                Perfumers
+            </TabsTrigger>
+            <TabsTrigger value="brands" className="h-full rounded-lg text-foreground/70 transition-all duration-300 data-[state=active]:bg-accent-gradient data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active">
+                <Building className="mr-2 h-5 w-5" />
+                Brands
+            </TabsTrigger>
+            <TabsTrigger value="parfums" className="h-full rounded-lg text-foreground/70 transition-all duration-300 data-[state=active]:bg-accent-gradient data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active">
+                <Bot className="mr-2 h-5 w-5" />
+                Parfums
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="perfumers" className="mt-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {perfumers.map(perfumer => (
+                <PerfumerCard key={perfumer.slug} perfumer={perfumer} />
+              ))}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="brands" className="mt-8">
+             <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
+                <CardHeader>
+                    <CardTitle className="text-xl font-bold text-foreground/80">All Brands</CardTitle>
+                    <CardDescription>A list of all brands available on the platform.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                        {uniqueBrands.map(brand => (
+                            <div key={brand} className="rounded-lg p-4 text-center font-semibold text-foreground/90 shadow-neumorphic-inset">
+                                {brand}
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+             </Card>
+          </TabsContent>
+
+          <TabsContent value="parfums" className="mt-8">
+            <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
+                <CardHeader>
+                    <CardTitle className="text-xl font-bold text-foreground/80">All Parfums</CardTitle>
+                    <CardDescription>A complete list of all perfumes in our database.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                            <TableHead>Perfume</TableHead>
+                            <TableHead>Brand</TableHead>
+                            <TableHead>Scent Profile</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {allParfums.map(parfum => (
+                            <TableRow key={parfum.id}>
+                                <TableCell className="font-medium">
+                                    <Link href={`/products/${parfum.id}`} className="hover:text-accent hover:underline">
+                                        {parfum.name}
+                                    </Link>
+                                </TableCell>
+                                <TableCell>{parfum.properties.Brand}</TableCell>
+                                <TableCell>
+                                    <Badge variant="secondary">{parfum.properties['Scent Profile']}</Badge>
+                                </TableCell>
+                            </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </main>
+    </div>
+  );
+}

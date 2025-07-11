@@ -23,6 +23,7 @@ const navLinks = [
   { href: '/', label: 'Marketplace' },
   { href: '/school', label: 'School' },
   { href: '/community', label: 'Community' },
+  { href: '/nusantarum', label: 'Nusantarum' },
 ];
 
 export function AppHeader() {
