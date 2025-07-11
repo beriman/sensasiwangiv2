@@ -143,6 +143,23 @@ export const products: Product[] = [
     imageHint: 'rose oil',
     properties: { 'Material Type': 'Absolute', 'Origin': 'Bulgaria' },
   },
+  {
+    id: 'rm4',
+    name: 'Oud Absolute (SAMBATAN)',
+    description: 'Extremely rare and potent Oud Absolute from the forests of Borneo. Join the sambatan to acquire this precious material at an accessible price point.',
+    price: 4500000,
+    category: 'Raw Material',
+    imageUrl: 'https://placehold.co/600x600.png',
+    imageHint: 'dark oil bottle',
+    properties: { 'Material Type': 'Absolute', 'Origin': 'Indonesia' },
+    sambatan: {
+      isActive: true,
+      targetParticipants: 15,
+      currentParticipants: 4,
+      deadline: oneWeekFromNow.toISOString(),
+      sambatanPrice: 3250000
+    }
+  },
   // Tools
   {
     id: 't1',
