@@ -10,17 +10,19 @@ import { products } from '@/data/products';
 import { perfumers } from '@/data/perfumers';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus, MessageSquare, Heart, PackageCheck, PackageX, Store } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, MessageSquare, Heart, PackageCheck, PackageX, Store } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 import { formatRupiah, cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useWishlist } from '@/hooks/use-wishlist';
+import type { ProductVariant } from '@/lib/types';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 const scentProfileIcons: { [key: string]: React.ElementType } = {
   Floral: Leaf,
@@ -85,7 +87,7 @@ export default function ProductDetailPage() {
   const product = products.find((p) => p.id === productId);
   const seller = perfumers.find(p => p.slug === product?.perfumerProfileSlug);
   
-  const [slotQuantity, setSlotQuantity] = useState(1);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product?.variants[0]);
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   const [isClient, setIsClient] = useState(false);
@@ -94,48 +96,44 @@ export default function ProductDetailPage() {
   }, []);
 
   useEffect(() => {
-    if (product?.sambatan) {
-      setSlotQuantity(product.sambatan.minOrder);
+    // Ensure a default variant is selected when the product loads
+    if (product && !selectedVariant) {
+      setSelectedVariant(product.variants[0]);
     }
-  }, [product]);
+  }, [product, selectedVariant]);
 
-  // Early exit if product not found or not listed
+
   if (!product || !product.isListed) {
     notFound();
   }
 
   const isSambatan = product.sambatan?.isActive;
   
-  // If a Sambatan is active, check if its deadline has passed.
   if (isSambatan) {
     const deadline = new Date(product.sambatan.deadline);
     if (deadline < new Date()) {
-      notFound(); // Treat expired Sambatan as not found
+      notFound();
     }
   }
+  
+  const handleAddToCart = () => {
+    if (product && selectedVariant) {
+      addItem(product, selectedVariant);
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Please select a variant before adding to cart.',
+      });
+    }
+  };
+
 
   const sambatanProgress = isSambatan ? (product.sambatan.currentParticipants / product.sambatan.targetParticipants) * 100 : 0;
   const inWishlist = isClient && isInWishlist(product.id);
 
-  const handleJoinSambatan = () => {
-    toast({
-        title: "Bergabung dengan Sambatan!",
-        description: `Anda telah dicatat sebagai peminat untuk ${slotQuantity} slot. Fitur pembayaran akan segera hadir.`
-    })
-  }
-  
-  const handleSlotChange = (change: number) => {
-    if (!isSambatan) return;
-    const newQuantity = slotQuantity + change;
-    if (newQuantity >= product.sambatan.minOrder && newQuantity <= product.sambatan.maxOrder) {
-      setSlotQuantity(newQuantity);
-    }
-  }
-
-
   const renderProductProperties = () => {
     const propertiesToShow = { ...product.properties };
-
     return (
         <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
         {Object.entries(propertiesToShow).map(([key, value]) => {
@@ -146,7 +144,7 @@ export default function ProductDetailPage() {
                 <div key={key}>
                   <p className="font-semibold text-muted-foreground">{key}</p>
                   {isPerfumerLink ? (
-                    <Link href={`/profile/${product.perfumerProfileSlug}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
+                    <Link href={`/?seller=${product.perfumerProfileSlug}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
                       {value}
                     </Link>
                   ) : (
@@ -171,18 +169,52 @@ export default function ProductDetailPage() {
         </div>
       )
     }
-    return <p className="mt-4 text-3xl font-bold text-foreground/80">{formatRupiah(product.price)}</p>
+    return <p className="mt-4 text-3xl font-bold text-foreground/80">{formatRupiah(selectedVariant?.price ?? 0)}</p>
   }
   
   const renderStockInfo = () => {
     if (isSambatan) return null; // Stock info not shown for Sambatan
-    if (product.stock > 10) {
+    const stock = selectedVariant?.stock ?? 0;
+    if (stock > 10) {
         return <div className="flex items-center gap-2 text-sm text-green-600"><PackageCheck className="h-4 w-4" /> In Stock</div>
     }
-    if (product.stock > 0) {
-        return <div className="flex items-center gap-2 text-sm text-yellow-600"><PackageCheck className="h-4 w-4" /> {product.stock} items left</div>
+    if (stock > 0) {
+        return <div className="flex items-center gap-2 text-sm text-yellow-600"><PackageCheck className="h-4 w-4" /> {stock} items left</div>
     }
     return <div className="flex items-center gap-2 text-sm text-destructive"><PackageX className="h-4 w-4" /> Out of Stock</div>
+  }
+
+  const renderVariantSelector = () => {
+    if (isSambatan || product.variants.length <= 1) return null;
+
+    return (
+      <div className="mt-6">
+        <h3 className="text-base font-semibold text-foreground/80">Select Variant:</h3>
+        <RadioGroup
+          value={selectedVariant?.id}
+          onValueChange={(variantId) => {
+            setSelectedVariant(product.variants.find(v => v.id === variantId));
+          }}
+          className="mt-2 flex flex-wrap gap-3"
+        >
+          {product.variants.map((variant) => (
+            <div key={variant.id} className="flex items-center">
+              <RadioGroupItem value={variant.id} id={variant.id} className="sr-only" />
+              <Label
+                htmlFor={variant.id}
+                className={cn(
+                  "cursor-pointer rounded-lg border px-4 py-2 text-center transition-all",
+                  "shadow-neumorphic-inset data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground data-[state=checked]:shadow-neumorphic-active",
+                  selectedVariant?.id === variant.id ? 'bg-accent text-accent-foreground shadow-neumorphic-active' : 'bg-background'
+                )}
+              >
+                {variant.name}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
+    );
   }
 
   return (
@@ -241,6 +273,8 @@ export default function ProductDetailPage() {
                 </div>
                 {renderStockInfo()}
             </div>
+            
+            {renderVariantSelector()}
 
             <p className="mt-6 text-base text-foreground/80">{product.description}</p>
             
@@ -279,29 +313,15 @@ export default function ProductDetailPage() {
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               {isSambatan ? (
                 <>
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon" className="h-14 w-14 rounded-xl shadow-neumorphic" onClick={() => handleSlotChange(-1)}>
-                            <Minus />
-                        </Button>
-                        <Input
-                            type="number"
-                            readOnly
-                            value={slotQuantity}
-                            className="h-14 w-20 rounded-xl border-none bg-background text-center text-lg font-bold shadow-neumorphic-inset"
-                        />
-                         <Button variant="outline" size="icon" className="h-14 w-14 rounded-xl shadow-neumorphic" onClick={() => handleSlotChange(1)}>
-                            <Plus />
-                        </Button>
-                    </div>
-                    <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={handleJoinSambatan}>
+                    <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active">
                         <Users className="mr-2 h-6 w-6" />
                         Gabung Sambatan
                     </Button>
                 </>
               ) : (
                 <>
-                  <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => addItem(product)} disabled={product.stock === 0}>
-                      {product.stock === 0 ? (
+                  <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={handleAddToCart} disabled={!selectedVariant || selectedVariant.stock === 0}>
+                      {!selectedVariant || selectedVariant.stock === 0 ? (
                         <>
                            <PackageX className="mr-2 h-6 w-6" />
                            Out of Stock

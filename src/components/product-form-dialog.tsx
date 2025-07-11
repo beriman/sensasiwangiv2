@@ -1,4 +1,5 @@
 
+
 // src/components/product-form-dialog.tsx
 'use client';
 
@@ -24,7 +25,7 @@ import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Loader2, Upload, CalendarIcon } from 'lucide-react';
-import type { Product, ProductCategory, SambatanDetails } from '@/lib/types';
+import type { Product, ProductCategory, SambatanDetails, ProductVariant } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from './ui/skeleton';
 import { perfumers } from '@/data/perfumers';
@@ -36,8 +37,6 @@ const productCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools',
 const productFormSchema = z.object({
   name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
   description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
-  price: z.coerce.number().min(0, { message: 'Price must be a positive number.' }),
-  stock: z.coerce.number().int().min(0, { message: 'Stock must be a non-negative number.' }),
   isListed: z.boolean().default(true),
   category: z.enum(productCategories, {
     required_error: "You need to select a product category.",
@@ -50,7 +49,14 @@ const productFormSchema = z.object({
     targetParticipants: z.coerce.number().optional(),
     sambatanPrice: z.coerce.number().optional(),
     deadline: z.date().optional(),
-  }).optional()
+  }).optional(),
+  // Hardcoded variants for now
+  variants: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    price: z.coerce.number().min(0),
+    stock: z.coerce.number().int().min(0),
+  })).min(1, "Product must have at least one variant."),
 }).superRefine((data, ctx) => {
     if (data.category === 'Parfum') {
         if (!data.properties?.Brand) {
@@ -81,14 +87,6 @@ const productFormSchema = z.object({
     }
 });
 
-export type ProductFormData = Omit<Product, 'sambatan'> & {
-    isSambatan: boolean;
-    sambatanDetails?: {
-        targetParticipants?: number;
-        sambatanPrice?: number;
-        deadline?: Date;
-    }
-};
 
 interface ProductFormDialogProps {
   isOpen: boolean;
@@ -107,8 +105,6 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
     defaultValues: {
         name: '',
         description: '',
-        price: 0,
-        stock: 0,
         isListed: true,
         category: 'Parfum',
         imageUrl: '',
@@ -119,7 +115,8 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
             targetParticipants: 10,
             sambatanPrice: 0,
             deadline: undefined,
-        }
+        },
+        variants: [{ id: 'default-variant', name: 'Default', price: 0, stock: 0 }],
     }
   });
 
@@ -133,8 +130,6 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
             form.reset({
                 name: productData.name,
                 description: productData.description,
-                price: productData.price,
-                stock: productData.stock,
                 isListed: productData.isListed,
                 category: productData.category,
                 imageUrl: productData.imageUrl,
@@ -145,14 +140,13 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     targetParticipants: productData.sambatan?.targetParticipants,
                     sambatanPrice: productData.sambatan?.sambatanPrice,
                     deadline: productData.sambatan?.deadline ? new Date(productData.sambatan.deadline) : undefined,
-                }
+                },
+                variants: productData.variants,
             });
         } else {
             form.reset({
                 name: '',
                 description: '',
-                price: 0,
-                stock: 0,
                 isListed: true,
                 category: 'Parfum',
                 imageUrl: '',
@@ -163,7 +157,8 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     targetParticipants: 10,
                     sambatanPrice: 0,
                     deadline: undefined
-                }
+                },
+                variants: [{ id: `new-${Date.now()}`, name: 'Default', price: 0, stock: 10 }],
             });
         }
     }
@@ -172,7 +167,9 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
   // Effect to manage stock and price when isSambatan changes
   useEffect(() => {
     if (watchedIsSambatan) {
-      form.setValue('stock', 1);
+      // For sambatan, there is only one variant with stock 1
+      const currentVariant = form.getValues('variants')[0] || {};
+      form.setValue('variants', [{...currentVariant, stock: 1}]);
     }
   }, [watchedIsSambatan, form]);
 
@@ -221,14 +218,13 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         id: productData?.id || `prod-${Date.now()}`,
         name: values.name,
         description: values.description,
-        price: values.isSambatan ? 0 : values.price, // Set price to 0 if sambatan
-        stock: values.stock,
         isListed: values.isListed,
         category: values.category,
         imageUrl: values.imageUrl || 'https://placehold.co/600x600.png',
         imageHint: 'perfume bottle', // default hint
         properties: values.properties || {},
         perfumerProfileSlug: values.perfumerProfileSlug,
+        variants: values.variants,
         sambatan: values.isSambatan && values.sambatanDetails?.deadline && values.sambatanDetails.sambatanPrice && values.sambatanDetails.targetParticipants ? {
             isActive: true,
             currentParticipants: productData?.sambatan?.currentParticipants ?? 0,
@@ -319,10 +315,12 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
+              {/* Simplified Variant Section */}
+              <div className="space-y-2 rounded-lg border p-4">
+                <h4 className="font-semibold">Product Variant</h4>
+                 <FormField
                     control={form.control}
-                    name="price"
+                    name={`variants.0.price`}
                     render={({ field }) => (
                     <FormItem>
                         <FormLabel>Price (Rp)</FormLabel>
@@ -335,7 +333,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 />
                 <FormField
                     control={form.control}
-                    name="stock"
+                    name={`variants.0.stock`}
                     render={({ field }) => (
                     <FormItem>
                         <FormLabel>Stock</FormLabel>
@@ -347,6 +345,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     )}
                 />
               </div>
+
 
               <FormField
                 control={form.control}

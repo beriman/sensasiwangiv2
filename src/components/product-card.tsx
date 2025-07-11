@@ -34,6 +34,17 @@ export function ProductCard({ product }: ProductCardProps) {
     toggleWishlist(product);
   }
 
+  const priceDisplay = () => {
+    if (isSambatan) {
+      return formatRupiah(product.sambatan.sambatanPrice);
+    }
+    if (product.variants.length > 1) {
+      const minPrice = Math.min(...product.variants.map(v => v.price));
+      return `${formatRupiah(minPrice)}+`;
+    }
+    return formatRupiah(product.variants[0]?.price || 0);
+  };
+
   return (
     <Link href={`/products/${product.id}`} className="block h-full">
       <Card className="group relative flex h-full transform-gpu flex-col overflow-hidden rounded-2xl border-none bg-transparent shadow-neumorphic transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg">
@@ -74,13 +85,9 @@ export function ProductCard({ product }: ProductCardProps) {
           </CardDescription>
         </CardContent>
         <CardFooter className="p-4 pt-0">
-          {isSambatan ? (
-             <div className="flex w-full flex-col">
-              <p className="text-lg font-bold text-accent">{formatRupiah(product.sambatan.sambatanPrice)}</p>
-            </div>
-          ) : (
-             <p className="text-lg font-bold text-foreground/80">{formatRupiah(product.price)}</p>
-          )}
+          <p className={cn("text-lg font-bold", isSambatan ? "text-accent" : "text-foreground/80")}>
+            {priceDisplay()}
+          </p>
         </CardFooter>
       </Card>
     </Link>

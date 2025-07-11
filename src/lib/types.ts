@@ -10,21 +10,28 @@ export interface SambatanDetails {
   maxOrder: number;
 }
 
+export interface ProductVariant {
+  id: string; // Unique ID for the variant, e.g., product.id + '-' + name
+  name: string; // e.g., "50ml", "10ml Decant"
+  price: number;
+  stock: number;
+}
+
 export interface Product {
   id: string;
   name: string;
   description: string;
-  price: number;
   category: ProductCategory;
   imageUrl: string;
   imageHint: string;
   properties: Record<string, string>;
   perfumerProfileSlug?: string;
   sambatan?: SambatanDetails;
-  stock: number;
+  variants: ProductVariant[]; // Replaces top-level price and stock
   isListed: boolean;
 }
 
 export interface CartItem extends Product {
   quantity: number;
+  variant: ProductVariant; // Add selected variant to cart item
 }

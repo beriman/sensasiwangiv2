@@ -2,14 +2,14 @@
 'use client';
 
 import { create } from 'zustand';
-import type { CartItem, Product } from '@/lib/types';
+import type { CartItem, Product, ProductVariant } from '@/lib/types';
 import { toast } from '@/hooks/use-toast';
 
 interface CartState {
   items: CartItem[];
-  addItem: (product: Product) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (product: Product, variant: ProductVariant) => void;
+  removeItem: (variantId: string) => void;
+  updateQuantity: (variantId: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -17,7 +17,7 @@ interface CartState {
 
 const updateTotals = (items: CartItem[]) => ({
   totalItems: items.reduce((total, item) => total + item.quantity, 0),
-  totalPrice: items.reduce((total, item) => total + item.price * item.quantity, 0),
+  totalPrice: items.reduce((total, item) => total + item.variant.price * item.quantity, 0),
 });
 
 export const useCart = create<CartState>((set, get) => ({
@@ -25,9 +25,10 @@ export const useCart = create<CartState>((set, get) => ({
   totalItems: 0,
   totalPrice: 0,
   
-  addItem: (product) => {
+  addItem: (product, variant) => {
     const { items } = get();
-    const existingItem = items.find((item) => item.id === product.id);
+    // A cart item is now uniquely identified by its variant ID
+    const existingItem = items.find((item) => item.variant.id === variant.id);
 
     let updatedItems;
     if (existingItem) {
@@ -39,31 +40,31 @@ export const useCart = create<CartState>((set, get) => ({
         return; // Prevent adding more than one of the same course
       }
       updatedItems = items.map((item) =>
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        item.variant.id === variant.id ? { ...item, quantity: item.quantity + 1 } : item
       );
     } else {
-      updatedItems = [...items, { ...product, quantity: 1 }];
+      updatedItems = [...items, { ...product, variant: variant, quantity: 1 }];
     }
     
     set({ items: updatedItems, ...updateTotals(updatedItems) });
     toast({
       title: 'Added to cart',
-      description: `${product.name} has been added to your cart.`,
+      description: `${product.name} (${variant.name}) has been added to your cart.`,
     });
   },
 
-  removeItem: (productId) => {
-    const updatedItems = get().items.filter((item) => item.id !== productId);
+  removeItem: (variantId) => {
+    const updatedItems = get().items.filter((item) => item.variant.id !== variantId);
     set({ items: updatedItems, ...updateTotals(updatedItems) });
   },
 
-  updateQuantity: (productId, quantity) => {
+  updateQuantity: (variantId, quantity) => {
     let updatedItems;
     if (quantity <= 0) {
-      updatedItems = get().items.filter((item) => item.id !== productId);
+      updatedItems = get().items.filter((item) => item.variant.id !== variantId);
     } else {
       updatedItems = get().items.map((item) =>
-        item.id === productId ? { ...item, quantity } : item
+        item.variant.id === variantId ? { ...item, quantity } : item
       );
     }
     set({ items: updatedItems, ...updateTotals(updatedItems) });

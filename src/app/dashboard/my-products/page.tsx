@@ -1,4 +1,5 @@
 
+
 // src/app/dashboard/my-products/page.tsx
 'use client';
 
@@ -130,7 +131,9 @@ export default function MyProductsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
+              {products.map((product) => {
+                const totalStock = product.variants.reduce((acc, v) => acc + v.stock, 0);
+                return (
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
@@ -164,12 +167,12 @@ export default function MyProductsPage() {
                     {product.sambatan?.isActive ? (
                         <span className="text-accent">{formatRupiah(product.sambatan.sambatanPrice)}</span>
                     ) : (
-                        formatRupiah(product.price)
+                        product.variants.length > 1 ? `${formatRupiah(product.variants[0].price)} ...` : formatRupiah(product.variants[0].price)
                     )}
                   </TableCell>
                   <TableCell>
-                    {product.stock > 0 ? (
-                        <span className={cn(product.stock < 5 && "text-destructive font-bold")}>{product.stock}</span>
+                    {totalStock > 0 ? (
+                        <span className={cn(totalStock < 5 && "text-destructive font-bold")}>{totalStock}</span>
                     ) : (
                         <Badge variant="destructive">Out of Stock</Badge>
                     )}
@@ -201,7 +204,7 @@ export default function MyProductsPage() {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))}
+              )})}
             </TableBody>
           </Table>
           {products.length === 0 && (
