@@ -1,4 +1,6 @@
 // src/app/products/[id]/page.tsx
+'use client';
+
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { products } from '@/data/products';
@@ -9,9 +11,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ShoppingCart, Star } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
+import { useCart } from '@/hooks/use-cart';
 
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
+  const { addItem } = useCart();
   const product = products.find((p) => p.id === params.id);
 
   if (!product) {
@@ -80,7 +84,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             </div>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+              <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => addItem(product)}>
                 <ShoppingCart className="mr-2 h-6 w-6" />
                 Add to Cart
               </Button>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Cart } from '@/components/cart';
 
 const navLinks = [
   { href: '/', label: 'Marketplace' },
@@ -39,17 +40,19 @@ export function AppHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
             <Button 
               onClick={() => setIsLoggedIn(!isLoggedIn)}
               className="rounded-xl px-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active"
             >
               {isLoggedIn ? 'Logout' : 'Login'}
             </Button>
+            <Cart />
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
+          <Cart />
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">

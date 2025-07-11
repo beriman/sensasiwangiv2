@@ -10,3 +10,7 @@ export interface Product {
   imageHint: string;
   properties: Record<string, string>;
 }
+
+export interface CartItem extends Product {
+  quantity: number;
+}
