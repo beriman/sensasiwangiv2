@@ -9,6 +9,9 @@ export type PerfumerProfile = {
       twitter?: string;
       instagram?: string;
       website?: string;
+      tiktok?: string;
+      youtube?: string;
+      facebook?: string;
     };
   };
   
@@ -24,6 +27,8 @@ export type PerfumerProfile = {
         twitter: 'https://twitter.com/alexdoe',
         instagram: 'https://instagram.com/alexdoe',
         website: 'https://sensasiwangi.id',
+        tiktok: 'https://www.tiktok.com/@perfumetok',
+        youtube: 'https://www.youtube.com/@fragrancereviews',
       },
     },
     {
@@ -36,6 +41,7 @@ export type PerfumerProfile = {
         socials: {
           twitter: 'https://twitter.com/leducparfums',
           website: 'https://leducparfums.com',
+          facebook: 'https://www.facebook.com/leducparfums',
         },
       },
   ];

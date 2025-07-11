@@ -25,6 +25,9 @@ const profileFormSchema = z.object({
   twitter: z.string().url().optional().or(z.literal('')),
   instagram: z.string().url().optional().or(z.literal('')),
   website: z.string().url().optional().or(z.literal('')),
+  tiktok: z.string().url().optional().or(z.literal('')),
+  youtube: z.string().url().optional().or(z.literal('')),
+  facebook: z.string().url().optional().or(z.literal('')),
 });
 
 export type ProfileData = {
@@ -36,6 +39,9 @@ export type ProfileData = {
     twitter?: string;
     instagram?: string;
     website?: string;
+    tiktok?: string;
+    youtube?: string;
+    facebook?: string;
   };
 };
 
@@ -56,6 +62,9 @@ export function EditProfileDialog({ isOpen, onOpenChange, profileData, onSave }:
       twitter: profileData.socials.twitter || '',
       instagram: profileData.socials.instagram || '',
       website: profileData.socials.website || '',
+      tiktok: profileData.socials.tiktok || '',
+      youtube: profileData.socials.youtube || '',
+      facebook: profileData.socials.facebook || '',
     },
   });
 
@@ -69,6 +78,9 @@ export function EditProfileDialog({ isOpen, onOpenChange, profileData, onSave }:
         twitter: values.twitter,
         instagram: values.instagram,
         website: values.website,
+        tiktok: values.tiktok,
+        youtube: values.youtube,
+        facebook: values.facebook,
       },
     });
   };
@@ -83,7 +95,7 @@ export function EditProfileDialog({ isOpen, onOpenChange, profileData, onSave }:
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-2">
             <FormField
               control={form.control}
               name="name"
@@ -144,6 +156,45 @@ export function EditProfileDialog({ isOpen, onOpenChange, profileData, onSave }:
                   <FormLabel>Instagram URL</FormLabel>
                   <FormControl>
                     <Input placeholder="https://instagram.com/..." {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="tiktok"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>TikTok URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://tiktok.com/@..." {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="youtube"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>YouTube URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://youtube.com/..." {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="facebook"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Facebook URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://facebook.com/..." {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
