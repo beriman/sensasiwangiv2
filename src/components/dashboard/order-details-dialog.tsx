@@ -16,7 +16,8 @@ import { formatRupiah, cn } from '@/lib/utils';
 import type { Order, OrderStatus } from '@/lib/types';
 import { ScrollArea } from '../ui/scroll-area';
 import { differenceInHours, parseISO } from 'date-fns';
-import { AlertTriangle, Package, Truck, CheckCircle } from 'lucide-react';
+import { AlertTriangle, Package, Truck, CheckCircle, Copy } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface OrderDetailsDialogProps {
   order: Order | null;
@@ -28,8 +29,20 @@ interface OrderDetailsDialogProps {
 }
 
 export function OrderDetailsDialog({ order, isOpen, onOpenChange, onConfirmDelivery, onReportProblem, isSellerView }: OrderDetailsDialogProps) {
+  const { toast } = useToast();
+  
   if (!order) {
     return null;
+  }
+
+  const handleCopyTrackingNumber = () => {
+    if (order?.shippingInfo?.trackingNumber) {
+        navigator.clipboard.writeText(order.shippingInfo.trackingNumber);
+        toast({
+            title: 'Nomor Resi Tersalin!',
+            description: 'Anda dapat menempelkannya di situs web kurir.',
+        });
+    }
   }
   
   const getStatusStyles = (status: OrderStatus) => {
@@ -103,13 +116,21 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange, onConfirmDeliv
             {order.shippingInfo && (
                 <div className="rounded-lg border bg-muted/50 p-4">
                     <h3 className="font-semibold text-foreground/80 flex items-center gap-2 mb-2"><Truck className="h-5 w-5"/>Info Pengiriman</h3>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="grid grid-cols-[auto,1fr,auto] items-center gap-x-4 gap-y-2 text-sm">
                         <p className="text-muted-foreground">Jasa Kirim:</p>
-                        <p className="font-medium text-foreground/90">{order.shippingInfo.provider}</p>
+                        <p className="font-medium text-foreground/90 col-span-2">{order.shippingInfo.provider}</p>
                         <p className="text-muted-foreground">Nomor Resi:</p>
-                        <p className="font-medium text-foreground/90">{order.shippingInfo.trackingNumber}</p>
+                        <p className="font-mono font-medium text-foreground/90">{order.shippingInfo.trackingNumber}</p>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground"
+                            onClick={handleCopyTrackingNumber}
+                        >
+                            <Copy className="h-4 w-4" />
+                        </Button>
                          <p className="text-muted-foreground">Dikirim Pada:</p>
-                        <p className="font-medium text-foreground/90">{new Date(order.shippingInfo.shippedOn).toLocaleDateString()}</p>
+                        <p className="font-medium text-foreground/90 col-span-2">{new Date(order.shippingInfo.shippedOn).toLocaleDateString()}</p>
                     </div>
                 </div>
             )}
