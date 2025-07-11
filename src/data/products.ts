@@ -68,6 +68,40 @@ export const products: Product[] = [
       'Variant': '50ml'
     },
   },
+  {
+    id: 'p5',
+    name: 'Ocean Breeze',
+    description: 'A crisp, clean scent with notes of sea salt, aquatic accords, and a hint of mint.',
+    price: 85,
+    category: 'Parfum',
+    imageUrl: 'https://placehold.co/600x600.png',
+    imageHint: 'ocean perfume',
+    properties: {
+      'Scent Profile': 'Fresh',
+      'Concentration': 'EDC',
+      'Brand': 'Aqua Vitae',
+      'Perfumer': 'Alex Doe',
+      'Variant': '120ml'
+    },
+    perfumerProfileSlug: 'alex-doe',
+  },
+  {
+    id: 'p6',
+    name: 'Poivre Noir',
+    description: 'A bold, spicy fragrance dominated by black pepper, cloves, and a warm leather base.',
+    price: 145,
+    category: 'Parfum',
+    imageUrl: 'https://placehold.co/600x600.png',
+    imageHint: 'spicy perfume',
+    properties: {
+      'Scent Profile': 'Spicy',
+      'Concentration': 'EDP',
+      'Brand': 'Forêt Noire Parfums',
+      'Perfumer': 'Antoine Leduc',
+      'Variant': '75ml'
+    },
+    perfumerProfileSlug: 'antoine-leduc',
+  },
   // Raw Materials
   {
     id: 'rm1',

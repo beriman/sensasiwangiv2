@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 
@@ -19,6 +19,8 @@ const scentProfileIcons: { [key: string]: React.ElementType } = {
   Woody: Trees,
   Citrus: Citrus,
   Oriental: Sparkles,
+  Fresh: Waves,
+  Spicy: Flame,
 };
 
 export default function ProductDetailPage() {
