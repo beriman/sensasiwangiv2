@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Trash2, Minus, Plus, CreditCard, PartyPopper } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { formatRupiah } from '@/lib/utils';
 
 export function Cart() {
   const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
@@ -78,7 +79,7 @@ export function Cart() {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold">{item.name}</h4>
-                      <p className="text-sm text-muted-foreground">${item.price.toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">{formatRupiah(item.price)}</p>
                       <div className="mt-2 flex items-center">
                         <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.id, item.quantity - 1)}>
                           <Minus className="h-4 w-4" />
@@ -99,7 +100,7 @@ export function Cart() {
             <SheetFooter className="mt-auto flex-col space-y-4 border-t pt-4">
                 <div className="flex justify-between text-lg font-semibold">
                     <span>Subtotal</span>
-                    <span>${totalPrice.toFixed(2)}</span>
+                    <span>{formatRupiah(totalPrice)}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">Taxes and shipping calculated at checkout.</p>
                 <Button onClick={handleCheckout} size="lg" className="h-14 w-full rounded-xl bg-accent-gradient text-lg text-accent-foreground shadow-neumorphic">

@@ -127,9 +127,9 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price ($)</FormLabel>
+                  <FormLabel>Price (Rp)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="99.99" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                    <Input type="number" placeholder="1200000" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { ProductFormDialog, ProductFormData } from '@/components/product-form-dialog';
 import { useToast } from '@/hooks/use-toast';
+import { formatRupiah } from '@/lib/utils';
 
 
 // In a real app, you'd get this from user authentication
@@ -149,7 +150,7 @@ export default function MyProductsPage() {
                   <TableCell>
                     <Badge variant="secondary">{product.category}</Badge>
                   </TableCell>
-                  <TableCell className="font-medium text-foreground/80">${product.price.toFixed(2)}</TableCell>
+                  <TableCell className="font-medium text-foreground/80">{formatRupiah(product.price)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

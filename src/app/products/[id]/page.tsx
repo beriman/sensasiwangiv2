@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, MessageSquare } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
+import { formatRupiah } from '@/lib/utils';
 
 const scentProfileIcons: { [key: string]: React.ElementType } = {
   Floral: Leaf,
@@ -88,7 +89,7 @@ export default function ProductDetailPage() {
             <h1 className="text-3xl font-bold tracking-tight text-foreground/90 md:text-4xl">
               {product.name}
             </h1>
-            <p className="mt-4 text-2xl font-bold text-foreground/80">${product.price.toFixed(2)}</p>
+            <p className="mt-4 text-2xl font-bold text-foreground/80">{formatRupiah(product.price)}</p>
             
             <div className="mt-4 flex items-center gap-2">
                 <div className="flex items-center">
