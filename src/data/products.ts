@@ -165,3 +165,5 @@ export const products: Product[] = [
     properties: { 'Tool Type': 'Evaluation', 'Material': 'Paper' },
   },
 ];
+
+export type { Product };

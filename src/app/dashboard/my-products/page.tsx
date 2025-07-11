@@ -1,11 +1,10 @@
-
 // src/app/dashboard/my-products/page.tsx
 'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
 import { AppHeader } from '@/components/header';
-import { products as allProducts } from '@/data/products';
+import { products as initialProducts, Product } from '@/data/products';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -34,19 +33,54 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { ProductFormDialog, ProductFormData } from '@/components/product-form-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 
 // In a real app, you'd get this from user authentication
 const MOCK_USER_ID = 'alex-doe';
+const MOCK_PERFUMER_PROFILE_SLUG = 'alex-doe';
+
 
 export default function MyProductsPage() {
-  // Filter products that belong to the mock user
-  const myProducts = allProducts.filter(
-    (p) => p.perfumerProfileSlug === MOCK_USER_ID
-  );
-  
+  const [products, setProducts] = useState(() => initialProducts.filter(p => p.perfumerProfileSlug === MOCK_USER_ID));
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleAddClick = () => {
+    setEditingProduct(null);
+    setIsFormOpen(true);
+  }
+
+  const handleEditClick = (product: Product) => {
+    setEditingProduct(product);
+    setIsFormOpen(true);
+  }
+  
+  const handleFormSave = (data: ProductFormData) => {
+    if (editingProduct) {
+      // Edit logic
+      setProducts(products.map(p => p.id === editingProduct.id ? { ...p, ...data } : p));
+      toast({ title: "Product Updated", description: `${data.name} has been successfully updated.` });
+    } else {
+      // Add logic
+      const newProduct: Product = {
+        id: `prod-${Date.now()}`, // simple unique id
+        ...data,
+        imageUrl: 'https://placehold.co/600x600.png', // placeholder image
+        imageHint: 'perfume bottle', // default hint
+        perfumerProfileSlug: MOCK_PERFUMER_PROFILE_SLUG,
+      };
+      setProducts([newProduct, ...products]);
+      toast({ title: "Product Added", description: `${data.name} has been successfully added.` });
+    }
+    setIsFormOpen(false);
+    setEditingProduct(null);
+  }
 
   const handleDeleteClick = (productId: string) => {
     setSelectedProductId(productId);
@@ -54,10 +88,12 @@ export default function MyProductsPage() {
   }
 
   const handleDeleteConfirm = () => {
-    // In a real app, you would make an API call to delete the product
-    console.log("Deleting product:", selectedProductId);
-    setIsDeleteDialogOpen(false);
-    setSelectedProductId(null);
+    if (selectedProductId) {
+      setProducts(products.filter(p => p.id !== selectedProductId));
+      toast({ title: "Product Deleted", description: "The product has been permanently deleted." });
+      setIsDeleteDialogOpen(false);
+      setSelectedProductId(null);
+    }
   }
 
 
@@ -72,7 +108,10 @@ export default function MyProductsPage() {
               Manage your creations and offerings.
             </p>
           </div>
-          <Button className="rounded-xl bg-accent-gradient text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+          <Button 
+            onClick={handleAddClick}
+            className="rounded-xl bg-accent-gradient text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
+          >
             <PlusCircle className="mr-2 h-5 w-5" />
             Add New Product
           </Button>
@@ -94,7 +133,7 @@ export default function MyProductsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {myProducts.map((product) => (
+              {products.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell className="hidden sm:table-cell">
                     <Image
@@ -124,7 +163,9 @@ export default function MyProductsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEditClick(product)}>
+                          Edit
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => handleDeleteClick(product.id)}
@@ -138,13 +179,22 @@ export default function MyProductsPage() {
               ))}
             </TableBody>
           </Table>
-          {myProducts.length === 0 && (
+          {products.length === 0 && (
             <div className="text-center p-8 text-muted-foreground">
                 You haven't added any products yet.
             </div>
           )}
         </div>
       </main>
+
+      {/* Add/Edit Product Dialog */}
+      <ProductFormDialog
+        isOpen={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        onSave={handleFormSave}
+        productData={editingProduct}
+      />
+
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -158,7 +208,7 @@ export default function MyProductsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setSelectedProductId(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteConfirm} className={buttonVariants({ variant: "destructive" })}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
