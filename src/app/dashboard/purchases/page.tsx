@@ -1,4 +1,4 @@
-// src/app/dashboard/orders/page.tsx
+// src/app/dashboard/purchases/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -21,14 +21,6 @@ import { Badge } from '@/components/ui/badge';
 import { formatRupiah, cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { AlertCircle, MoreHorizontal } from 'lucide-react';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-  } from '@/components/ui/dropdown-menu';
 import { OrderDetailsDialog } from '@/components/dashboard/order-details-dialog';
 import type { Order, OrderStatus } from '@/lib/types';
 

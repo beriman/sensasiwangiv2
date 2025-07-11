@@ -16,15 +16,18 @@ import { formatRupiah, cn } from '@/lib/utils';
 import type { Order, OrderStatus } from '@/lib/types';
 import { ScrollArea } from '../ui/scroll-area';
 import { differenceInHours, parseISO } from 'date-fns';
-import { AlertTriangle, Package, Truck } from 'lucide-react';
+import { AlertTriangle, Package, Truck, CheckCircle } from 'lucide-react';
 
 interface OrderDetailsDialogProps {
   order: Order | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onConfirmDelivery?: () => void;
+  onReportProblem?: () => void;
+  isSellerView: boolean;
 }
 
-export function OrderDetailsDialog({ order, isOpen, onOpenChange }: OrderDetailsDialogProps) {
+export function OrderDetailsDialog({ order, isOpen, onOpenChange, onConfirmDelivery, onReportProblem, isSellerView }: OrderDetailsDialogProps) {
   if (!order) {
     return null;
   }
@@ -47,6 +50,9 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange }: OrderDetails
     if (hoursLeft < 24) return "text-orange-600 font-semibold";
     return "text-muted-foreground";
   };
+  
+  const canConfirmDelivery = !isSellerView && order.status === 'Dikirim' && onConfirmDelivery;
+  const canReportProblem = !isSellerView && (order.status === 'Dikirim' || order.status === 'Pesanan Diterima') && onReportProblem;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -54,7 +60,7 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange }: OrderDetails
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-foreground/80">Detail Pesanan: {order.id}</DialogTitle>
           <DialogDescription className="text-base text-muted-foreground">
-            Tinjau pesanan dan ambil tindakan.
+            {isSellerView ? "Tinjau pesanan dan ambil tindakan." : "Rincian pembelian Anda."}
           </DialogDescription>
         </DialogHeader>
         
@@ -63,7 +69,7 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange }: OrderDetails
             {/* Customer & Status */}
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <h3 className="font-semibold text-foreground/70">Pembeli</h3>
+                    <h3 className="font-semibold text-foreground/70">{isSellerView ? 'Pembeli' : 'Detail Pengiriman'}</h3>
                     <p className="font-bold text-foreground/90">{order.customer.name}</p>
                     <p className="text-sm text-muted-foreground">{order.customer.email}</p>
                     <p className="text-sm text-muted-foreground mt-1">{order.customer.address}</p>
@@ -72,10 +78,14 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange }: OrderDetails
                     <h3 className="font-semibold text-foreground/70">Status</h3>
                     <Badge className={cn("mt-1 font-semibold", getStatusStyles(order.status))}>{order.status}</Badge>
                     
-                    <h3 className="font-semibold text-foreground/70 mt-3">Batas Waktu Pengiriman</h3>
-                    <p className={cn("font-medium", getDeadlineStyles(order.shippingDeadline))}>
-                        {new Date(order.shippingDeadline).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                    </p>
+                    {isSellerView && (
+                        <>
+                        <h3 className="font-semibold text-foreground/70 mt-3">Batas Waktu Pengiriman</h3>
+                        <p className={cn("font-medium", getDeadlineStyles(order.shippingDeadline))}>
+                            {new Date(order.shippingDeadline).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        </p>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -133,15 +143,31 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange }: OrderDetails
                     <AlertTriangle className="h-5 w-5 mt-0.5"/>
                     <div className="flex-1">
                         <p className="font-semibold">Pesanan ini sedang dalam sengketa.</p>
-                        <p>Silakan berkomunikasi dengan pembeli untuk menyelesaikan masalah atau hubungi admin untuk mediasi.</p>
+                        <p>Silakan berkomunikasi dengan penjual untuk menyelesaikan masalah atau hubungi admin untuk mediasi.</p>
                     </div>
                 </div>
             )}
             </div>
         </ScrollArea>
 
-        <DialogFooter className="pt-6">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Tutup</Button>
+        <DialogFooter className="pt-6 sm:justify-between">
+            <div>
+            {canConfirmDelivery && (
+                <Button onClick={onConfirmDelivery} className="bg-green-600 hover:bg-green-700 text-white shadow-neumorphic">
+                    <CheckCircle className="mr-2 h-5 w-5"/>
+                    Konfirmasi Pesanan Diterima
+                </Button>
+            )}
+            </div>
+
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+                <Button variant="outline" onClick={() => onOpenChange(false)}>Tutup</Button>
+                {canReportProblem && (
+                    <Button variant="destructive" onClick={onReportProblem}>
+                       <AlertTriangle className="mr-2 h-5 w-5" /> Laporkan Masalah
+                    </Button>
+                )}
+            </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
