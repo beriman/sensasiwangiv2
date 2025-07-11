@@ -13,11 +13,17 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ContentRenderer } from '@/components/content-renderer';
 import { Textarea } from '@/components/ui/textarea';
+import { formatDistanceToNow } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 // Helper to get profile pic, can be expanded later
 const getAuthorProfilePic = (authorName: string) => {
     const perfumer = profiles.find(p => p.name === authorName);
     return perfumer?.profilePicture || 'https://placehold.co/48x48.png';
+}
+
+const formatTimestamp = (timestamp: string) => {
+    return formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: id });
 }
 
 
@@ -44,7 +50,7 @@ export default function ThreadPage() {
         <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground/90">{thread.title}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-                Started by <Link href="#" className="font-semibold text-accent hover:underline">{thread.author}</Link>
+                Started by <Link href="#" className="font-semibold text-accent hover:underline">{thread.author}</Link> &middot; {formatTimestamp(thread.createdAt)}
             </p>
         </div>
 
@@ -57,10 +63,11 @@ export default function ThreadPage() {
                     height={48}
                     className="rounded-full"
                 />
-                <div>
+                <div className="flex-grow">
                     <p className="font-bold text-foreground/80">{thread.author}</p>
                     <p className="text-xs text-muted-foreground">Original Poster</p>
                 </div>
+                <p className="text-xs text-muted-foreground">{formatTimestamp(thread.createdAt)}</p>
             </CardHeader>
             <CardContent className="px-4 pb-6">
                 <ContentRenderer content={thread.content} />
@@ -82,9 +89,10 @@ export default function ThreadPage() {
                     height={40}
                     className="rounded-full"
                 />
-                <div>
+                <div className="flex-grow">
                   <p className="font-bold text-foreground/80">{post.author}</p>
                 </div>
+                 <p className="text-xs text-muted-foreground">{formatTimestamp(post.timestamp)}</p>
               </CardHeader>
               <CardContent className="px-4 pb-6">
                  <ContentRenderer content={post.content} />
