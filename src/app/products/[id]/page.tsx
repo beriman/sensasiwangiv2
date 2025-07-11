@@ -10,10 +10,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 
+const scentProfileIcons: { [key: string]: React.ElementType } = {
+  Floral: Leaf,
+  Woody: Trees,
+  Citrus: Citrus,
+  Oriental: Sparkles,
+};
 
 export default function ProductDetailPage() {
   const { addItem } = useCart();
@@ -30,18 +36,24 @@ export default function ProductDetailPage() {
 
     return (
         <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
-        {Object.entries(propertiesToShow).map(([key, value]) => (
-            <div key={key}>
-              <p className="font-semibold text-muted-foreground">{key}</p>
-              {key === 'Perfumer' && product.perfumerProfileSlug ? (
-                <Link href={`/profile/${product.perfumerProfileSlug}`} className="text-foreground/90 underline hover:text-accent">
-                  {value}
-                </Link>
-              ) : (
-                <p className="text-foreground/90">{value}</p>
-              )}
-            </div>
-        ))}
+        {Object.entries(propertiesToShow).map(([key, value]) => {
+            const Icon = key === 'Scent Profile' ? scentProfileIcons[value] : null;
+            return(
+                <div key={key}>
+                  <p className="font-semibold text-muted-foreground">{key}</p>
+                  {key === 'Perfumer' && product.perfumerProfileSlug ? (
+                    <Link href={`/profile/${product.perfumerProfileSlug}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
+                      {value}
+                    </Link>
+                  ) : (
+                    <div className="flex items-center gap-2 text-foreground/90">
+                      {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+                      <span>{value}</span>
+                    </div>
+                  )}
+                </div>
+            )
+        })}
         </div>
     );
   };
