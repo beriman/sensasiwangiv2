@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 const faqItems = [
     {
         question: "Apa itu Sambatan?",
-        answer: "Sambatan adalah fitur gotong royong (group buy) di mana beberapa anggota dapat bergabung untuk membeli produk dalam jumlah besar (seperti botol parfum utuh) dan membaginya menjadi ukuran lebih kecil (seperti vial atau decant) dengan harga yang lebih terjangkau per mililiter."
+        answer: "Sambatan adalah fitur gotong royong (group buy) di mana anggota dapat bergabung untuk membeli produk dalam jumlah besar—seperti botol parfum utuh atau bahan baku kiloan—dan membaginya menjadi ukuran lebih kecil (misalnya, decant atau kemasan 100g) untuk mendapatkan harga yang lebih terjangkau per unit."
     },
     {
         question: "Bagaimana proses pengiriman dilakukan?",
