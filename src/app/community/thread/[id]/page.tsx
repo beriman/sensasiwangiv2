@@ -27,7 +27,7 @@ export default function ThreadPage() {
   const getAuthorProfilePic = (authorName: string) => {
     const perfumer = perfumers.find(p => p.name === authorName);
     return perfumer?.profilePicture || 'https://placehold.co/40x40.png';
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background font-body">
