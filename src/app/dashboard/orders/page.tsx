@@ -1,3 +1,4 @@
+
 // src/app/dashboard/orders/page.tsx
 'use client';
 
@@ -30,78 +31,90 @@ import {
     DropdownMenuTrigger,
   } from '@/components/ui/dropdown-menu';
 import { OrderDetailsDialog } from '@/components/dashboard/order-details-dialog';
-import type { Order, OrderStatus } from '@/lib/types';
+import { ShippingInfoDialog } from '@/components/dashboard/shipping-info-dialog';
+import type { Order, OrderStatus, ShippingInfo } from '@/lib/types';
+import { differenceInHours, parseISO } from 'date-fns';
 
-// Mock data for demonstration purposes. In a real app, this would be fetched for the logged-in user.
+// Mock data for demonstration purposes. In a real app, this would be fetched for the logged-in user (seller).
 const initialOrders: Order[] = [
   {
-    id: '#3208',
-    customer: {
-      name: 'Alex Doe',
-      address: 'Jl. Cendana No. 8, Menteng, Jakarta Pusat, DKI Jakarta',
-      email: 'alex.doe@example.com',
-    },
+    id: '#3210',
+    customer: { name: 'Olivia Martin', email: 'olivia.martin@email.com', address: 'Jl. Merdeka No. 10, Bandung' },
     status: 'Pesanan Diterima',
     date: new Date().toISOString(),
     shippingDeadline: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString(),
-    total: 1200000,
-    items: [
-        { id: 'p1', name: 'Eau de Lumière', quantity: 1, price: 1200000 },
-    ]
-  },
-   {
-    id: '#3207',
-    customer: {
-        name: 'Alex Doe',
-        address: 'Jl. Cendana No. 8, Menteng, Jakarta Pusat, DKI Jakarta',
-        email: 'alex.doe@example.com',
-    },
-    status: 'Dikirim',
-    date: new Date(new Date().setDate(new Date().getDate() - 3)).toISOString(),
-    shippingDeadline: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
-    total: 800000,
-    items: [
-      { id: 'rm1', name: 'Sandalwood Oil', quantity: 1, price: 800000 },
-    ],
-    shippingInfo: { provider: 'SiCepat', trackingNumber: 'SC00987654321', shippedOn: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString() }
+    total: 450000,
+    items: [{ id: 'rm2', name: 'Iso E Super', quantity: 1, price: 450000 }],
   },
   {
-    id: '#3201',
-    customer: {
-      name: 'Alex Doe',
-      address: 'Jl. Cendana No. 8, Menteng, Jakarta Pusat, DKI Jakarta',
-      email: 'alex.doe@example.com',
-    },
-    status: 'Selesai',
-    date: new Date('2023-01-25').toISOString(),
-    shippingDeadline: new Date('2023-01-27').toISOString(),
-    total: 750000,
-    items: [
-      { id: 't2', name: 'Digital Perfumer\'s Scale', quantity: 1, price: 750000 },
-    ],
-    shippingInfo: { provider: 'JNE', trackingNumber: 'JN0012345678', shippedOn: '2023-01-26' }
+    id: '#3209',
+    customer: { name: 'Ava Johnson', email: 'ava.johnson@email.com', address: 'Jl. Sudirman No. 12, Surabaya' },
+    status: 'Dikirim',
+    date: '2023-01-31',
+    shippingDeadline: '2023-02-02',
+    total: 350000,
+    items: [{ id: 't1', name: 'Glass Beaker Set', quantity: 1, price: 350000 }],
+    shippingInfo: { provider: 'J&T', trackingNumber: 'JT987654321', shippedOn: '2023-02-01' }
+  },
+  {
+    id: '#3204',
+    customer: { name: 'Michael Johnson', email: 'michael.johnson@email.com', address: 'Jl. Gatot Subroto No. 5, Medan' },
+    status: 'Bermasalah',
+    date: '2023-01-28',
+    shippingDeadline: '2023-01-30',
+    total: 250000,
+    items: [{ id: 'p4', name: 'Ambre Nuit', quantity: 1, price: 250000 }],
+  },
+  {
+    id: '#3202',
+    customer: { name: 'Emma Brown', email: 'emma.brown@email.com', address: 'Jl. Diponegoro No. 8, Semarang' },
+    status: 'Pesanan Diterima',
+    date: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
+    shippingDeadline: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
+    total: 150000,
+    items: [{ id: 't3', name: 'Perfume Testing Strips', quantity: 1, price: 150000 }],
+  },
+  {
+    id: '#3205',
+    customer: { name: 'Sophia Lee', email: 'sophia.lee@email.com', address: 'Jl. Imam Bonjol No. 15, Makassar' },
+    status: 'Pesanan Diterima',
+    date: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString(),
+    shippingDeadline: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(), // Deadline has passed
+    total: 950000,
+    items: [{ id: 'p3', name: 'Zeste d\'Agrumes', quantity: 1, price: 950000 }],
   },
 ];
 
-export default function MyPurchasesPage() {
+export default function MyOrdersPage() {
     const [orders, setOrders] = useState(initialOrders);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [isShippingDialogOpen, setIsShippingDialogOpen] = useState(false);
+    const [orderToShip, setOrderToShip] = useState<Order | null>(null);
     const { toast } = useToast();
 
-    const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
+    const handleUpdateStatus = (orderId: string, newStatus: OrderStatus, shippingInfo?: ShippingInfo) => {
         setOrders(orders.map(order => 
-            order.id === orderId ? { ...order, status: newStatus } : order
+            order.id === orderId ? { ...order, status: newStatus, shippingInfo: shippingInfo || order.shippingInfo } : order
         ));
         toast({
             title: "Status Pesanan Diperbarui",
             description: `Pesanan ${orderId} sekarang berstatus "${newStatus}".`,
         });
     };
-    
-    const handleReportProblem = (orderId: string) => {
-        handleUpdateStatus(orderId, 'Bermasalah');
-    }
 
+    const handleOpenShippingDialog = (order: Order) => {
+        setOrderToShip(order);
+        setIsShippingDialogOpen(true);
+    };
+
+    const handleSaveShippingInfo = (shippingInfo: ShippingInfo) => {
+        if (orderToShip) {
+            handleUpdateStatus(orderToShip.id, 'Dikirim', shippingInfo);
+        }
+        setIsShippingDialogOpen(false);
+        setOrderToShip(null);
+    };
+    
     const getStatusStyles = (status: OrderStatus) => {
         switch (status) {
             case 'Selesai': return 'bg-green-100 text-green-800';
@@ -113,14 +126,21 @@ export default function MyPurchasesPage() {
             default: return 'bg-muted text-muted-foreground';
         }
     };
+    
+    const getDeadlineStyles = (deadline: string) => {
+        const hoursLeft = differenceInHours(parseISO(deadline), new Date());
+        if (hoursLeft < 0) return "text-destructive font-bold";
+        if (hoursLeft < 24) return "text-orange-600 font-semibold";
+        return "text-muted-foreground";
+    };
 
   return (
     <>
     <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
       <CardHeader>
-        <CardTitle>My Purchase History</CardTitle>
+        <CardTitle>Manage Incoming Orders</CardTitle>
         <CardDescription>
-          Review your past orders and track their status.
+          Review and fulfill orders from your customers.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -128,17 +148,24 @@ export default function MyPurchasesPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Order</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Batas Kirim</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Total</TableHead>
-              <TableHead className="text-center">Action</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id} className={cn("cursor-pointer", order.status === 'Bermasalah' && 'bg-orange-50/50')} onClick={() => setSelectedOrder(order)}>
+              <TableRow key={order.id} className={cn(order.status === 'Bermasalah' && 'bg-orange-50/50')}>
                 <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                <TableCell>{order.customer.name}</TableCell>
+                <TableCell className={cn("font-medium", getDeadlineStyles(order.shippingDeadline))}>
+                  {differenceInHours(parseISO(order.shippingDeadline), new Date()) < 0 && (
+                     <AlertCircle className="inline-block h-4 w-4 mr-1 text-destructive" />
+                  )}
+                  {new Date(order.shippingDeadline).toLocaleDateString()}
+                </TableCell>
                 <TableCell>
                   <Badge 
                     className={cn("font-semibold", getStatusStyles(order.status))}
@@ -148,9 +175,25 @@ export default function MyPurchasesPage() {
                 </TableCell>
                 <TableCell className="text-right">{formatRupiah(order.total)}</TableCell>
                 <TableCell className="text-center">
-                    <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedOrder(order)}}>
-                        View Details
-                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button aria-haspopup="true" size="icon" variant="ghost">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => setSelectedOrder(order)}>
+                                View Details
+                            </DropdownMenuItem>
+                            {order.status === 'Pesanan Diterima' && (
+                                <DropdownMenuItem onClick={() => handleOpenShippingDialog(order)}>
+                                    Kirim Pesanan
+                                </DropdownMenuItem>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}
@@ -165,15 +208,13 @@ export default function MyPurchasesPage() {
         onOpenChange={(isOpen) => {
             if (!isOpen) setSelectedOrder(null);
         }}
-        onConfirmDelivery={() => {
-            if(selectedOrder) handleUpdateStatus(selectedOrder.id, 'Selesai');
-            setSelectedOrder(null);
-        }}
-        onReportProblem={() => {
-            if(selectedOrder) handleReportProblem(selectedOrder.id);
-            setSelectedOrder(null);
-        }}
-        isSellerView={false} // This is for the buyer's view
+        isSellerView={true}
+    />
+
+    <ShippingInfoDialog
+        isOpen={isShippingDialogOpen}
+        onOpenChange={setIsShippingDialogOpen}
+        onSave={handleSaveShippingInfo}
     />
     </>
   );

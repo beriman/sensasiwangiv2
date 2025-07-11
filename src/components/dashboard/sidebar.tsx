@@ -1,3 +1,4 @@
+
 // src/components/dashboard/sidebar.tsx
 'use client';
 
@@ -8,8 +9,8 @@ import { cn } from '@/lib/utils';
 
 const navLinks = [
     { href: '/dashboard/my-products', icon: Package, label: 'My Products' },
-    { href: '/dashboard/orders', icon: Truck, label: 'My Orders' }, // Changed from My Purchases to My Orders for sellers
-    { href: '/dashboard/purchases', icon: ShoppingBag, label: 'My Purchases' }, // New link for buyers
+    { href: '/dashboard/orders', icon: Truck, label: 'My Orders' }, // For sellers
+    { href: '/dashboard/purchases', icon: ShoppingBag, label: 'My Purchases' }, // For buyers
     { href: '/dashboard/messages', icon: MessageSquare, label: 'Messages' },
     { href: '/dashboard/wishlist', icon: Heart, label: 'Wishlist' },
     { href: '/dashboard/settings', icon: Settings, label: 'Account Settings' },

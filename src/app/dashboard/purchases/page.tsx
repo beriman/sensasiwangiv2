@@ -1,3 +1,4 @@
+
 // src/app/dashboard/purchases/page.tsx
 'use client';
 
