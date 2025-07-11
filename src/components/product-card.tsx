@@ -1,12 +1,16 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Product } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { formatRupiah } from '@/lib/utils';
-import { Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { formatRupiah, cn } from '@/lib/utils';
+import { Users, Heart } from 'lucide-react';
+import { useWishlist } from '@/hooks/use-wishlist';
+
 
 interface ProductCardProps {
   product: Product;
@@ -14,10 +18,25 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const isSambatan = product.sambatan?.isActive;
+  const { toggleWishlist, isInWishlist } = useWishlist();
+
+  // Client-side check to avoid hydration mismatch
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  const inWishlist = isClient && isInWishlist(product.id);
+
+  const handleWishlistClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product);
+  }
 
   return (
     <Link href={`/products/${product.id}`} className="block h-full">
-      <Card className="group flex h-full transform-gpu flex-col overflow-hidden rounded-2xl border-none bg-transparent shadow-neumorphic transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg">
+      <Card className="group relative flex h-full transform-gpu flex-col overflow-hidden rounded-2xl border-none bg-transparent shadow-neumorphic transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg">
         <CardHeader className="relative p-0">
           <div className="relative h-48 w-full">
             <Image
@@ -32,6 +51,16 @@ export function ProductCard({ product }: ProductCardProps) {
                   <Users className="mr-1.5 h-3 w-3" />
                   Sambatan
                 </Badge>
+            )}
+            {!isSambatan && (
+              <Button
+                size="icon"
+                variant="ghost"
+                className="absolute top-2 right-2 h-9 w-9 rounded-full bg-background/70 shadow-neumorphic backdrop-blur-sm transition-all hover:bg-background"
+                onClick={handleWishlistClick}
+              >
+                  <Heart className={cn("h-5 w-5 text-muted-foreground", inWishlist && "fill-destructive text-destructive")} />
+              </Button>
             )}
           </div>
         </CardHeader>
