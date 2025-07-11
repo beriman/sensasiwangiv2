@@ -30,7 +30,7 @@ import {
     DropdownMenuTrigger,
   } from '@/components/ui/dropdown-menu';
 import { OrderDetailsDialog } from '@/components/dashboard/order-details-dialog';
-import type { Order } from '@/lib/types';
+import type { Order, OrderStatus } from '@/lib/types';
 import { differenceInHours, parseISO } from 'date-fns';
 
 const addDays = (date: Date, days: number): Date => {
@@ -47,7 +47,7 @@ const initialOrders: Order[] = [
       address: 'Jl. Merdeka No. 17, Jakarta Pusat, DKI Jakarta',
       email: 'olivia.martin@email.com',
     },
-    status: 'Pending',
+    status: 'Pesanan Diterima',
     date: new Date('2023-02-01').toISOString(),
     shippingDeadline: addDays(new Date('2023-02-01'), 2).toISOString(),
     total: 450000,
@@ -63,7 +63,7 @@ const initialOrders: Order[] = [
       address: 'Jl. Cendana No. 8, Menteng, Jakarta Pusat, DKI Jakarta',
       email: 'alex.doe@example.com',
     },
-    status: 'Pending',
+    status: 'Pesanan Diterima',
     date: new Date().toISOString(), // Today's order
     shippingDeadline: addDays(new Date(), 1).toISOString(), // Deadline is tomorrow
     total: 1200000,
@@ -78,7 +78,7 @@ const initialOrders: Order[] = [
       address: 'Jl. Gajah Mada No. 101, Semarang, Jawa Tengah',
       email: 'emma.brown@email.com',
     },
-    status: 'Fulfilled',
+    status: 'Selesai',
     date: new Date('2023-01-25').toISOString(),
     shippingDeadline: addDays(new Date('2023-01-25'), 2).toISOString(),
     total: 750000,
@@ -93,7 +93,7 @@ const initialOrders: Order[] = [
       address: 'Jl. Pahlawan No. 45, Surabaya, Jawa Timur',
       email: 'michael.johnson@email.com',
     },
-    status: 'Disputed',
+    status: 'Bermasalah',
     date: new Date('2023-01-28').toISOString(),
     shippingDeadline: addDays(new Date('2023-01-28'), 2).toISOString(),
     total: 250000,
@@ -108,22 +108,33 @@ export default function SellerOrdersPage() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const { toast } = useToast();
 
-    const handleMarkAsFulfilled = (orderId: string) => {
-        setOrders(orders.map(order => 
-            order.id === orderId ? { ...order, status: 'Fulfilled' } : order
-        ));
+    const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
+        setOrders(orders.map(order => {
+            if (order.id === orderId) {
+                const updatedOrder = { ...order, status: newStatus };
+                if (newStatus === 'Dikirim') {
+                    // Set buyer confirmation deadline, e.g., 7 days from now
+                    updatedOrder.buyerConfirmationDeadline = addDays(new Date(), 7).toISOString();
+                }
+                return updatedOrder;
+            }
+            return order;
+        }));
         toast({
-            title: "Order Fulfilled",
-            description: `Order ${orderId} has been marked as fulfilled.`,
+            title: "Status Pesanan Diperbarui",
+            description: `Pesanan ${orderId} sekarang berstatus "${newStatus}".`,
         });
     };
 
-    const getStatusStyles = (status: Order['status']) => {
+    const getStatusStyles = (status: OrderStatus) => {
         switch (status) {
-            case 'Fulfilled': return 'bg-green-100 text-green-800';
-            case 'Pending': return 'bg-yellow-100 text-yellow-800';
-            case 'Disputed': return 'bg-orange-200 text-orange-800 border-orange-400';
-            default: return '';
+            case 'Selesai': return 'bg-green-100 text-green-800';
+            case 'Pesanan Diterima': return 'bg-yellow-100 text-yellow-800';
+            case 'Dikirim': return 'bg-blue-100 text-blue-800';
+            case 'Menunggu Konfirmasi': return 'bg-purple-100 text-purple-800';
+            case 'Bermasalah': return 'bg-orange-200 text-orange-800 border-orange-400';
+            case 'Dibatalkan': return 'bg-red-100 text-red-800';
+            default: return 'bg-muted text-muted-foreground';
         }
     };
     
@@ -159,7 +170,7 @@ export default function SellerOrdersPage() {
           </TableHeader>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id} className={cn(order.status === 'Disputed' && 'bg-orange-50/50')}>
+              <TableRow key={order.id} className={cn(order.status === 'Bermasalah' && 'bg-orange-50/50')}>
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>{order.customer.name}</TableCell>
                 <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
@@ -195,10 +206,10 @@ export default function SellerOrdersPage() {
                             View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                            onClick={() => handleMarkAsFulfilled(order.id)}
-                            disabled={order.status !== 'Pending'}
+                            onClick={() => handleUpdateStatus(order.id, 'Dikirim')}
+                            disabled={order.status !== 'Pesanan Diterima'}
                         >
-                            Mark as Fulfilled
+                            Kirim Pesanan
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                             Contact Customer
@@ -221,7 +232,7 @@ export default function SellerOrdersPage() {
                 setSelectedOrder(null);
             }
         }}
-        onMarkAsFulfilled={handleMarkAsFulfilled}
+        onUpdateStatus={handleUpdateStatus}
     />
     </>
   );

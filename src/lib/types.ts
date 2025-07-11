@@ -50,12 +50,15 @@ export interface OrderCustomer {
     address: string;
 }
 
+export type OrderStatus = 'Pesanan Diterima' | 'Dikirim' | 'Menunggu Konfirmasi' | 'Selesai' | 'Bermasalah' | 'Dibatalkan';
+
 export interface Order {
     id: string;
     customer: OrderCustomer;
-    status: 'Pending' | 'Fulfilled' | 'Disputed' | 'Cancelled';
+    status: OrderStatus;
     date: string; // ISO 8601
     shippingDeadline: string; // ISO 8601
     total: number;
     items: OrderItem[];
+    buyerConfirmationDeadline?: string; // Optional: for buyer confirmation window
 }

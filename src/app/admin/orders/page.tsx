@@ -28,71 +28,72 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import type { Order, OrderStatus } from '@/lib/types';
 
 // Mock data for demonstration
-const initialOrders = [
+const initialOrders: Order[] = [
   {
     id: '#3210',
-    customer: 'Olivia Martin',
-    email: 'olivia.martin@email.com',
-    type: 'Sale',
-    status: 'Fulfilled' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    customer: { name: 'Olivia Martin', email: 'olivia.martin@email.com', address: '' },
+    status: 'Selesai',
     date: '2023-02-01',
+    shippingDeadline: '2023-02-03',
     total: 450000,
+    items: [],
   },
   {
     id: '#3209',
-    customer: 'Ava Johnson',
-    email: 'ava.johnson@email.com',
-    type: 'Sale',
-    status: 'Fulfilled' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    customer: { name: 'Ava Johnson', email: 'ava.johnson@email.com', address: '' },
+    status: 'Selesai',
     date: '2023-01-31',
+    shippingDeadline: '2023-02-02',
     total: 350000,
+    items: [],
   },
     {
     id: '#3208',
-    customer: 'Alex Doe', // For user view
-    email: 'alex.doe@example.com',
-    type: 'Sale',
-    status: 'Pending' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    customer: { name: 'Alex Doe', email: 'alex.doe@example.com', address: '' },
+    status: 'Pesanan Diterima',
     date: '2023-01-30',
+    shippingDeadline: '2023-02-01',
     total: 1200000,
+    items: [],
   },
   {
     id: '#3204',
-    customer: 'Michael Johnson',
-    email: 'michael.johnson@email.com',
-    type: 'Refund',
-    status: 'Declined' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    customer: { name: 'Michael Johnson', email: 'michael.johnson@email.com', address: '' },
+    status: 'Dibatalkan',
     date: '2023-01-28',
+    shippingDeadline: '2023-01-30',
     total: 250000,
+    items: [],
   },
     {
     id: '#3203',
-    customer: 'Liam Smith',
-    email: 'liam.smith@email.com',
-    type: 'Sale',
-    status: 'Fulfilled' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    customer: { name: 'Liam Smith', email: 'liam.smith@email.com', address: '' },
+    status: 'Selesai',
     date: '2023-01-27',
+    shippingDeadline: '2023-01-29',
     total: 550000,
+    items: [],
   },
    {
     id: '#3202',
-    customer: 'Emma Brown',
-    email: 'emma.brown@email.com',
-    type: 'Sale',
-    status: 'Pending' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    customer: { name: 'Emma Brown', email: 'emma.brown@email.com', address: '' },
+    status: 'Pesanan Diterima',
     date: '2023-01-26',
+    shippingDeadline: '2023-01-28',
     total: 150000,
+    items: [],
   },
     {
     id: '#3201',
-    customer: 'Alex Doe', // For user view
-    email: 'alex.doe@example.com',
-    type: 'Sale',
-    status: 'Fulfilled' as 'Fulfilled' | 'Pending' | 'Declined' | 'Disputed',
+    customer: { name: 'Alex Doe', email: 'alex.doe@example.com', address: '' },
+    status: 'Selesai',
     date: '2023-01-25',
+    shippingDeadline: '2023-01-27',
     total: 750000,
+    items: [],
   },
 ];
 
@@ -101,16 +102,18 @@ export default function AdminOrdersPage() {
 
     const handleMarkAsDisputed = (orderId: string) => {
         setOrders(orders.map(order => 
-            order.id === orderId ? { ...order, status: 'Disputed' } : order
+            order.id === orderId ? { ...order, status: 'Bermasalah' } : order
         ));
     };
 
-    const getStatusStyles = (status: string) => {
+    const getStatusStyles = (status: OrderStatus) => {
         switch (status) {
-            case 'Fulfilled': return 'bg-green-100 text-green-800';
-            case 'Pending': return 'bg-yellow-100 text-yellow-800';
-            case 'Disputed': return 'bg-orange-200 text-orange-800 border-orange-400';
-            case 'Declined': return 'bg-red-100 text-red-800';
+            case 'Selesai': return 'bg-green-100 text-green-800';
+            case 'Pesanan Diterima': return 'bg-yellow-100 text-yellow-800';
+            case 'Dikirim': return 'bg-blue-100 text-blue-800';
+            case 'Menunggu Konfirmasi': return 'bg-purple-100 text-purple-800';
+            case 'Bermasalah': return 'bg-orange-200 text-orange-800 border-orange-400';
+            case 'Dibatalkan': return 'bg-red-100 text-red-800';
             default: return '';
         }
     };
@@ -140,15 +143,14 @@ export default function AdminOrdersPage() {
           </TableHeader>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id} className={cn(order.status === 'Disputed' && 'bg-orange-50')}>
+              <TableRow key={order.id} className={cn(order.status === 'Bermasalah' && 'bg-orange-50')}>
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>
-                  <div className="font-medium">{order.customer}</div>
-                  <div className="text-sm text-muted-foreground">{order.email}</div>
+                  <div className="font-medium">{order.customer.name}</div>
+                  <div className="text-sm text-muted-foreground">{order.customer.email}</div>
                 </TableCell>
                 <TableCell>
                   <Badge 
-                    variant={order.status === 'Fulfilled' ? 'default' : order.status === 'Pending' ? 'secondary' : 'destructive'}
                     className={cn("font-semibold", getStatusStyles(order.status))}
                   >
                     {order.status}
