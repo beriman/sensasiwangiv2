@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Trash2, Minus, Plus, CreditCard, PartyPopper } from 'lucide-react';
-import { useToast } from './hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 export function Cart() {
   const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
