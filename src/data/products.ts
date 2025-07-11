@@ -1,5 +1,8 @@
 import type { Product } from '@/lib/types';
 
+const oneWeekFromNow = new Date();
+oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+
 export const products: Product[] = [
   // Parfum
   {
@@ -21,8 +24,8 @@ export const products: Product[] = [
   },
   {
     id: 'p2',
-    name: 'Boisé Mystique',
-    description: 'An enchanting woody scent featuring sandalwood, cedar, and a touch of cardamom.',
+    name: 'Boisé Mystique (SAMBATAN)',
+    description: 'An enchanting woody scent featuring sandalwood, cedar, and a touch of cardamom. Join our group buy to get it at a special price!',
     price: 1350000,
     category: 'Parfum',
     imageUrl: 'https://placehold.co/600x600.png',
@@ -35,6 +38,13 @@ export const products: Product[] = [
       'Variant': '75ml'
     },
     perfumerProfileSlug: 'antoine-leduc',
+    sambatan: {
+      isActive: true,
+      targetParticipants: 20,
+      currentParticipants: 7,
+      deadline: oneWeekFromNow.toISOString(),
+      sambatanPrice: 999000
+    }
   },
   {
     id: 'p3',

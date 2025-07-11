@@ -1,7 +1,7 @@
-
 // src/app/products/[id]/page.tsx
 'use client';
 
+import { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -11,10 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, MessageSquare } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, MessageSquare, Users, Clock } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
-import { formatRupiah } from '@/lib/utils';
+import { formatRupiah, cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 const scentProfileIcons: { [key: string]: React.ElementType } = {
   Floral: Leaf,
@@ -25,14 +27,71 @@ const scentProfileIcons: { [key: string]: React.ElementType } = {
   Spicy: Flame,
 };
 
+const CountdownTimer = ({ deadline }: { deadline: string }) => {
+    const calculateTimeLeft = () => {
+        const difference = +new Date(deadline) - +new Date();
+        let timeLeft = {};
+
+        if (difference > 0) {
+            timeLeft = {
+                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                minutes: Math.floor((difference / 1000 / 60) % 60),
+            };
+        }
+        return timeLeft;
+    };
+
+    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setTimeLeft(calculateTimeLeft());
+        }, 1000);
+        return () => clearTimeout(timer);
+    });
+
+    const timerComponents: any[] = [];
+    Object.keys(timeLeft).forEach((interval) => {
+        if (!timeLeft[interval as keyof typeof timeLeft]) {
+            return;
+        }
+        timerComponents.push(
+            <span key={interval}>
+                {timeLeft[interval as keyof typeof timeLeft]}
+                {interval.substring(0,1)}
+            </span>
+        );
+    });
+    
+    return (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Clock className="h-4 w-4" />
+            {timerComponents.length ? timerComponents.reduce((prev, curr) => [prev, ' ', curr]) : <span>Time's up!</span>}
+        </div>
+    );
+};
+
+
 export default function ProductDetailPage() {
   const { addItem } = useCart();
+  const { toast } = useToast();
   const params = useParams();
   const productId = Array.isArray(params.id) ? params.id[0] : params.id;
   const product = products.find((p) => p.id === productId);
 
   if (!product) {
     notFound();
+  }
+  
+  const isSambatan = product.sambatan?.isActive;
+  const sambatanProgress = isSambatan ? (product.sambatan.currentParticipants / product.sambatan.targetParticipants) * 100 : 0;
+
+  const handleJoinSambatan = () => {
+    toast({
+        title: "Bergabung dengan Sambatan!",
+        description: "Fitur pembayaran akan segera hadir. Anda telah dicatat sebagai peminat."
+    })
   }
 
   const renderProductProperties = () => {
@@ -61,6 +120,19 @@ export default function ProductDetailPage() {
         </div>
     );
   };
+  
+  const renderPriceSection = () => {
+    if (isSambatan) {
+      return (
+        <div className="mt-4">
+            <span className="text-xl text-muted-foreground line-through">{formatRupiah(product.price)}</span>
+            <p className="text-3xl font-bold text-accent">{formatRupiah(product.sambatan.sambatanPrice)}</p>
+            <Badge variant="secondary" className="mt-2 bg-accent/20 text-accent">Harga Sambatan</Badge>
+        </div>
+      )
+    }
+    return <p className="mt-4 text-3xl font-bold text-foreground/80">{formatRupiah(product.price)}</p>
+  }
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -82,13 +154,22 @@ export default function ProductDetailPage() {
 
           {/* Product Info */}
           <div className="flex flex-col">
-            <Badge variant="secondary" className="mb-2 w-fit rounded-md bg-accent/50 text-accent-foreground">
-              {product.category}
-            </Badge>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground/90 md:text-4xl">
+            <div className="flex items-center gap-4">
+                <Badge variant="secondary" className="w-fit rounded-md bg-accent/50 text-accent-foreground">
+                {product.category}
+                </Badge>
+                {isSambatan && (
+                    <Badge className="bg-accent-gradient text-accent-foreground">
+                        <Users className="mr-1.5 h-4 w-4" />
+                        Sambatan Aktif
+                    </Badge>
+                )}
+            </div>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground/90 md:text-4xl">
               {product.name}
             </h1>
-            <p className="mt-4 text-2xl font-bold text-foreground/80">{formatRupiah(product.price)}</p>
+            
+            {renderPriceSection()}
             
             <div className="mt-4 flex items-center gap-2">
                 <div className="flex items-center">
@@ -103,17 +184,46 @@ export default function ProductDetailPage() {
             
             <Separator className="my-6" />
 
-            <h3 className="text-lg font-semibold text-foreground/80">Details</h3>
-            <div className="mt-4">
-                {renderProductProperties()}
-            </div>
+            {isSambatan ? (
+                <Card className="rounded-2xl border-none bg-background shadow-neumorphic-inset p-6">
+                    <CardTitle className="text-xl text-foreground/80 mb-4">Detail Sambatan</CardTitle>
+                    <div className="space-y-4">
+                        <div>
+                            <div className="flex justify-between text-sm font-medium text-muted-foreground">
+                                <span>Partisipan Terkumpul</span>
+                                <span>{product.sambatan.currentParticipants} / {product.sambatan.targetParticipants}</span>
+                            </div>
+                            <Progress value={sambatanProgress} className="mt-2 h-3" />
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                            <span className="font-semibold text-muted-foreground">Batas Waktu:</span>
+                            <CountdownTimer deadline={product.sambatan.deadline} />
+                        </div>
+                    </div>
+                </Card>
+            ) : (
+                <>
+                    <h3 className="text-lg font-semibold text-foreground/80">Details</h3>
+                    <div className="mt-4">
+                        {renderProductProperties()}
+                    </div>
+                </>
+            )}
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-              <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => addItem(product)}>
-                <ShoppingCart className="mr-2 h-6 w-6" />
-                Add to Cart
-              </Button>
+              {isSambatan ? (
+                 <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={handleJoinSambatan}>
+                    <Users className="mr-2 h-6 w-6" />
+                    Gabung Sambatan
+                </Button>
+              ) : (
+                <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => addItem(product)}>
+                    <ShoppingCart className="mr-2 h-6 w-6" />
+                    Add to Cart
+                </Button>
+              )}
             </div>
+            {!isSambatan && <Separator className="my-6" />}
           </div>
         </div>
         <PersonalizedRecommendations category={product.category} activeFilters={{}} />

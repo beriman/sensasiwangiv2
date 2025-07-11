@@ -19,11 +19,16 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Upload } from 'lucide-react';
-import type { Product, ProductCategory } from '@/lib/types';
+import { Switch } from '@/components/ui/switch';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Loader2, Upload, CalendarIcon } from 'lucide-react';
+import type { Product, ProductCategory, SambatanDetails } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from './ui/skeleton';
 import { perfumers } from '@/data/perfumers';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 const productCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools'];
 
@@ -37,6 +42,12 @@ const productFormSchema = z.object({
   imageUrl: z.string().optional(),
   properties: z.record(z.string()).optional().default({}),
   perfumerProfileSlug: z.string().optional(),
+  isSambatan: z.boolean().default(false),
+  sambatanDetails: z.object({
+    targetParticipants: z.coerce.number().optional(),
+    sambatanPrice: z.coerce.number().optional(),
+    deadline: z.date().optional(),
+  }).optional()
 }).superRefine((data, ctx) => {
     if (data.category === 'Parfum') {
         if (!data.properties?.Brand) {
@@ -54,14 +65,32 @@ const productFormSchema = z.object({
             });
         }
     }
+    if (data.isSambatan) {
+        if (!data.sambatanDetails?.targetParticipants || data.sambatanDetails.targetParticipants <= 0) {
+            ctx.addIssue({ code: 'custom', message: 'Target participants must be a positive number.', path: ['sambatanDetails.targetParticipants']});
+        }
+        if (!data.sambatanDetails?.sambatanPrice || data.sambatanDetails.sambatanPrice <= 0) {
+            ctx.addIssue({ code: 'custom', message: 'Sambatan price must be a positive number.', path: ['sambatanDetails.sambatanPrice']});
+        }
+        if (!data.sambatanDetails?.deadline) {
+            ctx.addIssue({ code: 'custom', message: 'Deadline is required for Sambatan.', path: ['sambatanDetails.deadline']});
+        }
+    }
 });
 
-export type ProductFormData = z.infer<typeof productFormSchema>;
+export type ProductFormData = Omit<Product, 'sambatan'> & {
+    isSambatan: boolean;
+    sambatanDetails?: {
+        targetParticipants?: number;
+        sambatanPrice?: number;
+        deadline?: Date;
+    }
+};
 
 interface ProductFormDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: (data: ProductFormData) => void;
+  onSave: (data: Product) => void;
   productData?: Product | null;
 }
 
@@ -70,7 +99,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
-  const form = useForm<ProductFormData>({
+  const form = useForm<z.infer<typeof productFormSchema>>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
         name: '',
@@ -80,33 +109,54 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         imageUrl: '',
         properties: {},
         perfumerProfileSlug: '',
+        isSambatan: false,
+        sambatanDetails: {
+            targetParticipants: 10,
+            sambatanPrice: 0,
+            deadline: undefined,
+        }
     }
   });
 
   const watchedImageUrl = useWatch({ control: form.control, name: 'imageUrl' });
   const watchedCategory = useWatch({ control: form.control, name: 'category' });
+  const watchedIsSambatan = useWatch({ control: form.control, name: 'isSambatan' });
 
   useEffect(() => {
-    if (productData) {
-      form.reset({
-        name: productData.name,
-        description: productData.description,
-        price: productData.price,
-        category: productData.category,
-        imageUrl: productData.imageUrl,
-        properties: productData.properties,
-        perfumerProfileSlug: productData.perfumerProfileSlug,
-      });
-    } else {
-      form.reset({
-        name: '',
-        description: '',
-        price: 0,
-        category: 'Parfum',
-        imageUrl: '',
-        properties: {},
-        perfumerProfileSlug: '',
-      });
+    if (isOpen) {
+        if (productData) {
+            form.reset({
+                name: productData.name,
+                description: productData.description,
+                price: productData.price,
+                category: productData.category,
+                imageUrl: productData.imageUrl,
+                properties: productData.properties,
+                perfumerProfileSlug: productData.perfumerProfileSlug,
+                isSambatan: productData.sambatan?.isActive ?? false,
+                sambatanDetails: {
+                    targetParticipants: productData.sambatan?.targetParticipants,
+                    sambatanPrice: productData.sambatan?.sambatanPrice,
+                    deadline: productData.sambatan?.deadline ? new Date(productData.sambatan.deadline) : undefined,
+                }
+            });
+        } else {
+            form.reset({
+                name: '',
+                description: '',
+                price: 0,
+                category: 'Parfum',
+                imageUrl: '',
+                properties: {},
+                perfumerProfileSlug: '',
+                isSambatan: false,
+                sambatanDetails: {
+                    targetParticipants: 10,
+                    sambatanPrice: 0,
+                    deadline: undefined
+                }
+            });
+        }
     }
   }, [productData, form, isOpen]);
 
@@ -144,12 +194,32 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
   };
 
 
-  const onSubmit = (values: ProductFormData) => {
+  const onSubmit = (values: z.infer<typeof productFormSchema>) => {
     const perfumer = perfumers.find(p => p.slug === values.perfumerProfileSlug);
     if(perfumer) {
         values.properties.Perfumer = perfumer.name;
     }
-    onSave(values);
+
+    const finalProductData: Product = {
+        id: productData?.id || `prod-${Date.now()}`,
+        name: values.name,
+        description: values.description,
+        price: values.price,
+        category: values.category,
+        imageUrl: values.imageUrl || 'https://placehold.co/600x600.png',
+        imageHint: 'perfume bottle', // default hint
+        properties: values.properties || {},
+        perfumerProfileSlug: values.perfumerProfileSlug,
+        sambatan: values.isSambatan && values.sambatanDetails?.deadline && values.sambatanDetails.sambatanPrice && values.sambatanDetails.targetParticipants ? {
+            isActive: true,
+            currentParticipants: productData?.sambatan?.currentParticipants ?? 0,
+            deadline: values.sambatanDetails.deadline.toISOString(),
+            sambatanPrice: values.sambatanDetails.sambatanPrice,
+            targetParticipants: values.sambatanDetails.targetParticipants,
+        } : undefined,
+    }
+
+    onSave(finalProductData);
   };
   
   const dialogTitle = productData ? 'Edit Product' : 'Add New Product';
@@ -200,7 +270,6 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     <Upload className="mr-2 h-5 w-5" />
                     Change Image
                 </Button>
-
 
               <FormField
                 control={form.control}
@@ -303,6 +372,101 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     />
                 </>
               )}
+              
+                <FormField
+                    control={form.control}
+                    name="isSambatan"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-neumorphic-inset">
+                        <div className="space-y-0.5">
+                            <FormLabel className="text-base">Buat Sambatan (Group Buy)</FormLabel>
+                            <DialogDescription>
+                                Tawarkan harga spesial untuk pembelian kolektif.
+                            </DialogDescription>
+                        </div>
+                        <FormControl>
+                            <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            />
+                        </FormControl>
+                        </FormItem>
+                    )}
+                />
+
+                {watchedIsSambatan && (
+                    <div className="space-y-4 rounded-lg border p-4">
+                        <h4 className="font-semibold">Parameter Sambatan</h4>
+                        <FormField
+                            control={form.control}
+                            name="sambatanDetails.targetParticipants"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Target Partisipan</FormLabel>
+                                <FormControl>
+                                <Input type="number" placeholder="20" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                         <FormField
+                            control={form.control}
+                            name="sambatanDetails.sambatanPrice"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Harga Sambatan (Rp)</FormLabel>
+                                <FormControl>
+                                <Input type="number" placeholder="999000" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="sambatanDetails.deadline"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                <FormLabel>Batas Waktu</FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                    <FormControl>
+                                        <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full pl-3 text-left font-normal rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                        >
+                                        {field.value ? (
+                                            format(field.value, "PPP")
+                                        ) : (
+                                            <span>Pilih tanggal</span>
+                                        )}
+                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                    </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        disabled={(date) => date < new Date() || date < new Date("1900-01-01")
+                                        }
+                                        initialFocus
+                                    />
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                )}
+
+
             </div>
             <DialogFooter className="pt-4">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>

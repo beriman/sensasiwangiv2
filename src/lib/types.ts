@@ -1,5 +1,13 @@
 export type ProductCategory = 'Parfum' | 'Raw Material' | 'Tools';
 
+export interface SambatanDetails {
+  isActive: boolean;
+  targetParticipants: number;
+  currentParticipants: number;
+  deadline: string; // ISO 8601 date string
+  sambatanPrice: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -10,6 +18,7 @@ export interface Product {
   imageHint: string;
   properties: Record<string, string>;
   perfumerProfileSlug?: string;
+  sambatan?: SambatanDetails;
 }
 
 export interface CartItem extends Product {
