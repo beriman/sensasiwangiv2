@@ -3,13 +3,14 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { notFound, useParams } from 'next/navigation';
 import { perfumers, type PerfumerProfile } from '@/data/perfumers';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditProfileDialog, type ProfileData } from '@/components/edit-profile-dialog';
-import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck } from 'lucide-react';
+import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare } from 'lucide-react';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -93,8 +94,13 @@ export default function ProfilePage() {
             </div>
             <p className="mt-6 text-base text-foreground/80">{profile.bio}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <Button onClick={() => setIsDialogOpen(true)} className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+              <Button onClick={() => setIsDialogOpen(true)} variant="outline" className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
                 Edit Profile
+              </Button>
+              <Button asChild className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+                <Link href="/dashboard/messages">
+                    <MessageSquare className="mr-2" /> Message
+                </Link>
               </Button>
               <Button
                 onClick={() => setIsFollowing(!isFollowing)}

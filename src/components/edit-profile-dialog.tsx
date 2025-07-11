@@ -20,7 +20,7 @@ import { Loader2 } from 'lucide-react';
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
-  username: z.string().min(2, { message: 'Username must be at least 2 characters.' }),
+  username: z.string().min(2, { message: 'Username must be at least 2 characters.' }).refine(val => val.startsWith('@'), { message: 'Username must start with @.'}),
   bio: z.string().max(160, { message: 'Bio must not be longer than 160 characters.' }).min(10, { message: 'Bio must be at least 10 characters.' }),
   twitter: z.string().url().optional().or(z.literal('')),
   instagram: z.string().url().optional().or(z.literal('')),
@@ -32,7 +32,6 @@ export type ProfileData = {
   username: string;
   bio: string;
   profilePicture: string;
-  imageHint: string;
   socials: {
     twitter?: string;
     instagram?: string;
@@ -93,6 +92,19 @@ export function EditProfileDialog({ isOpen, onOpenChange, profileData, onSave }:
                   <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input placeholder="Your name" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="@username" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

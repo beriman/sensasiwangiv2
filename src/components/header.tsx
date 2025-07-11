@@ -3,24 +3,62 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Cart } from '@/components/cart';
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 
 const navLinks = [
   { href: '/', label: 'Marketplace' },
   { href: '/school', label: 'School' },
   { href: '/community', label: 'Community' },
-  { href: '/dashboard/my-products', label: 'My Products' },
-  { href: '/profile', label: 'Profile' },
 ];
 
 export function AppHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const UserMenu = () => (
+    <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full">
+            <Avatar>
+                <AvatarImage src="https://placehold.co/40x40.png" alt="Alex Doe" />
+                <AvatarFallback>AD</AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/my-products">
+                Dashboard
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/profile/alex-doe">
+                Profile
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>
+            Logout
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+  );
 
   return (
     <header className="sticky top-0 z-10 w-full border-b border-border/60 bg-background/80 shadow-neumorphic backdrop-blur-sm">
@@ -43,12 +81,16 @@ export function AppHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-            <Button 
-              onClick={() => setIsLoggedIn(!isLoggedIn)}
-              className="rounded-xl px-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active"
-            >
-              {isLoggedIn ? 'Logout' : 'Login'}
-            </Button>
+            {isLoggedIn ? (
+               <UserMenu />
+            ) : (
+                 <Button 
+                    onClick={() => setIsLoggedIn(true)}
+                    className="rounded-xl px-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active"
+                >
+                    Login
+                </Button>
+            )}
             <Cart />
         </div>
 
@@ -81,6 +123,15 @@ export function AppHeader() {
                       {link.label}
                     </Link>
                   ))}
+                  {isLoggedIn && (
+                     <Link
+                        href="/dashboard/my-products"
+                        className="rounded-lg p-3 text-lg font-medium text-foreground/80 transition-colors hover:bg-accent/50"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                        Dashboard
+                    </Link>
+                  )}
                 </div>
                 <Button 
                     onClick={() => {

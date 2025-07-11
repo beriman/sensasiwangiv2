@@ -4,7 +4,6 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { AppHeader } from '@/components/header';
 import { products as initialProducts, Product } from '@/data/products';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
@@ -37,6 +36,7 @@ import {
 import { ProductFormDialog } from '@/components/product-form-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { formatRupiah } from '@/lib/utils';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 
 
 // In a real app, you'd get this from user authentication
@@ -97,15 +97,12 @@ export default function MyProductsPage() {
 
 
   return (
-    <div className="min-h-screen bg-background font-body">
-      <AppHeader />
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
+    <>
+      <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
+        <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground/90">My Products</h1>
-            <p className="text-muted-foreground mt-1">
-              Manage your creations and offerings.
-            </p>
+            <CardTitle className="text-xl font-bold text-foreground/80">My Products</CardTitle>
+            <CardDescription>Manage your creations and offerings.</CardDescription>
           </div>
           <Button 
             onClick={handleAddClick}
@@ -114,9 +111,8 @@ export default function MyProductsPage() {
             <PlusCircle className="mr-2 h-5 w-5" />
             Add New Product
           </Button>
-        </div>
-
-        <div className="rounded-2xl border-none bg-transparent shadow-neumorphic">
+        </CardHeader>
+        <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
@@ -200,8 +196,8 @@ export default function MyProductsPage() {
                 You haven't added any products yet.
             </div>
           )}
-        </div>
-      </main>
+        </CardContent>
+      </Card>
 
       {/* Add/Edit Product Dialog */}
       <ProductFormDialog
@@ -228,6 +224,6 @@ export default function MyProductsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }
