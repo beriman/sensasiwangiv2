@@ -108,6 +108,9 @@ export default function CurationDashboardPage() {
     const [confirmAction, setConfirmAction] = useState<{ type: 'Approve' | 'Reject' | null }>({ type: null });
     const { toast } = useToast();
 
+    // In a real app, this would come from the authenticated user's session
+    const MOCK_CURATOR_NAME = "Curator A";
+
     const getStatusVariant = (status: string) => {
         switch (status) {
             case 'Approved': return 'bg-green-100 text-green-800';
@@ -138,7 +141,7 @@ export default function CurationDashboardPage() {
     };
 
     const updateApplicationStatus = (appId: string, status: CurationStatus) => {
-        setApplications(prev => prev.map(app => app.id === appId ? { ...app, status } : app));
+        setApplications(prev => prev.map(app => app.id === appId ? { ...app, status, lastUpdatedBy: MOCK_CURATOR_NAME } : app));
         toast({
             title: 'Status Updated',
             description: `Application from ${selectedApp?.applicantName} is now "${status}".`,
@@ -179,6 +182,7 @@ export default function CurationDashboardPage() {
               </TableHead>
               <TableHead>Date Applied</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Last Updated By</TableHead>
               <TableHead className="text-center">AI Score</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
@@ -195,6 +199,7 @@ export default function CurationDashboardPage() {
                     {app.status}
                   </Badge>
                 </TableCell>
+                 <TableCell className="text-muted-foreground">{app.lastUpdatedBy || '-'}</TableCell>
                 <TableCell className={cn("text-center font-bold", getScoreColor(app.aiScore))}>
                     {app.aiScore > 0 ? `${app.aiScore}/10` : 'N/A'}
                 </TableCell>

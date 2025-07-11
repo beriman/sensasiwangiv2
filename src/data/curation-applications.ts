@@ -15,6 +15,7 @@ export interface CurationApplication {
     status: CurationStatus;
     aiScore: number;
     statement: string;
+    lastUpdatedBy?: string;
 }
 
 export const curationApplications: CurationApplication[] = [
@@ -25,7 +26,8 @@ export const curationApplications: CurationApplication[] = [
         dateApplied: new Date('2024-05-28T10:00:00Z').toISOString(),
         status: 'Pending Sample Review',
         aiScore: 9,
-        statement: 'Our philosophy at Forêt Noire is to capture the essence of deep, ancient forests. We formulate everything in-house using raw materials like oakmoss absolute, vetiver essential oil, and our own tincture of local resins. We never use pre-made fragrance oils.'
+        statement: 'Our philosophy at Forêt Noire is to capture the essence of deep, ancient forests. We formulate everything in-house using raw materials like oakmoss absolute, vetiver essential oil, and our own tincture of local resins. We never use pre-made fragrance oils.',
+        lastUpdatedBy: 'Curator AI',
     },
     {
         id: 'app-002',
@@ -34,7 +36,8 @@ export const curationApplications: CurationApplication[] = [
         dateApplied: new Date('2024-05-27T14:30:00Z').toISOString(),
         status: 'Rejected',
         aiScore: 2,
-        statement: 'Kami menyediakan bibit parfum import kualitas terbaik. Wanginya tahan lama dan mirip dengan parfum desainer ternama. Proses kami adalah mencampur bibit dengan pelarut khusus untuk hasil terbaik.'
+        statement: 'Kami menyediakan bibit parfum import kualitas terbaik. Wanginya tahan lama dan mirip dengan parfum desainer ternama. Proses kami adalah mencampur bibit dengan pelarut khusus untuk hasil terbaik.',
+        lastUpdatedBy: 'Curator B',
     },
     {
         id: 'app-003',
@@ -43,7 +46,8 @@ export const curationApplications: CurationApplication[] = [
         dateApplied: new Date('2024-05-25T09:00:00Z').toISOString(),
         status: 'Approved',
         aiScore: 8,
-        statement: 'Aroma Pribumi mengangkat kekayaan flora Indonesia. Setiap parfum diracik dari nol menggunakan minyak atsiri pala dari Maluku, nilam dari Aceh, dan melati dari Jawa. Proses kami sangat mengandalkan maserasi dan distilasi uap tradisional.'
+        statement: 'Aroma Pribumi mengangkat kekayaan flora Indonesia. Setiap parfum diracik dari nol menggunakan minyak atsiri pala dari Maluku, nilam dari Aceh, dan melati dari Jawa. Proses kami sangat mengandalkan maserasi dan distilasi uap tradisional.',
+        lastUpdatedBy: 'Curator A',
     },
     {
         id: 'app-004',
