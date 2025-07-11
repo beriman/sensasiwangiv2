@@ -25,19 +25,48 @@ interface AdminHeaderProps {
     onLogout: () => void;
 }
 
+const notifications = [
+    { title: "New order #3210 has been placed.", time: "5 min ago" },
+    { title: "User 'Jane Smith' submitted new feedback.", time: "20 min ago"},
+    { title: "Product 'Boisé Mystique' needs approval.", time: "1 hour ago"},
+    { title: "Your sales report for May is ready.", time: "3 hours ago"},
+]
+
 export function AdminHeader({ onLogout }: AdminHeaderProps) {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
        <div className="flex-1">
           <h1 className="text-xl font-semibold">Dashboard</h1>
        </div>
-      <Button
-        variant="outline"
-        size="icon"
-        className="overflow-hidden rounded-full"
-      >
-        <Bell className="h-5 w-5" />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="overflow-hidden rounded-full relative"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {notifications.map((notification, index) => (
+                <DropdownMenuItem key={index} className="flex flex-col items-start gap-1">
+                    <p className="text-sm font-medium leading-none whitespace-normal">{notification.title}</p>
+                    <p className="text-xs text-muted-foreground">{notification.time}</p>
+                </DropdownMenuItem>
+            ))}
+             <DropdownMenuSeparator />
+             <DropdownMenuItem className="justify-center text-sm text-muted-foreground hover:text-foreground">
+                View all notifications
+             </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
