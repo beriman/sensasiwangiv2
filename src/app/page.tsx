@@ -27,6 +27,7 @@ const categories = [
 export default function Home() {
   const searchParams = useSearchParams();
   const brandQuery = searchParams.get('brand');
+  const sellerQuery = searchParams.get('seller');
 
   const [category, setCategory] = useState<string>('Parfum');
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,8 +38,13 @@ export default function Home() {
     if (brandQuery) {
       setCategory('Parfum'); // Assume brands are for perfumes
       setFilters(prev => ({ ...prev, 'Brand': [brandQuery] }));
+      setSearchTerm('');
     }
-  }, [brandQuery]);
+    if (sellerQuery) {
+      setFilters({}); // Clear other filters when focusing on a seller
+      setSearchTerm('');
+    }
+  }, [brandQuery, sellerQuery]);
 
   const handleFilterChange = (filterType: string, value: string) => {
     setFilters((prevFilters) => {
@@ -73,6 +79,11 @@ export default function Home() {
           return false; // Automatically unlist expired Sambatan
         }
       }
+      
+      // Handle seller filter first, as it's a primary view
+      if (sellerQuery) {
+        return product.perfumerProfileSlug === sellerQuery;
+      }
 
       const categoryMatch = category === 'All' || product.category === category;
       
@@ -91,7 +102,7 @@ export default function Home() {
 
       return categoryMatch && searchTermMatch && filtersMatch;
     });
-  }, [category, searchTerm, filters]);
+  }, [category, searchTerm, filters, sellerQuery]);
   
   const productsForFilter = useMemo(() => {
     return allProducts.filter(p => (category === 'All' || p.category === category) && p.isListed);
@@ -102,36 +113,47 @@ export default function Home() {
     <div className="min-h-screen bg-background font-body">
       <AppHeader />
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex flex-col items-center justify-between gap-6 md:flex-row">
-            <Tabs value={category} onValueChange={setCategory} className="w-full md:w-auto">
-              <TabsList className="h-12 w-full rounded-xl bg-transparent p-1 shadow-neumorphic-inset md:w-auto">
-                {categories.map((cat) => (
-                  <TabsTrigger
-                    key={cat.name}
-                    value={cat.name}
-                    className={cn(
-                      'h-full flex-1 rounded-lg px-4 py-2 text-foreground/70 transition-all duration-300 data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active',
-                      'data-[state=active]:bg-accent-gradient',
-                      'hover:bg-background/50 hover:shadow-neumorphic-active'
-                    )}
-                  >
-                    <cat.icon className="mr-2 h-5 w-5 text-current/80" />
-                    {cat.name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-            <div className="relative w-full max-w-xs">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-12 w-full rounded-xl border-none bg-background pl-10 text-base shadow-neumorphic-inset focus:ring-2 focus:ring-ring"
-              />
-            </div>
-        </div>
+        {sellerQuery ? (
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-bold text-foreground/90">Products by {sellerQuery}</h1>
+            <p className="mt-1 text-muted-foreground">Browsing all offerings from a single seller.</p>
+            <Button asChild variant="link" className="mt-2">
+              <Link href="/">Clear Seller Filter</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="mb-8 flex flex-col items-center justify-between gap-6 md:flex-row">
+              <Tabs value={category} onValueChange={setCategory} className="w-full md:w-auto">
+                <TabsList className="h-12 w-full rounded-xl bg-transparent p-1 shadow-neumorphic-inset md:w-auto">
+                  {categories.map((cat) => (
+                    <TabsTrigger
+                      key={cat.name}
+                      value={cat.name}
+                      className={cn(
+                        'h-full flex-1 rounded-lg px-4 py-2 text-foreground/70 transition-all duration-300 data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active',
+                        'data-[state=active]:bg-accent-gradient',
+                        'hover:bg-background/50 hover:shadow-neumorphic-active'
+                      )}
+                    >
+                      <cat.icon className="mr-2 h-5 w-5 text-current/80" />
+                      {cat.name}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+              <div className="relative w-full max-w-xs">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="h-12 w-full rounded-xl border-none bg-background pl-10 text-base shadow-neumorphic-inset focus:ring-2 focus:ring-ring"
+                />
+              </div>
+          </div>
+        )}
+
 
         <div className="relative grid grid-cols-1 gap-8 md:grid-cols-4">
           <Collapsible

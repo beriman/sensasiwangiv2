@@ -7,6 +7,7 @@ import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { products } from '@/data/products';
+import { perfumers } from '@/data/perfumers';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus, MessageSquare, Heart, PackageCheck, PackageX } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, Plus, Minus, MessageSquare, Heart, PackageCheck, PackageX, Store } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 import { formatRupiah, cn } from '@/lib/utils';
@@ -82,6 +83,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const productId = Array.isArray(params.id) ? params.id[0] : params.id;
   const product = products.find((p) => p.id === productId);
+  const seller = perfumers.find(p => p.slug === product?.perfumerProfileSlug);
   
   const [slotQuantity, setSlotQuantity] = useState(1);
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -139,17 +141,12 @@ export default function ProductDetailPage() {
         {Object.entries(propertiesToShow).map(([key, value]) => {
             const Icon = key === 'Scent Profile' ? scentProfileIcons[value] : null;
             const isPerfumerLink = key === 'Perfumer' && product.perfumerProfileSlug;
-            const isBrandLink = key === 'Brand' && product.category === 'Parfum';
 
             return(
                 <div key={key}>
                   <p className="font-semibold text-muted-foreground">{key}</p>
                   {isPerfumerLink ? (
                     <Link href={`/profile/${product.perfumerProfileSlug}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
-                      {value}
-                    </Link>
-                  ) : isBrandLink ? (
-                     <Link href={`/?brand=${encodeURIComponent(value)}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
                       {value}
                     </Link>
                   ) : (
@@ -222,6 +219,14 @@ export default function ProductDetailPage() {
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground/90 md:text-4xl">
               {product.name}
             </h1>
+             {seller && (
+                <div className="mt-2">
+                    <Link href={`/?seller=${seller.slug}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent">
+                        <Store className="h-4 w-4" />
+                        <span>Sold by {seller.name}</span>
+                    </Link>
+                </div>
+            )}
             
             {renderPriceSection()}
             
