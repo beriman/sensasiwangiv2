@@ -65,9 +65,9 @@ export default {
         '2xl': 'calc(var(--radius) + 8px)',
       },
       boxShadow: {
-        'neumorphic': '8px 8px 16px hsl(0 0% 88%), -8px -8px 16px hsl(0 0% 100%)',
-        'neumorphic-inset': 'inset 6px 6px 12px hsl(0 0% 88%), inset -6px -6px 12px hsl(0 0% 100%)',
-        'neumorphic-active': 'inset 3px 3px 7px hsl(0 0% 88%), inset -3px -3px 7px hsl(0 0% 100%)',
+        'neumorphic': '8px 8px 16px hsl(var(--border)), -8px -8px 16px hsl(var(--card))',
+        'neumorphic-inset': 'inset 6px 6px 12px hsl(var(--border)), inset -6px -6px 12px hsl(var(--card))',
+        'neumorphic-active': 'inset 3px 3px 7px hsl(var(--border)), inset -3px -3px 7px hsl(var(--card))',
       },
       keyframes: {
         'accordion-down': {

@@ -44,12 +44,12 @@ export default function AdminProductsPage() {
           <TableHeader>
             <TableRow>
               <TableHead className="hidden w-[100px] sm:table-cell">
-                Image
+                <span className="sr-only">Image</span>
               </TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Category</TableHead>
+              <TableHead className="hidden md:table-cell">Price</TableHead>
+              <TableHead className="hidden md:table-cell">Category</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -73,8 +73,8 @@ export default function AdminProductsPage() {
                     {product.sambatan?.isActive ? 'Sambatan' : 'Active'}
                   </Badge>
                 </TableCell>
-                <TableCell>{formatRupiah(product.price)}</TableCell>
-                <TableCell>{product.category}</TableCell>
+                <TableCell className="hidden md:table-cell">{formatRupiah(product.price)}</TableCell>
+                <TableCell className="hidden md:table-cell">{product.category}</TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

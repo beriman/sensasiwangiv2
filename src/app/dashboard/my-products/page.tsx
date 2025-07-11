@@ -99,14 +99,14 @@ export default function MyProductsPage() {
   return (
     <>
       <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle className="text-xl font-bold text-foreground/80">My Products</CardTitle>
             <CardDescription>Manage your creations and offerings.</CardDescription>
           </div>
           <Button 
             onClick={handleAddClick}
-            className="rounded-xl bg-accent-gradient text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
+            className="w-full sm:w-auto rounded-xl bg-accent-gradient text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
           >
             <PlusCircle className="mr-2 h-5 w-5" />
             Add New Product
