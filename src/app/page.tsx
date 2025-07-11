@@ -10,9 +10,11 @@ import { Filters } from '@/components/filters';
 import { ProductGrid } from '@/components/product-grid';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Leaf, FlaskConical, Wrench, Search } from 'lucide-react';
+import { Leaf, FlaskConical, Wrench, Search, SlidersHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
 
 
 const categories = [
@@ -28,6 +30,7 @@ export default function Home() {
   const [category, setCategory] = useState<string>('Parfum');
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<Record<string, string[]>>({});
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   useEffect(() => {
     if (brandQuery) {
@@ -117,15 +120,34 @@ export default function Home() {
         </div>
 
         <div className="relative grid grid-cols-1 gap-8 md:grid-cols-4">
-          <aside className="md:col-span-1">
-            <Filters
-              category={category}
-              products={productsForFilter}
-              activeFilters={filters}
-              onFilterChange={handleFilterChange}
-            />
-          </aside>
-          <main className="md:col-span-3">
+          <Collapsible asChild open={isFiltersOpen} onOpenChange={setIsFiltersOpen} className="md:col-span-1 md:block">
+            <>
+            <div className="mb-4 flex justify-between items-center md:hidden">
+              <h2 className="text-lg font-bold">Filters</h2>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <SlidersHorizontal className="h-5 w-5 mr-2" />
+                  {isFiltersOpen ? 'Hide' : 'Show'}
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+            <CollapsibleContent asChild>
+              <aside>
+                <Filters
+                  category={category}
+                  products={productsForFilter}
+                  activeFilters={filters}
+                  onFilterChange={handleFilterChange}
+                />
+              </aside>
+            </CollapsibleContent>
+            </>
+          </Collapsible>
+
+          <main className={cn(
+            "md:col-span-3",
+            !isFiltersOpen && "md:col-span-4"
+          )}>
             <ProductGrid products={filteredProducts} />
           </main>
           <PersonalizedRecommendations category={category} activeFilters={filters} />
