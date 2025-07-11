@@ -35,6 +35,23 @@ const productFormSchema = z.object({
   }),
   imageUrl: z.string().optional(),
   properties: z.record(z.string()).optional().default({}),
+}).superRefine((data, ctx) => {
+    if (data.category === 'Parfum') {
+        if (!data.properties?.Brand) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Brand is required for Parfum category.',
+                path: ['properties.Brand'],
+            });
+        }
+        if (!data.properties?.Perfumer) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Perfumer is required for Parfum category.',
+                path: ['properties.Perfumer'],
+            });
+        }
+    }
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
@@ -64,6 +81,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
   });
 
   const watchedImageUrl = useWatch({ control: form.control, name: 'imageUrl' });
+  const watchedCategory = useWatch({ control: form.control, name: 'category' });
 
   useEffect(() => {
     if (productData) {
@@ -237,6 +255,36 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                   </FormItem>
                 )}
               />
+              {watchedCategory === 'Parfum' && (
+                <>
+                    <FormField
+                        control={form.control}
+                        name="properties.Brand"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Brand</FormLabel>
+                            <FormControl>
+                            <Input placeholder="e.g., Maison de Rêve" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="properties.Perfumer"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Perfumer</FormLabel>
+                            <FormControl>
+                            <Input placeholder="e.g., Alex Doe" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </>
+              )}
             </div>
             <DialogFooter className="pt-4">
               <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
