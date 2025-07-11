@@ -9,7 +9,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const CurationScreenerInputSchema = z.object({
+const CurationScreenerInputSchema = z.object({
   statement: z
     .string()
     .min(100)
@@ -17,9 +17,9 @@ export const CurationScreenerInputSchema = z.object({
       'A detailed statement from the applicant covering their philosophy, creation process, and key materials.'
     ),
 });
-export type CurationScreenerInput = z.infer<typeof CurationScreenerInputSchema>;
+type CurationScreenerInput = z.infer<typeof CurationScreenerInputSchema>;
 
-export const CurationScreenerOutputSchema = z.object({
+const CurationScreenerOutputSchema = z.object({
   isStrongCandidate: z
     .boolean()
     .describe(
@@ -43,7 +43,7 @@ export const CurationScreenerOutputSchema = z.object({
       'An initial screening score from 1 (very weak) to 10 (very strong candidate) based on artisan perfumery principles.'
     ),
 });
-export type CurationScreenerOutput = z.infer<typeof CurationScreenerOutputSchema>;
+type CurationScreenerOutput = z.infer<typeof CurationScreenerOutputSchema>;
 
 const curationScreenerPrompt = ai.definePrompt({
   name: 'curationScreenerPrompt',

@@ -19,13 +19,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Send, WandSparkles, CheckCircle, FileUp, Package, Home } from 'lucide-react';
 import {
-  CurationScreenerOutput,
   screenCurationApplication,
 } from '@/ai/flows/curation-screener';
 import { Skeleton } from './ui/skeleton';
 import { Progress } from './ui/progress';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
+
+
+const CurationScreenerOutputSchema = z.object({
+  isStrongCandidate: z.boolean(),
+  summary: z.string(),
+  recommendation: z.string(),
+  score: z.number(),
+});
+
+type CurationScreenerOutput = z.infer<typeof CurationScreenerOutputSchema>;
 
 const curationFormSchema = z.object({
   statement: z.string().min(100, {
