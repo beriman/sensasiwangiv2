@@ -1,6 +1,11 @@
 // src/components/footer.tsx
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
-import { Flame, Twitter, Instagram } from 'lucide-react';
+import { Flame, Twitter, Instagram, MessageSquare, Bug } from 'lucide-react';
+import { FeedbackDialog } from './feedback-dialog';
+import { Button } from './ui/button';
 
 const footerLinks = {
   platform: [
@@ -17,10 +22,13 @@ const footerLinks = {
 };
 
 export function AppFooter() {
+  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
+
   return (
+    <>
     <footer className="border-t bg-background/80 pt-12 pb-8">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-4 lg:grid-cols-5">
           {/* Brand Info */}
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="mb-4 flex items-center gap-2 text-2xl font-bold text-foreground/80">
@@ -59,6 +67,18 @@ export function AppFooter() {
               ))}
             </ul>
           </div>
+
+           {/* Feedback */}
+          <div>
+            <h3 className="mb-4 font-semibold text-foreground/90">Feedback</h3>
+            <ul className="space-y-2">
+               <li>
+                <Button variant="link" className="p-0 h-auto text-muted-foreground hover:text-accent" onClick={() => setIsFeedbackDialogOpen(true)}>
+                  Saran &amp; Kritik
+                </Button>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between border-t pt-8 sm:flex-row">
@@ -76,5 +96,7 @@ export function AppFooter() {
         </div>
       </div>
     </footer>
+    <FeedbackDialog isOpen={isFeedbackDialogOpen} onOpenChange={setIsFeedbackDialogOpen} />
+    </>
   );
 }

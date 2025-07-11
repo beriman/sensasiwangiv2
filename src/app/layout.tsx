@@ -31,8 +31,8 @@ export default function RootLayout({
         <div className="flex-grow">
           {children}
         </div>
-        <Toaster />
         <AppFooter />
+        <Toaster />
       </body>
     </html>
   );

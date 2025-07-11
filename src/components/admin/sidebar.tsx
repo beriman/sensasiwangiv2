@@ -9,7 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Home, Package, ShoppingCart, Users, LineChart, Settings, Flame } from 'lucide-react';
+import { Home, Package, ShoppingCart, Users, LineChart, Settings, Flame, MessageSquareWarning } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
@@ -18,6 +18,7 @@ const navLinks = [
     { href: '/admin/products', icon: Package, label: 'Products' },
     { href: '/admin/users', icon: Users, label: 'Customers' },
     { href: '/admin/analytics', icon: LineChart, label: 'Analytics' },
+    { href: '/admin/feedback', icon: MessageSquareWarning, label: 'Feedback' },
 ];
 
 export function AdminSidebar() {
