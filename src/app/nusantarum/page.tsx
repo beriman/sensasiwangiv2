@@ -1,3 +1,4 @@
+
 // src/app/nusantarum/page.tsx
 'use client';
 
@@ -10,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Users, Bot, Building } from 'lucide-react';
+import { ArrowRight, Users, Bot, Building, BadgeCheck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const uniqueBrands = [...new Set(products.map(p => p.properties.Brand).filter(Boolean))];
@@ -36,7 +37,15 @@ function PerfumerCard({ perfumer }: { perfumer: Profile }) {
       </CardContent>
       <div className="flex items-center justify-between p-4">
         <div className="text-sm text-muted-foreground">
-            {perfumer.followers?.toLocaleString()} Followers
+            {perfumer.followers ? 
+              `${perfumer.followers.toLocaleString()} Followers` :
+              perfumer.curation?.isCurated ? (
+                 <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-800">
+                    <BadgeCheck className="h-4 w-4" />
+                    Terverifikasi
+                </div>
+              ) : ''
+            }
         </div>
         <Link href={`/profile/${perfumer.slug}`} className="flex items-center text-sm font-semibold text-accent hover:underline">
           View Profile
