@@ -146,21 +146,21 @@ export default function MyOrdersPage() {
     <>
     <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
       <CardHeader>
-        <CardTitle>Manage Incoming Orders</CardTitle>
+        <CardTitle>Kelola Pesanan Masuk</CardTitle>
         <CardDescription>
-          Review and fulfill orders from your customers.
+          Tinjau dan penuhi pesanan dari pelanggan Anda.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order</TableHead>
-              <TableHead>Customer</TableHead>
+              <TableHead>Pesanan</TableHead>
+              <TableHead>Pelanggan</TableHead>
               <TableHead>Batas Kirim</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Total</TableHead>
-              <TableHead className="text-center">Actions</TableHead>
+              <TableHead className="text-center">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -191,9 +191,9 @@ export default function MyOrdersPage() {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => setSelectedOrder(order)}>
-                                View Details
+                                Lihat Detail
                             </DropdownMenuItem>
                             {order.status === 'Pesanan Diterima' && (
                                 <DropdownMenuItem onClick={() => handleOpenShippingDialog(order)}>

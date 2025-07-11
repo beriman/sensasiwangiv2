@@ -1,5 +1,3 @@
-
-
 // src/app/dashboard/my-products/page.tsx
 'use client';
 
@@ -68,7 +66,7 @@ export default function MyProductsPage() {
     if (editingProduct) {
       // Edit logic
       setProducts(products.map(p => p.id === editingProduct.id ? data : p));
-      toast({ title: "Product Updated", description: `${data.name} has been successfully updated.` });
+      toast({ title: "Produk Diperbarui", description: `${data.name} telah berhasil diperbarui.` });
     } else {
       // Add logic
       const newProduct: Product = {
@@ -77,7 +75,7 @@ export default function MyProductsPage() {
         perfumerProfileSlug: data.perfumerProfileSlug || MOCK_PERFUMER_PROFILE_SLUG,
       };
       setProducts([newProduct, ...products]);
-      toast({ title: "Product Added", description: `${data.name} has been successfully added.` });
+      toast({ title: "Produk Ditambahkan", description: `${data.name} telah berhasil ditambahkan.` });
     }
     setIsFormOpen(false);
     setEditingProduct(null);
@@ -91,7 +89,7 @@ export default function MyProductsPage() {
   const handleDeleteConfirm = () => {
     if (selectedProductId) {
       setProducts(products.filter(p => p.id !== selectedProductId));
-      toast({ title: "Product Deleted", description: "The product has been permanently deleted." });
+      toast({ title: "Produk Dihapus", description: "Produk telah dihapus secara permanen." });
       setIsDeleteDialogOpen(false);
       setSelectedProductId(null);
     }
@@ -103,15 +101,15 @@ export default function MyProductsPage() {
       <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
         <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-xl font-bold text-foreground/80">My Products</CardTitle>
-            <CardDescription>Manage your creations and offerings.</CardDescription>
+            <CardTitle className="text-xl font-bold text-foreground/80">Produk Saya</CardTitle>
+            <CardDescription>Kelola kreasi dan penawaran Anda.</CardDescription>
           </div>
           <Button 
             onClick={handleAddClick}
             className="w-full sm:w-auto rounded-xl bg-accent-gradient text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
           >
             <PlusCircle className="mr-2 h-5 w-5" />
-            Add New Product
+            Tambah Produk Baru
           </Button>
         </CardHeader>
         <CardContent>
@@ -119,14 +117,14 @@ export default function MyProductsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="hidden w-[100px] sm:table-cell">
-                  Image
+                  Gambar
                 </TableHead>
-                <TableHead>Name</TableHead>
+                <TableHead>Nama</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
+                <TableHead>Harga</TableHead>
+                <TableHead>Stok</TableHead>
                 <TableHead>
-                  <span className="sr-only">Actions</span>
+                  <span className="sr-only">Aksi</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -154,12 +152,12 @@ export default function MyProductsPage() {
                     ) : product.isListed ? (
                         <Badge variant="secondary" className="bg-green-100 text-green-800">
                            <CheckCircle className="mr-1.5 h-3 w-3" />
-                           Listed
+                           Terdaftar
                         </Badge>
                     ) : (
                         <Badge variant="outline">
                            <XCircle className="mr-1.5 h-3 w-3" />
-                           Unlisted
+                           Tidak Terdaftar
                         </Badge>
                     )}
                   </TableCell>
@@ -174,7 +172,7 @@ export default function MyProductsPage() {
                     {totalStock > 0 ? (
                         <span className={cn(totalStock < 5 && "text-destructive font-bold")}>{totalStock}</span>
                     ) : (
-                        <Badge variant="destructive">Out of Stock</Badge>
+                        <Badge variant="destructive">Stok Habis</Badge>
                     )}
                   </TableCell>
                   <TableCell>
@@ -190,15 +188,15 @@ export default function MyProductsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => handleEditClick(product)}>
-                          Edit
+                          Ubah
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => handleDeleteClick(product.id)}
                         >
-                          Delete
+                          Hapus
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -209,7 +207,7 @@ export default function MyProductsPage() {
           </Table>
           {products.length === 0 && (
             <div className="text-center p-8 text-muted-foreground">
-                You haven't added any products yet.
+                Anda belum menambahkan produk apa pun.
             </div>
           )}
         </CardContent>
@@ -228,15 +226,15 @@ export default function MyProductsPage() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Apakah Anda benar-benar yakin?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              product from our servers.
+              Tindakan ini tidak bisa dibatalkan. Ini akan menghapus produk Anda secara permanen
+              dari server kami.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setSelectedProductId(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className={buttonVariants({ variant: "destructive" })}>Continue</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setSelectedProductId(null)}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className={buttonVariants({ variant: "destructive" })}>Lanjutkan</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -119,20 +119,20 @@ export default function MyPurchasesPage() {
     <>
     <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
       <CardHeader>
-        <CardTitle>My Purchase History</CardTitle>
+        <CardTitle>Riwayat Pembelian Saya</CardTitle>
         <CardDescription>
-          Review your past orders and track their status.
+          Tinjau pesanan Anda sebelumnya dan lacak statusnya.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>Pesanan</TableHead>
+              <TableHead>Tanggal</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Total</TableHead>
-              <TableHead className="text-center">Action</TableHead>
+              <TableHead className="text-center">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -150,7 +150,7 @@ export default function MyPurchasesPage() {
                 <TableCell className="text-right">{formatRupiah(order.total)}</TableCell>
                 <TableCell className="text-center">
                     <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedOrder(order)}}>
-                        View Details
+                        Lihat Detail
                     </Button>
                 </TableCell>
               </TableRow>

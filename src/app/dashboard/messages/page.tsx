@@ -50,10 +50,10 @@ export default function MessagesPage() {
         {/* Conversations List */}
         <div className="flex w-1/3 flex-col border-r">
           <div className="p-4">
-            <h2 className="text-xl font-bold text-foreground/80">Chats</h2>
+            <h2 className="text-xl font-bold text-foreground/80">Obrolan</h2>
             <div className="relative mt-2">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input placeholder="Search messages..." className="rounded-xl border-none bg-background pl-10 shadow-neumorphic-inset" />
+                <Input placeholder="Cari pesan..." className="rounded-xl border-none bg-background pl-10 shadow-neumorphic-inset" />
             </div>
           </div>
           <ScrollArea className="flex-1">
@@ -138,7 +138,7 @@ export default function MessagesPage() {
                   }}
                   className="flex items-center gap-2"
                 >
-                  <Input name="message" placeholder="Type a message..." className="h-12 flex-1 rounded-xl border-none bg-background shadow-neumorphic-inset" autoComplete="off" />
+                  <Input name="message" placeholder="Ketik pesan..." className="h-12 flex-1 rounded-xl border-none bg-background shadow-neumorphic-inset" autoComplete="off" />
                   <Button type="submit" size="icon" className="h-12 w-12 rounded-xl bg-accent-gradient shadow-neumorphic">
                     <SendHorizonal />
                   </Button>
@@ -147,8 +147,8 @@ export default function MessagesPage() {
             </>
           ) : (
             <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
-              <p className="text-lg">Select a conversation</p>
-              <p className="text-sm">or start a new one from a user's profile.</p>
+              <p className="text-lg">Pilih percakapan</p>
+              <p className="text-sm">atau mulai yang baru dari profil pengguna.</p>
             </div>
           )}
         </div>

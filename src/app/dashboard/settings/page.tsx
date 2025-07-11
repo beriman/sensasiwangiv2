@@ -19,10 +19,10 @@ export default function AccountSettingsPage() {
       <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
         <CardHeader>
           <CardTitle className="text-xl font-bold text-foreground/80">
-            Account Settings
+            Pengaturan Akun
           </CardTitle>
           <CardDescription>
-            Manage your personal and security information.
+            Kelola informasi pribadi dan keamanan Anda.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -32,18 +32,18 @@ export default function AccountSettingsPage() {
 
       <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
         <CardHeader>
-          <CardTitle>Profile Information</CardTitle>
+          <CardTitle>Informasi Profil</CardTitle>
           <CardDescription>
-            Update your personal details.
+            Perbarui detail pribadi Anda.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">Nama Lengkap</Label>
             <Input id="name" defaultValue="Alex Doe" className="rounded-xl border-none bg-background shadow-neumorphic-inset"/>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email">Alamat Email</Label>
             <Input id="email" type="email" defaultValue="alex.doe@example.com" className="rounded-xl border-none bg-background shadow-neumorphic-inset"/>
           </div>
         </CardContent>
@@ -51,26 +51,26 @@ export default function AccountSettingsPage() {
 
       <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
         <CardHeader>
-          <CardTitle>Security</CardTitle>
+          <CardTitle>Keamanan</CardTitle>
           <CardDescription>
-            Change your password.
+            Ubah kata sandi Anda.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="current-password">Current Password</Label>
+            <Label htmlFor="current-password">Kata Sandi Saat Ini</Label>
             <Input id="current-password" type="password" className="rounded-xl border-none bg-background shadow-neumorphic-inset"/>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="new-password">New Password</Label>
+            <Label htmlFor="new-password">Kata Sandi Baru</Label>
             <Input id="new-password" type="password" className="rounded-xl border-none bg-background shadow-neumorphic-inset"/>
           </div>
-          <Button className="mt-4 rounded-xl shadow-neumorphic transition-all hover:shadow-neumorphic-active">Change Password</Button>
+          <Button className="mt-4 rounded-xl shadow-neumorphic transition-all hover:shadow-neumorphic-active">Ubah Kata Sandi</Button>
         </CardContent>
       </Card>
       
       <div className="flex justify-end">
-        <Button className="h-12 rounded-xl bg-accent-gradient px-6 text-lg font-bold text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active">Save Changes</Button>
+        <Button className="h-12 rounded-xl bg-accent-gradient px-6 text-lg font-bold text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active">Simpan Perubahan</Button>
       </div>
     </div>
   );

@@ -1,5 +1,3 @@
-
-
 // src/components/product-form-dialog.tsx
 'use client';
 
@@ -35,11 +33,11 @@ import { format } from 'date-fns';
 const productCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools', 'Misc'];
 
 const productFormSchema = z.object({
-  name: z.string().min(3, { message: 'Name must be at least 3 characters.' }),
-  description: z.string().min(10, { message: 'Description must be at least 10 characters.' }),
+  name: z.string().min(3, { message: 'Nama harus minimal 3 karakter.' }),
+  description: z.string().min(10, { message: 'Deskripsi harus minimal 10 karakter.' }),
   isListed: z.boolean().default(true),
   category: z.enum(productCategories, {
-    required_error: "You need to select a product category.",
+    required_error: "Anda harus memilih kategori produk.",
   }),
   imageUrl: z.string().optional(),
   properties: z.record(z.string()).optional().default({}),
@@ -56,33 +54,33 @@ const productFormSchema = z.object({
     name: z.string(),
     price: z.coerce.number().min(0),
     stock: z.coerce.number().int().min(0),
-  })).min(1, "Product must have at least one variant."),
+  })).min(1, "Produk harus memiliki setidaknya satu varian."),
 }).superRefine((data, ctx) => {
     if (data.category === 'Parfum') {
         if (!data.properties?.Brand) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: 'Brand is required for Parfum category.',
+                message: 'Brand wajib diisi untuk kategori Parfum.',
                 path: ['properties.Brand'],
             });
         }
         if (!data.perfumerProfileSlug) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: 'Perfumer is required for Parfum category.',
+                message: 'Perfumer wajib diisi untuk kategori Parfum.',
                 path: ['perfumerProfileSlug'],
             });
         }
     }
     if (data.isSambatan) {
         if (!data.sambatanDetails?.targetParticipants || data.sambatanDetails.targetParticipants <= 0) {
-            ctx.addIssue({ code: 'custom', message: 'Target participants must be a positive number.', path: ['sambatanDetails.targetParticipants']});
+            ctx.addIssue({ code: 'custom', message: 'Target partisipan harus angka positif.', path: ['sambatanDetails.targetParticipants']});
         }
         if (!data.sambatanDetails?.sambatanPrice || data.sambatanDetails.sambatanPrice <= 0) {
-            ctx.addIssue({ code: 'custom', message: 'Sambatan price must be a positive number.', path: ['sambatanDetails.sambatanPrice']});
+            ctx.addIssue({ code: 'custom', message: 'Harga sambatan harus angka positif.', path: ['sambatanDetails.sambatanPrice']});
         }
         if (!data.sambatanDetails?.deadline) {
-            ctx.addIssue({ code: 'custom', message: 'Deadline is required for Sambatan.', path: ['sambatanDetails.deadline']});
+            ctx.addIssue({ code: 'custom', message: 'Batas waktu wajib diisi untuk Sambatan.', path: ['sambatanDetails.deadline']});
         }
     }
 });
@@ -180,8 +178,8 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
       if (file.size > 4 * 1024 * 1024) { // 4MB limit
         toast({
           variant: 'destructive',
-          title: 'File is too large',
-          description: 'Please upload an image smaller than 4MB.',
+          title: 'File terlalu besar',
+          description: 'Mohon unggah gambar berukuran kurang dari 4MB.',
         });
         return;
       }
@@ -191,16 +189,16 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         form.setValue('imageUrl', reader.result as string, { shouldValidate: true });
         setIsImageLoading(false);
         toast({
-          title: 'Image Uploaded',
-          description: 'Your new product image has been set.',
+          title: 'Gambar Terunggah',
+          description: 'Gambar produk baru Anda telah diatur.',
         });
       };
       reader.onerror = () => {
         setIsImageLoading(false);
         toast({
           variant: 'destructive',
-          title: 'Error reading file',
-          description: 'Could not read the selected image. Please try again.',
+          title: 'Error membaca file',
+          description: 'Tidak dapat membaca gambar yang dipilih. Mohon coba lagi.',
         });
       };
       reader.readAsDataURL(file);
@@ -239,10 +237,10 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
     onSave(finalProductData);
   };
   
-  const dialogTitle = productData ? 'Edit Product' : 'Add New Product';
+  const dialogTitle = productData ? 'Ubah Produk' : 'Tambah Produk Baru';
   const dialogDescription = productData
-    ? "Make changes to your product here. Click save when you're done."
-    : 'Fill in the details below to add a new product to your listings.';
+    ? "Buat perubahan pada produk Anda di sini. Klik simpan setelah selesai."
+    : 'Isi detail di bawah ini untuk menambahkan produk baru ke daftar Anda.';
 
 
   return (
@@ -263,7 +261,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 ) : (
                   <Image
                     src={watchedImageUrl || 'https://placehold.co/600x600.png'}
-                    alt="Product image preview"
+                    alt="Pratinjau gambar produk"
                     fill
                     className="rounded-xl object-cover shadow-neumorphic-inset"
                   />
@@ -285,7 +283,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     disabled={isImageLoading}
                 >
                     <Upload className="mr-2 h-5 w-5" />
-                    Change Image
+                    Ubah Gambar
                 </Button>
 
               <FormField
@@ -293,9 +291,9 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Product Name</FormLabel>
+                    <FormLabel>Nama Produk</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Eau de Lumière" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                      <Input placeholder="Contoh: Eau de Lumière" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -306,9 +304,9 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Deskripsi</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Describe your product..." className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" {...field} />
+                      <Textarea placeholder="Deskripsikan produk Anda..." className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -317,13 +315,13 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
 
               {/* Simplified Variant Section */}
               <div className="space-y-2 rounded-lg border p-4">
-                <h4 className="font-semibold">Product Variant</h4>
+                <h4 className="font-semibold">Varian Produk</h4>
                  <FormField
                     control={form.control}
                     name={`variants.0.price`}
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Price (Rp)</FormLabel>
+                        <FormLabel>Harga (Rp)</FormLabel>
                         <FormControl>
                         <Input type="number" placeholder="1200000" {...field} disabled={watchedIsSambatan} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring disabled:opacity-50" />
                         </FormControl>
@@ -336,7 +334,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     name={`variants.0.stock`}
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Stock</FormLabel>
+                        <FormLabel>Stok</FormLabel>
                         <FormControl>
                         <Input type="number" placeholder="10" {...field} disabled={watchedIsSambatan} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring disabled:opacity-50" />
                         </FormControl>
@@ -352,11 +350,11 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>Kategori</FormLabel>
                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring">
-                          <SelectValue placeholder="Select a category" />
+                          <SelectValue placeholder="Pilih kategori" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -378,7 +376,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                         <FormItem>
                             <FormLabel>Brand</FormLabel>
                             <FormControl>
-                            <Input placeholder="e.g., Maison de Rêve" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
+                            <Input placeholder="Contoh: Maison de Rêve" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -393,7 +391,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                              <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                     <SelectTrigger className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring">
-                                    <SelectValue placeholder="Select a perfumer" />
+                                    <SelectValue placeholder="Pilih perfumer" />
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
@@ -415,9 +413,9 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-neumorphic-inset">
                         <div className="space-y-0.5">
-                            <FormLabel className="text-base">List Product</FormLabel>
+                            <FormLabel className="text-base">Tampilkan Produk</FormLabel>
                             <DialogDescription>
-                                Make this product visible in the marketplace.
+                                Jadikan produk ini terlihat di marketplace.
                             </DialogDescription>
                         </div>
                         <FormControl>
@@ -526,10 +524,10 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
 
             </div>
             <DialogFooter className="pt-4">
-              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+              <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Batal</Button>
               <Button type="submit" disabled={form.formState.isSubmitting || isImageLoading} className="h-12 rounded-xl bg-accent-gradient px-6 font-bold text-accent-foreground shadow-neumorphic transition-all duration-300 ease-in-out hover:shadow-lg hover:bg-accent-gradient-active">
                 {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Product
+                Simpan Produk
               </Button>
             </DialogFooter>
           </form>
