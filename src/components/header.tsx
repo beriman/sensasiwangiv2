@@ -5,8 +5,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Cart } from '@/components/cart';
+import { cn } from '@/lib/utils';
+
 
 const navLinks = [
   { href: '/', label: 'Marketplace' },
@@ -61,6 +63,9 @@ export function AppHeader() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+              <SheetHeader>
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+              </SheetHeader>
               <nav className="flex h-full flex-col p-6">
                 <Link href="/" className="mb-8 text-2xl font-bold tracking-tight text-foreground/80">
                   sensasiwangi.id
