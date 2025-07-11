@@ -14,7 +14,6 @@ const navLinks = [
   { href: '/', label: 'Marketplace' },
   { href: '/community', label: 'Community' },
   { href: '#', label: 'School' },
-  { href: '/database', label: 'Database' },
   { href: '/dashboard/my-products', label: 'My Products' },
   { href: '/profile', label: 'Profile' },
 ];
