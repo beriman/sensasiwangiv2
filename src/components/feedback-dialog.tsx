@@ -87,13 +87,13 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
                     >
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="Saran" id="saran"/>
+                          <RadioGroupItem value="Saran" id="saran" />
                         </FormControl>
                         <FormLabel htmlFor="saran" className="font-normal cursor-pointer">Saran</FormLabel>
                       </FormItem>
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value="Laporan Bug" id="laporan-bug"/>
+                          <RadioGroupItem value="Laporan Bug" id="laporan-bug" />
                         </FormControl>
                         <FormLabel htmlFor="laporan-bug" className="font-normal cursor-pointer">Laporan Bug</FormLabel>
                       </FormItem>
