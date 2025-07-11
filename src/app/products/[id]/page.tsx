@@ -1,7 +1,7 @@
 // src/app/products/[id]/page.tsx
 'use client';
 
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { products } from '@/data/products';
 import { AppHeader } from '@/components/header';
@@ -14,9 +14,11 @@ import { PersonalizedRecommendations } from '@/components/personalized-recommend
 import { useCart } from '@/hooks/use-cart';
 
 
-export default function ProductDetailPage({ params }: { params: { id: string } }) {
+export default function ProductDetailPage() {
   const { addItem } = useCart();
-  const product = products.find((p) => p.id === params.id);
+  const params = useParams();
+  const productId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const product = products.find((p) => p.id === productId);
 
   if (!product) {
     notFound();
