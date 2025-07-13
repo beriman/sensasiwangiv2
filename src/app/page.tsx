@@ -1,197 +1,128 @@
-
+// src/app/page.tsx
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import type { Product } from '@/lib/types';
-import { products as allProducts } from '@/data/products';
+import Image from 'next/image';
 import { AppHeader } from '@/components/header';
-import { Filters } from '@/components/filters';
-import { ProductGrid } from '@/components/product-grid';
-import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Leaf, FlaskConical, Wrench, Search, SlidersHorizontal, ShoppingBag } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { ArrowRight, BookOpen, MessageSquare, Users } from 'lucide-react';
+import { ProductCard } from '@/components/product-card';
+import { products } from '@/data/products';
+import { courses } from '@/data/courses';
+import { allThreads } from '@/data/forum';
+import { profiles } from '@/data/profiles';
 
-
-const categories = [
-  { name: 'Parfum', icon: Leaf },
-  { name: 'Raw Material', icon: FlaskConical },
-  { name: 'Tools', icon: Wrench },
-  { name: 'Misc', icon: ShoppingBag },
-];
-
-export default function Home() {
-  const searchParams = useSearchParams();
-  const brandQuery = searchParams.get('brand');
-  const sellerQuery = searchParams.get('seller');
-
-  const [category, setCategory] = useState<string>('Parfum');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState<Record<string, string[]>>({});
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-
-  useEffect(() => {
-    if (brandQuery) {
-      setCategory('Parfum'); // Assume brands are for perfumes
-      setFilters(prev => ({ ...prev, 'Brand': [brandQuery] }));
-      setSearchTerm('');
-    }
-    if (sellerQuery) {
-      setFilters({}); // Clear other filters when focusing on a seller
-      setSearchTerm('');
-    }
-  }, [brandQuery, sellerQuery]);
-
-  const handleFilterChange = (filterType: string, value: string) => {
-    setFilters((prevFilters) => {
-      const currentFilterValues = prevFilters[filterType] || [];
-      const newFilterValues = currentFilterValues.includes(value)
-        ? currentFilterValues.filter((v) => v !== value)
-        : [...currentFilterValues, value];
-      
-      if (newFilterValues.length === 0) {
-        const { [filterType]: _, ...rest } = prevFilters;
-        return rest;
-      }
-
-      return {
-        ...prevFilters,
-        [filterType]: newFilterValues,
-      };
-    });
-  };
-
-  const filteredProducts = useMemo(() => {
-    return allProducts.filter((product) => {
-      // Only show listed products in the marketplace
-      if (!product.isListed) {
-        return false;
-      }
-      
-      // If a Sambatan is active, check if its deadline has passed.
-      if (product.sambatan?.isActive) {
-        const deadline = new Date(product.sambatan.deadline);
-        if (deadline < new Date()) {
-          return false; // Automatically unlist expired Sambatan
-        }
-      }
-      
-      // Handle seller filter first, as it's a primary view
-      if (sellerQuery) {
-        return product.perfumerProfileSlug === sellerQuery;
-      }
-
-      const categoryMatch = category === 'All' || product.category === category;
-      
-      const searchTermMatch =
-        searchTerm.trim() === '' ||
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const filtersMatch = Object.entries(filters).every(([key, values]) => {
-        if (values.length === 0) return true;
-        const productValue = product.properties[key];
-        if (!productValue) return false;
-        if(key === 'Brand' && product.category !== 'Parfum') return true;
-        return values.includes(productValue);
-      });
-
-      return categoryMatch && searchTermMatch && filtersMatch;
-    });
-  }, [category, searchTerm, filters, sellerQuery]);
-  
-  const productsForFilter = useMemo(() => {
-    return allProducts.filter(p => (category === 'All' || p.category === category) && p.isListed);
-  }, [category]);
-
+export default function LandingPage() {
+  const featuredProducts = products.filter(p => p.isListed).slice(0, 4);
+  const featuredCourse = courses[0];
+  const recentThreads = allThreads.slice(0, 3);
+  const featuredPerfumers = profiles.filter(p => p.type === 'Perfumer').slice(0, 3);
 
   return (
     <div className="min-h-screen bg-background font-body">
       <AppHeader />
-      <div className="container mx-auto px-4 py-8">
-        {sellerQuery ? (
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-foreground/90">Products by {sellerQuery}</h1>
-            <p className="mt-1 text-muted-foreground">Browsing all offerings from a single seller.</p>
-            <Button asChild variant="link" className="mt-2">
-              <Link href="/">Clear Seller Filter</Link>
-            </Button>
-          </div>
-        ) : (
-          <div className="mb-8 flex flex-col items-center justify-between gap-6 md:flex-row">
-              <Tabs value={category} onValueChange={setCategory} className="w-full md:w-auto">
-                <TabsList className="h-12 w-full rounded-xl bg-transparent p-1 shadow-neumorphic-inset md:w-auto">
-                  {categories.map((cat) => (
-                    <TabsTrigger
-                      key={cat.name}
-                      value={cat.name}
-                      className={cn(
-                        'h-full flex-1 rounded-lg px-4 py-2 text-foreground/70 transition-all duration-300 data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active',
-                        'data-[state=active]:bg-accent-gradient',
-                        'hover:bg-background/50 hover:shadow-neumorphic-active'
-                      )}
-                    >
-                      <cat.icon className="mr-2 h-5 w-5 text-current/80" />
-                      {cat.name}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-              <div className="relative w-full max-w-xs">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="h-12 w-full rounded-xl border-none bg-background pl-10 text-base shadow-neumorphic-inset focus:ring-2 focus:ring-ring"
-                />
-              </div>
-          </div>
-        )}
-
-
-        <div className="relative grid grid-cols-1 gap-8 md:grid-cols-4">
-          <Collapsible
-            open={isFiltersOpen}
-            onOpenChange={setIsFiltersOpen}
-            className="md:col-span-1 md:block"
-          >
-            <div className="mb-4 flex justify-between items-center md:hidden">
-              <h2 className="text-lg font-bold">Filters</h2>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <SlidersHorizontal className="h-5 w-5 mr-2" />
-                  {isFiltersOpen ? 'Hide' : 'Show'}
+      <main>
+        {/* Hero Section */}
+        <section className="relative h-[60vh] text-center flex flex-col items-center justify-center text-white">
+            <div className="absolute inset-0 bg-black/50 z-10"></div>
+            <Image 
+                src="https://placehold.co/1200x800.png"
+                alt="Perfumery background"
+                fill
+                className="object-cover"
+                data-ai-hint="perfume ingredients spices"
+            />
+            <div className="relative z-20 p-4">
+                <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Temukan Esensi Sejati Anda</h1>
+                <p className="mt-4 max-w-2xl text-lg md:text-xl text-white/90">
+                    Platform komunitas untuk para pecinta, perajin, dan penjelajah dunia wewangian di Indonesia.
+                </p>
+                <Button asChild size="lg" className="mt-8 h-14 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+                    <Link href="/browse">Mulai Menjelajah</Link>
                 </Button>
-              </CollapsibleTrigger>
             </div>
-            <CollapsibleContent asChild>
-              <aside>
-                <Filters
-                  category={category}
-                  products={productsForFilter}
-                  activeFilters={filters}
-                  onFilterChange={handleFilterChange}
-                />
-              </aside>
-            </CollapsibleContent>
-          </Collapsible>
+        </section>
 
-          <main className={cn(
-            "md:col-span-3",
-            !isFiltersOpen && "md:col-span-4"
-          )}>
-            <ProductGrid products={filteredProducts} />
-          </main>
-          <PersonalizedRecommendations category={category} activeFilters={filters} />
+        <div className="container mx-auto px-4 py-16 space-y-20">
+            {/* Featured Products */}
+            <section>
+                <h2 className="text-3xl font-bold text-foreground/90 mb-2">Kreasi Unggulan</h2>
+                <div className="flex justify-between items-center mb-6">
+                    <p className="text-muted-foreground">Temukan wewangian yang sedang tren dan dicintai oleh komunitas.</p>
+                     <Button asChild variant="link" className="text-accent">
+                        <Link href="/browse">Lihat Semua <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                    </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                    {featuredProducts.map(product => (
+                        <ProductCard key={product.id} product={product} />
+                    ))}
+                </div>
+            </section>
+
+            {/* Featured Course */}
+            <section>
+                 <Card className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl border-none bg-transparent shadow-neumorphic">
+                    <div className="relative w-full h-64 md:w-1/3 md:h-auto md:aspect-square shrink-0">
+                       <Image
+                            src={featuredCourse.imageUrl}
+                            alt={featuredCourse.title}
+                            fill
+                            className="rounded-xl object-cover"
+                            data-ai-hint={featuredCourse.imageHint}
+                        />
+                    </div>
+                    <div className="flex-grow">
+                        <p className="font-semibold text-accent mb-2">Kursus Pilihan</p>
+                        <h3 className="text-3xl font-bold text-foreground/90">{featuredCourse.title}</h3>
+                        <p className="text-muted-foreground mt-2">oleh {featuredCourse.instructor}</p>
+                        <p className="mt-4 text-lg text-foreground/80">{featuredCourse.description}</p>
+                        <Button asChild size="lg" className="mt-6 rounded-xl shadow-neumorphic">
+                            <Link href={`/school/course/${featuredCourse.slug}`}>
+                                <BookOpen className="mr-2"/>
+                                Pelajari Selengkapnya
+                            </Link>
+                        </Button>
+                    </div>
+                </Card>
+            </section>
+            
+            {/* Community & Perfumers */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Community Highlights */}
+                <div className="lg:col-span-2">
+                    <h2 className="text-3xl font-bold text-foreground/90 mb-2">Dari Forum Komunitas</h2>
+                    <p className="text-muted-foreground mb-6">Lihat apa yang sedang ramai dibicarakan.</p>
+                    <div className="space-y-4">
+                       {recentThreads.map(thread => (
+                         <Link key={thread.id} href={`/community/thread/${thread.id}`} className="block p-4 rounded-xl shadow-neumorphic transition-all hover:bg-muted/30 hover:shadow-neumorphic-active">
+                            <h4 className="font-bold text-foreground/80">{thread.title}</h4>
+                            <p className="text-sm text-muted-foreground">oleh {thread.author} di kategori {thread.categoryId}</p>
+                        </Link>
+                       ))}
+                    </div>
+                </div>
+
+                {/* Featured Perfumers */}
+                <div>
+                    <h2 className="text-3xl font-bold text-foreground/90 mb-2">Kreator Pilihan</h2>
+                    <p className="text-muted-foreground mb-6">Kenali para perajin di balik karya-karya luar biasa.</p>
+                     <div className="space-y-4">
+                       {featuredPerfumers.map(perfumer => (
+                         <Link key={perfumer.slug} href={`/profile/${perfumer.slug}`} className="flex items-center gap-4 p-3 rounded-xl shadow-neumorphic transition-all hover:bg-muted/30 hover:shadow-neumorphic-active">
+                           <Image src={perfumer.profilePicture || 'https://placehold.co/64x64.png'} alt={perfumer.name} width={64} height={64} className="rounded-full" />
+                           <div>
+                               <h4 className="font-bold text-foreground/80">{perfumer.name}</h4>
+                               <p className="text-sm text-muted-foreground">{perfumer.username}</p>
+                           </div>
+                        </Link>
+                       ))}
+                    </div>
+                </div>
+            </section>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -21,7 +21,7 @@ import { Badge } from './ui/badge';
 
 
 const navLinks = [
-  { href: '/', label: 'Marketplace' },
+  { href: '/browse', label: 'Marketplace' },
   { href: '/school', label: 'School' },
   { href: '/community', label: 'Community' },
   { href: '/nusantarum', label: 'Nusantarum' },

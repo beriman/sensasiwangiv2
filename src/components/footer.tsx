@@ -9,7 +9,7 @@ import { Button } from './ui/button';
 
 const footerLinks = {
   platform: [
-    { href: '/', label: 'Marketplace' },
+    { href: '/browse', label: 'Marketplace' },
     { href: '/school', label: 'School' },
     { href: '/community', label: 'Community' },
   ],
