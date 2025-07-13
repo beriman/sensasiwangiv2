@@ -14,6 +14,7 @@ import { CurationDialog } from '@/components/curation-dialog';
 import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck, Ribbon } from 'lucide-react';
 import { Badge as UiBadge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 const TikTokIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
@@ -25,8 +26,12 @@ const TikTokIcon = () => (
 
 export default function ProfilePage() {
   const params = useParams();
+  const { toast } = useToast();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   
+  // In a real app, this would come from an auth hook like useUser()
+  const MOCK_LOGGED_IN_USER_SLUG = 'alex-doe';
+
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -42,16 +47,28 @@ export default function ProfilePage() {
   }, [slug]);
 
   const handleProfileSave = (newProfileData: ProfileData) => {
-    if (profile) {
-      // In a real app, you would send this data to your backend to save.
-      // For this demo, we'll just update the local state.
-      const updatedProfile: Profile = {
-        ...profile,
-        ...newProfileData,
-        // Since followers/following aren't in ProfileData, we keep the existing ones
-      };
-      setProfile(updatedProfile);
+    // Simulate database security rules: only the logged-in user can edit their own profile.
+    if (profile?.slug !== MOCK_LOGGED_IN_USER_SLUG) {
+      toast({
+        variant: 'destructive',
+        title: 'Akses Ditolak',
+        description: 'Anda hanya dapat mengedit profil Anda sendiri.',
+      });
+      setIsEditDialogOpen(false);
+      return;
     }
+
+    // In a real app, you would send this data to your backend to save.
+    // For this demo, we'll just update the local state.
+    const updatedProfile: Profile = {
+      ...profile,
+      ...newProfileData,
+    };
+    setProfile(updatedProfile);
+    toast({
+      title: 'Profil Diperbarui',
+      description: 'Perubahan pada profil Anda telah disimpan.',
+    });
     setIsEditDialogOpen(false);
   };
 
@@ -71,6 +88,7 @@ export default function ProfilePage() {
   };
   
   const canApplyForCuration = !profile.curation?.isCurated && (profile.type === 'Brand' || profile.type === 'Perfumer');
+  const isOwnProfile = profile.slug === MOCK_LOGGED_IN_USER_SLUG;
 
   return (
     <>
@@ -157,27 +175,34 @@ export default function ProfilePage() {
                   </p>
               )}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-                <Button onClick={() => setIsEditDialogOpen(true)} variant="outline" className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
-                  Edit Profile
-                </Button>
-                {canApplyForCuration && (
-                    <Button onClick={() => setIsCurationDialogOpen(true)} variant="outline" className="rounded-xl border-blue-500/50 px-8 py-6 text-blue-700 shadow-neumorphic transition-all hover:border-blue-500 hover:shadow-neumorphic-active">
-                      <Ribbon className="mr-2" /> Ajukan Kurasi
+                {isOwnProfile ? (
+                  <>
+                    <Button onClick={() => setIsEditDialogOpen(true)} variant="outline" className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+                      Edit Profile
                     </Button>
-                )}
-                <Button asChild className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
-                  <Link href="/dashboard/messages">
-                      <MessageSquare className="mr-2" /> Message
-                  </Link>
-                </Button>
-                {profile.type === 'Perfumer' && (
-                  <Button
-                      onClick={() => setIsFollowing(!isFollowing)}
-                      className="rounded-xl bg-accent-gradient px-8 py-6 text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
-                  >
-                      {isFollowing ? <UserCheck className="mr-2" /> : <UserPlus className="mr-2" />}
-                      {isFollowing ? 'Following' : 'Follow'}
-                  </Button>
+                    {canApplyForCuration && (
+                        <Button onClick={() => setIsCurationDialogOpen(true)} variant="outline" className="rounded-xl border-blue-500/50 px-8 py-6 text-blue-700 shadow-neumorphic transition-all hover:border-blue-500 hover:shadow-neumorphic-active">
+                          <Ribbon className="mr-2" /> Ajukan Kurasi
+                        </Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Button asChild className="rounded-xl px-8 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+                      <Link href="/dashboard/messages">
+                          <MessageSquare className="mr-2" /> Message
+                      </Link>
+                    </Button>
+                    {profile.type === 'Perfumer' && (
+                      <Button
+                          onClick={() => setIsFollowing(!isFollowing)}
+                          className="rounded-xl bg-accent-gradient px-8 py-6 text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active"
+                      >
+                          {isFollowing ? <UserCheck className="mr-2" /> : <UserPlus className="mr-2" />}
+                          {isFollowing ? 'Following' : 'Follow'}
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </CardContent>

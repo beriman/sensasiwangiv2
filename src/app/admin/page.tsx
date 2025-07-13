@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Flame } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { rateLimiter } from '@/lib/rate-limiter';
 
 interface AdminLoginPageProps {
   onLogin?: () => void;
@@ -15,8 +17,20 @@ interface AdminLoginPageProps {
 export default function AdminLoginPage({ onLogin }: AdminLoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { toast } = useToast();
 
   const handleLoginClick = () => {
+    // Use a generic key for rate limiting the login form
+    const limiterKey = 'admin-login';
+    if (!rateLimiter(limiterKey)) {
+        toast({
+            variant: 'destructive',
+            title: 'Terlalu banyak percobaan',
+            description: 'Silakan coba lagi dalam beberapa saat.',
+        });
+        return;
+    }
+
     if (onLogin && email && password) {
       onLogin();
     }
