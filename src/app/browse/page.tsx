@@ -8,14 +8,12 @@ import Link from 'next/link';
 import type { Product } from '@/lib/types';
 import { products as allProducts } from '@/data/products';
 import { AppHeader } from '@/components/header';
-import { Filters } from '@/components/filters';
 import { ProductGrid } from '@/components/product-grid';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Leaf, FlaskConical, Wrench, Search, SlidersHorizontal, ShoppingBag } from 'lucide-react';
+import { Leaf, FlaskConical, Wrench, Search, ShoppingBag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
 
 
@@ -28,44 +26,18 @@ const categories = [
 
 export default function BrowsePage() {
   const searchParams = useSearchParams();
-  const brandQuery = searchParams.get('brand');
   const sellerQuery = searchParams.get('seller');
 
   const [category, setCategory] = useState<string>('Parfum');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState<Record<string, string[]>>({});
-  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
   useEffect(() => {
-    if (brandQuery) {
-      setCategory('Parfum'); // Assume brands are for perfumes
-      setFilters(prev => ({ ...prev, 'Brand': [brandQuery] }));
-      setSearchTerm('');
-    }
+    // When a seller is queried, reset other filters
     if (sellerQuery) {
-      setFilters({}); // Clear other filters when focusing on a seller
       setSearchTerm('');
     }
-  }, [brandQuery, sellerQuery]);
+  }, [sellerQuery]);
 
-  const handleFilterChange = (filterType: string, value: string) => {
-    setFilters((prevFilters) => {
-      const currentFilterValues = prevFilters[filterType] || [];
-      const newFilterValues = currentFilterValues.includes(value)
-        ? currentFilterValues.filter((v) => v !== value)
-        : [...currentFilterValues, value];
-      
-      if (newFilterValues.length === 0) {
-        const { [filterType]: _, ...rest } = prevFilters;
-        return rest;
-      }
-
-      return {
-        ...prevFilters,
-        [filterType]: newFilterValues,
-      };
-    });
-  };
 
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
@@ -94,22 +66,11 @@ export default function BrowsePage() {
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const filtersMatch = Object.entries(filters).every(([key, values]) => {
-        if (values.length === 0) return true;
-        const productValue = product.properties[key];
-        if (!productValue) return false;
-        if(key === 'Brand' && product.category !== 'Parfum') return true;
-        return values.includes(productValue);
-      });
 
-      return categoryMatch && searchTermMatch && filtersMatch;
+      return categoryMatch && searchTermMatch;
     });
-  }, [category, searchTerm, filters, sellerQuery]);
+  }, [category, searchTerm, sellerQuery]);
   
-  const productsForFilter = useMemo(() => {
-    return allProducts.filter(p => (category === 'All' || p.category === category) && p.isListed);
-  }, [category]);
-
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -157,39 +118,11 @@ export default function BrowsePage() {
         )}
 
 
-        <div className="relative grid grid-cols-1 gap-8 md:grid-cols-4">
-          <Collapsible
-            open={isFiltersOpen}
-            onOpenChange={setIsFiltersOpen}
-            className="md:col-span-1 md:block"
-          >
-            <div className="mb-4 flex justify-between items-center md:hidden">
-              <h2 className="text-lg font-bold">Filters</h2>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <SlidersHorizontal className="h-5 w-5 mr-2" />
-                  {isFiltersOpen ? 'Sembunyikan' : 'Tampilkan'}
-                </Button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent asChild>
-              <aside>
-                <Filters
-                  category={category}
-                  products={productsForFilter}
-                  activeFilters={filters}
-                  onFilterChange={handleFilterChange}
-                />
-              </aside>
-            </CollapsibleContent>
-          </Collapsible>
-
-          <main className={cn(
-            isFiltersOpen ? "md:col-span-3" : "md:col-span-4"
-          )}>
+        <div className="relative">
+          <main>
             <ProductGrid products={filteredProducts} />
           </main>
-          <PersonalizedRecommendations category={category} activeFilters={filters} />
+          <PersonalizedRecommendations category={category} activeFilters={{}} />
         </div>
       </div>
     </div>
