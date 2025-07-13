@@ -30,20 +30,23 @@ const mockUsers = [
         role: p.type,
         status: 'Active',
         avatar: p.profilePicture,
+        isModerator: p.slug === 'alex-doe', // Alex Doe is now a moderator
     })),
     {
         name: 'John Doe',
         email: 'john.doe@email.com',
         role: 'Member',
         status: 'Active',
-        avatar: 'https://placehold.co/40x40.png'
+        avatar: 'https://placehold.co/40x40.png',
+        isModerator: false,
     },
     {
         name: 'Jane Smith',
         email: 'jane.smith@email.com',
         role: 'Member',
         status: 'Suspended',
-        avatar: 'https://placehold.co/40x40.png'
+        avatar: 'https://placehold.co/40x40.png',
+        isModerator: false,
     }
 ]
 
@@ -88,7 +91,12 @@ export default function AdminUsersPage() {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>{user.role}</TableCell>
+                <TableCell>
+                    <div className="flex items-center gap-2">
+                        <span>{user.role}</span>
+                        {user.isModerator && <Badge className="bg-blue-100 text-blue-800">Moderator</Badge>}
+                    </div>
+                </TableCell>
                 <TableCell>
                   <Badge variant={user.status === 'Active' ? 'secondary' : 'destructive'}>
                     {user.status}

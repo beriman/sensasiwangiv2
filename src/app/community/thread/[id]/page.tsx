@@ -9,7 +9,7 @@ import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { getThreadById, Post } from '@/data/forum';
 import { profiles } from '@/data/profiles';
-import { ArrowLeft, ArrowUp, ArrowDown } from 'lucide-react';
+import { ArrowLeft, ArrowUp, ArrowDown, Gavel, Trash2, ShieldAlert } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ContentRenderer } from '@/components/content-renderer';
@@ -17,6 +17,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 // Helper to get profile pic, can be expanded later
 const getAuthorProfilePic = (authorName: string) => {
@@ -32,32 +34,66 @@ const formatTimestamp = (timestamp: string) => {
 export default function ThreadPage() {
   const params = useParams();
   const router = useRouter();
+  const { toast } = useToast();
   const threadId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const thread = getThreadById(threadId);
+  
+  // For simulation, we assume the logged-in user is 'Alex Doe', who is a moderator.
+  const MOCK_CURRENT_USER_NAME = 'Alex Doe';
+  const MOCK_IS_MODERATOR = MOCK_CURRENT_USER_NAME === 'Alex Doe';
 
-  const [posts, setPosts] = useState<Post[]>(thread?.posts || []);
+  // Use a state for thread data to allow modifications
+  const [threadData, setThreadData] = useState(() => getThreadById(threadId));
 
   const handleVote = (postIndex: number, voteType: 'up' | 'down') => {
-    setPosts(currentPosts => {
-        const newPosts = [...currentPosts];
+    if (!threadData) return;
+
+    setThreadData(currentThread => {
+        if (!currentThread) return null;
+        const newPosts = [...currentThread.posts];
         const post = newPosts[postIndex];
         if (voteType === 'up') {
             post.votes += 1;
         } else {
             post.votes -= 1;
         }
-        return newPosts;
+        return { ...currentThread, posts: newPosts };
+    });
+  };
+
+  const handleModeratorDeletePost = (postIndex: number) => {
+    if (!threadData) return;
+
+    const postAuthor = threadData.posts[postIndex].author;
+    setThreadData(currentThread => {
+        if (!currentThread) return null;
+        const newPosts = currentThread.posts.filter((_, index) => index !== postIndex);
+        return { ...currentThread, posts: newPosts };
+    });
+    toast({
+        title: "Postingan Dihapus",
+        description: `Postingan oleh ${postAuthor} telah dihapus.`,
+    });
+  };
+
+  const handleModeratorWarnUser = (authorName: string) => {
+    toast({
+        variant: "destructive",
+        title: "Peringatan Terkirim",
+        description: `Peringatan resmi telah dikirim kepada pengguna ${authorName}.`,
     });
   };
 
   const sortedPosts = useMemo(() => {
-    return [...posts].sort((a, b) => b.votes - a.votes);
-  }, [posts]);
+    if (!threadData) return [];
+    return [...threadData.posts].sort((a, b) => b.votes - a.votes);
+  }, [threadData]);
 
 
-  if (!thread) {
+  if (!threadData) {
     notFound();
   }
+
+  const { thread, posts } = { thread: threadData, posts: sortedPosts };
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -101,8 +137,8 @@ export default function ThreadPage() {
         {/* Replies */}
         <h2 className="mb-4 text-2xl font-bold text-foreground/80">Replies ({thread.posts.length})</h2>
         <div className="space-y-6">
-          {sortedPosts.map((post, index) => {
-            const originalIndex = posts.findIndex(p => p.content === post.content && p.author === post.author);
+          {posts.map((post, index) => {
+            const originalIndex = threadData.posts.findIndex(p => p.content === post.content && p.author === post.author);
             return (
             <Card key={index} className="flex gap-4 rounded-2xl border-none bg-transparent p-4 shadow-neumorphic">
                 <div className="flex flex-col items-center space-y-1">
@@ -128,7 +164,29 @@ export default function ThreadPage() {
                         <div className="flex-grow">
                         <p className="font-bold text-foreground/80">{post.author}</p>
                         </div>
-                        <p className="text-xs text-muted-foreground">{formatTimestamp(post.timestamp)}</p>
+                        <div className="flex items-center gap-2">
+                            {MOCK_IS_MODERATOR && post.author !== MOCK_CURRENT_USER_NAME && (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                        <Gavel className="h-5 w-5 text-muted-foreground" />
+                                    </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Aksi Moderasi</DropdownMenuLabel>
+                                    <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive" onClick={() => handleModeratorDeletePost(originalIndex)}>
+                                        <Trash2 className="mr-2 h-4 w-4" />
+                                        Hapus Postingan
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-orange-600 focus:bg-orange-100 focus:text-orange-700" onClick={() => handleModeratorWarnUser(post.author)}>
+                                        <ShieldAlert className="mr-2 h-4 w-4" />
+                                        Kirim Peringatan
+                                    </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            )}
+                            <p className="text-xs text-muted-foreground">{formatTimestamp(post.timestamp)}</p>
+                        </div>
                     </CardHeader>
                     <CardContent className="p-0 pt-4">
                         <ContentRenderer content={post.content} />
