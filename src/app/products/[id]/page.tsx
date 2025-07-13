@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, MessageSquare, Heart, PackageCheck, PackageX, Store } from 'lucide-react';
+import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, MessageSquare, Heart, PackageCheck, PackageX, Store, Handshake } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
 import { formatRupiah, cn } from '@/lib/utils';
@@ -23,6 +23,7 @@ import { useWishlist } from '@/hooks/use-wishlist';
 import type { ProductVariant } from '@/lib/types';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const scentProfileIcons: { [key: string]: React.ElementType } = {
   Floral: Leaf,
@@ -108,6 +109,7 @@ export default function ProductDetailPage() {
   }
 
   const isSambatan = product.sambatan?.isActive;
+  const isService = product.category === 'Jasa';
   
   if (isSambatan) {
     const deadline = new Date(product.sambatan.deadline);
@@ -173,7 +175,7 @@ export default function ProductDetailPage() {
   }
   
   const renderStockInfo = () => {
-    if (isSambatan) return null; // Stock info not shown for Sambatan
+    if (isSambatan || isService) return null; // Stock info not shown for Sambatan or Service
     const stock = selectedVariant?.stock ?? 0;
     if (stock > 10) {
         return <div className="flex items-center gap-2 text-sm text-green-600"><PackageCheck className="h-4 w-4" /> In Stock</div>
@@ -280,6 +282,16 @@ export default function ProductDetailPage() {
             
             <Separator className="my-6" />
 
+            {isService && (
+              <Alert className="mb-6">
+                <Handshake className="h-4 w-4" />
+                <AlertTitle>Ini adalah Produk Jasa</AlertTitle>
+                <AlertDescription>
+                  Alur pembelian untuk jasa berbeda. Setelah pembayaran, Anda perlu mengirimkan barang Anda ke penyedia jasa sesuai alamat yang akan diberikan.
+                </AlertDescription>
+              </Alert>
+            )}
+
             {isSambatan ? (
                 <Card className="rounded-2xl border-none bg-background shadow-neumorphic-inset p-6">
                     <CardTitle className="text-xl text-foreground/80 mb-4">Detail Sambatan</CardTitle>
@@ -321,7 +333,12 @@ export default function ProductDetailPage() {
               ) : (
                 <>
                   <Button size="lg" className="h-14 flex-1 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={handleAddToCart} disabled={!selectedVariant || selectedVariant.stock === 0}>
-                      {!selectedVariant || selectedVariant.stock === 0 ? (
+                      {isService ? (
+                        <>
+                           <Handshake className="mr-2 h-6 w-6" />
+                           Pesan Jasa
+                        </>
+                      ) : !selectedVariant || selectedVariant.stock === 0 ? (
                         <>
                            <PackageX className="mr-2 h-6 w-6" />
                            Stok Habis

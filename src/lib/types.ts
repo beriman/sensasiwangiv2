@@ -1,4 +1,4 @@
-export type ProductCategory = 'Parfum' | 'Raw Material' | 'Tools' | 'Misc' | 'Course';
+export type ProductCategory = 'Parfum' | 'Raw Material' | 'Tools' | 'Misc' | 'Course' | 'Jasa';
 
 export interface SambatanDetails {
   isActive: boolean;

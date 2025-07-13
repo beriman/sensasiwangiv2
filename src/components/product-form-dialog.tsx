@@ -22,15 +22,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Loader2, Upload, CalendarIcon, Trash2, PlusCircle } from 'lucide-react';
+import { Loader2, Upload, CalendarIcon, Trash2, PlusCircle, Star } from 'lucide-react';
 import type { Product, ProductCategory, SambatanDetails, ProductVariant } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from './ui/skeleton';
 import { profiles } from '@/data/profiles';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
-const productCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools', 'Misc'];
+
+const productCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools', 'Misc', 'Jasa'];
 
 const variantSchema = z.object({
     id: z.string(),
@@ -93,6 +95,9 @@ interface ProductFormDialogProps {
   onSave: (data: Product) => void;
   productData?: Product | null;
 }
+
+// In a real app, this would come from the user's session/authentication state
+const MOCK_IS_PREMIUM_MEMBER = true; 
 
 export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }: ProductFormDialogProps) {
   const [isImageLoading, setIsImageLoading] = useState(false);
@@ -401,10 +406,19 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                       </FormControl>
                       <SelectContent>
                         {productCategories.map(cat => (
-                           <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                           <SelectItem key={cat} value={cat} disabled={cat === 'Jasa' && !MOCK_IS_PREMIUM_MEMBER}>{cat}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                     {!MOCK_IS_PREMIUM_MEMBER && (
+                        <Alert variant="default" className="mt-2">
+                           <Star className="h-4 w-4" />
+                           <AlertTitle>Fitur Premium</AlertTitle>
+                           <AlertDescription>
+                            Menawarkan "Jasa" adalah fitur untuk anggota premium atau terverifikasi.
+                           </AlertDescription>
+                        </Alert>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}

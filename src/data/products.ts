@@ -229,6 +229,19 @@ export const products: Product[] = [
     perfumerProfileSlug: 'alex-doe',
     variants: [{ id: 't3-pack', name: 'Pack of 100', price: 150000, stock: 200 }]
   },
+  // Services
+  {
+    id: 'svc1',
+    name: 'Jasa Lukis Botol Parfum',
+    description: 'Ubah botol parfum Anda menjadi sebuah karya seni. Saya akan melukis desain kustom pada botol Anda. Alur: Anda mengirim botol -> Saya melukis -> Saya mengirim kembali botol yang sudah jadi.',
+    category: 'Jasa',
+    imageUrl: 'https://placehold.co/600x600.png',
+    imageHint: 'painted bottle art',
+    properties: { 'Jenis Layanan': 'Kustomisasi Artistik', 'Waktu Pengerjaan': '5-7 hari kerja' },
+    isListed: true,
+    perfumerProfileSlug: 'maison-de-reve', // Service offered by a curated brand
+    variants: [{ id: 'svc1-bottle', name: 'Per Botol', price: 300000, stock: 100 }] // Stock can represent capacity
+  },
   // Misc
   {
     id: 'm3',
