@@ -8,7 +8,6 @@ export interface Lesson {
   type: LessonType;
   duration: number; // in minutes
   content: string; // For text, it's markdown. For video, it's the YouTube video ID.
-  isCompleted?: boolean;
 }
 
 export interface Module {
@@ -48,7 +47,7 @@ export const courses: Course[] = [
         id: 'm1',
         title: 'Module 1: The Basics',
         lessons: [
-          { id: 'l1-1', title: 'Welcome to the World of Perfumery', type: 'video', duration: 8, content: 'dQw4w9WgXcQ', isCompleted: true },
+          { id: 'l1-1', title: 'Welcome to the World of Perfumery', type: 'video', duration: 8, content: 'dQw4w9WgXcQ' },
           { id: 'l1-2', title: 'Essential Tools & Safety', type: 'text', duration: 10, content: 'Safety is paramount. You will need:\n- Beakers\n- Digital Scale\n- Perfumer\'s Alcohol\n- Pipettes\n- Testing Strips\n\nAlways work in a well-ventilated area and wear gloves when handling pure essences.' },
           { id: 'l1-3', title: 'Understanding Scent Notes (Top, Middle, Base)', type: 'video', duration: 12, content: '3q-r8t_vC-s' },
         ],
@@ -108,3 +107,23 @@ export const getLessonByIds = (courseSlug: string, lessonId: string) => {
     }
     return null;
   };
+
+export const findNextLesson = (courseSlug: string, currentLessonId: string) => {
+    const course = getCourseBySlug(courseSlug);
+    if (!course) return null;
+
+    let foundCurrent = false;
+    for (const module of course.modules) {
+        for (const lesson of module.lessons) {
+            if (foundCurrent) {
+                // This is the next lesson
+                return { courseSlug, lessonId: lesson.id };
+            }
+            if (lesson.id === currentLessonId) {
+                foundCurrent = true;
+            }
+        }
+    }
+    // If no next lesson is found in the loop, it was the last one
+    return null;
+};

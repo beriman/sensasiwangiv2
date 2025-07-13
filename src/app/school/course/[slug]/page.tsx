@@ -16,6 +16,7 @@ import { CheckCircle2, PlayCircle, FileText, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { formatRupiah } from '@/lib/utils';
 import type { Product } from '@/lib/types';
+import { useCourseProgress } from '@/hooks/use-course-progress';
 
 
 const getLessonIcon = (type: 'video' | 'text') => {
@@ -27,15 +28,15 @@ export default function CourseDetailPage() {
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   const course = getCourseBySlug(slug);
   const { addItem } = useCart();
+  const { isLessonCompleted, getCourseProgress } = useCourseProgress();
 
 
   if (!course) {
     notFound();
   }
 
-  const allLessons = course.modules.flatMap(m => m.lessons);
-  const completedLessons = allLessons.filter(l => l.isCompleted).length;
-  const progress = (completedLessons / allLessons.length) * 100;
+  const allLessonIds = course.modules.flatMap(m => m.lessons.map(l => l.id));
+  const progress = getCourseProgress(allLessonIds);
 
   const handleBuyClick = () => {
     if (!course || !course.price) return;
@@ -49,6 +50,7 @@ export default function CourseDetailPage() {
         imageUrl: course.imageUrl,
         imageHint: course.imageHint,
         properties: { Instructor: course.instructor, Level: course.level },
+        isListed: true, // Courses should be listable to be bought
     };
     addItem(courseAsProduct, courseAsProduct.variants[0]);
   }
@@ -118,6 +120,7 @@ export default function CourseDetailPage() {
                     <ul className="space-y-2 px-6 pb-4">
                       {moduleItem.lessons.map((lesson) => {
                         const Icon = getLessonIcon(lesson.type);
+                        const completed = isLessonCompleted(lesson.id);
                         return(
                             <li key={lesson.id}>
                                 <Link href={`/school/course/${course.slug}/lesson/${lesson.id}`} 
@@ -128,7 +131,7 @@ export default function CourseDetailPage() {
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <span className="text-sm text-muted-foreground">{lesson.duration} min</span>
-                                    {lesson.isCompleted ? (
+                                    {completed ? (
                                         <CheckCircle2 className="h-5 w-5 text-accent" />
                                     ) : (
                                         <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/50" />

@@ -5,7 +5,7 @@
 import { useParams, notFound, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppHeader } from '@/components/header';
-import { getLessonByIds } from '@/data/courses';
+import { getLessonByIds, findNextLesson } from '@/data/courses';
 import { Button } from '@/components/ui/button';
 import { ContentRenderer } from '@/components/content-renderer';
 import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-react';
@@ -17,10 +17,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { useCourseProgress } from '@/hooks/use-course-progress';
 
 export default function LessonPage() {
   const params = useParams();
   const router = useRouter();
+  const { toggleLessonCompletion } = useCourseProgress();
   const courseSlug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
   const lessonId = Array.isArray(params.lessonId) ? params.lessonId[0] : params.lessonId;
   
@@ -33,10 +35,19 @@ export default function LessonPage() {
   const { lesson, moduleTitle, courseTitle } = lessonData;
 
   const handleComplete = () => {
-    // In a real app, you would update the user's progress in a database.
-    // For now, we'll just navigate back to the course page.
-    // We would also need logic to find the next lesson.
-    router.push(`/school/course/${courseSlug}`);
+    // Mark the current lesson as complete
+    toggleLessonCompletion(lesson.id, lesson.title);
+
+    // Find the next lesson
+    const nextLesson = findNextLesson(courseSlug, lesson.id);
+
+    if (nextLesson) {
+      // Navigate to the next lesson
+      router.push(`/school/course/${nextLesson.courseSlug}/lesson/${nextLesson.lessonId}`);
+    } else {
+      // This was the last lesson, navigate back to the course page
+      router.push(`/school/course/${courseSlug}`);
+    }
   }
 
   const renderContent = () => {
@@ -91,7 +102,7 @@ export default function LessonPage() {
         </div>
 
         <div className="mt-8 flex justify-between">
-            <Button variant="outline" className="rounded-xl px-6 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+            <Button variant="outline" className="rounded-xl px-6 py-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active" onClick={() => router.back()}>
                 <ChevronLeft className="mr-2 h-5 w-5" />
                 Previous
             </Button>
