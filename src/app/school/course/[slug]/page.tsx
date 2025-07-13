@@ -43,14 +43,40 @@ export default function CourseDetailPage() {
         id: `course-${course.slug}`,
         name: `Akses: ${course.title}`,
         description: `Akses selamanya untuk kursus ${course.title}`,
+        variants: [{ id: `course-${course.slug}-variant`, name: 'Full Access', price: course.price, stock: 1 }],
         price: course.price,
         category: 'Course',
         imageUrl: course.imageUrl,
         imageHint: course.imageHint,
         properties: { Instructor: course.instructor, Level: course.level },
     };
-    addItem(courseAsProduct);
+    addItem(courseAsProduct, courseAsProduct.variants[0]);
   }
+  
+  const renderPreview = () => {
+    if (course.price && course.previewVideoUrl) {
+      return (
+        <video
+          src={course.previewVideoUrl}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="h-full w-full object-cover"
+        />
+      );
+    }
+    return (
+      <Image
+        src={course.imageUrl}
+        alt={course.title}
+        fill
+        className="object-cover"
+        data-ai-hint={course.imageHint}
+      />
+    );
+  };
+
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -123,13 +149,7 @@ export default function CourseDetailPage() {
           <div className="lg:col-span-1">
             <Card className="sticky top-28 overflow-hidden rounded-2xl border-none shadow-neumorphic">
                 <div className="relative h-56 w-full">
-                    <Image
-                    src={course.imageUrl}
-                    alt={course.title}
-                    fill
-                    className="object-cover"
-                    data-ai-hint={course.imageHint}
-                    />
+                   {renderPreview()}
                 </div>
                 <CardContent className="p-6">
                     {course.price ? (
