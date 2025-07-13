@@ -21,7 +21,6 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  price?: number; // legacy, to be removed
   category: ProductCategory;
   imageUrl: string;
   imageHint: string;

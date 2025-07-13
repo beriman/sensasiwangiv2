@@ -15,7 +15,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { CheckCircle2, PlayCircle, FileText, ShoppingCart } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { formatRupiah } from '@/lib/utils';
-import type { Product } from '@/lib/types';
+import type { Product, ProductVariant } from '@/lib/types';
 import { useCourseProgress } from '@/hooks/use-course-progress';
 
 
@@ -45,14 +45,14 @@ export default function CourseDetailPage() {
         name: `Akses: ${course.title}`,
         description: `Akses selamanya untuk kursus ${course.title}`,
         variants: [{ id: `course-${course.slug}-variant`, name: 'Full Access', price: course.price, stock: 1 }],
-        price: course.price,
         category: 'Course',
         imageUrl: course.imageUrl,
         imageHint: course.imageHint,
         properties: { Instructor: course.instructor, Level: course.level },
         isListed: true, // Courses should be listable to be bought
     };
-    addItem(courseAsProduct, courseAsProduct.variants[0]);
+    const variant: ProductVariant = courseAsProduct.variants[0];
+    addItem(courseAsProduct, variant);
   }
   
   const renderPreview = () => {

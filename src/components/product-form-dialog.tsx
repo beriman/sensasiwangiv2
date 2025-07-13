@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Loader2, Upload, CalendarIcon } from 'lucide-react';
+import { Loader2, Upload, CalendarIcon, Trash2, PlusCircle } from 'lucide-react';
 import type { Product, ProductCategory, SambatanDetails, ProductVariant } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from './ui/skeleton';
@@ -31,6 +31,13 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
 const productCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools', 'Misc'];
+
+const variantSchema = z.object({
+    id: z.string(),
+    name: z.string().min(1, 'Nama varian tidak boleh kosong.'),
+    price: z.coerce.number().min(0, 'Harga harus positif.'),
+    stock: z.coerce.number().int().min(0, 'Stok harus angka bulat positif.'),
+});
 
 const productFormSchema = z.object({
   name: z.string().min(3, { message: 'Nama harus minimal 3 karakter.' }),
@@ -48,13 +55,7 @@ const productFormSchema = z.object({
     sambatanPrice: z.coerce.number().optional(),
     deadline: z.date().optional(),
   }).optional(),
-  // Hardcoded variants for now
-  variants: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    price: z.coerce.number().min(0),
-    stock: z.coerce.number().int().min(0),
-  })).min(1, "Produk harus memiliki setidaknya satu varian."),
+  variants: z.array(variantSchema).min(1, "Produk harus memiliki setidaknya satu varian."),
 }).superRefine((data, ctx) => {
     if (data.category === 'Parfum') {
         if (!data.properties?.Brand) {
@@ -118,6 +119,11 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
     }
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "variants"
+  });
+
   const watchedImageUrl = useWatch({ control: form.control, name: 'imageUrl' });
   const watchedCategory = useWatch({ control: form.control, name: 'category' });
   const watchedIsSambatan = useWatch({ control: form.control, name: 'isSambatan' });
@@ -165,11 +171,16 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
   // Effect to manage stock and price when isSambatan changes
   useEffect(() => {
     if (watchedIsSambatan) {
-      // For sambatan, there is only one variant with stock 1
-      const currentVariant = form.getValues('variants')[0] || {};
-      form.setValue('variants', [{...currentVariant, stock: 1}]);
+      if (fields.length > 1) {
+        // Keep only the first variant for Sambatan
+        const firstVariant = form.getValues('variants')[0];
+        form.setValue('variants', [{...firstVariant, stock: 1}]);
+      } else if (fields.length === 1) {
+        // Set stock of the single variant to 1
+        form.setValue('variants.0.stock', 1);
+      }
     }
-  }, [watchedIsSambatan, form]);
+  }, [watchedIsSambatan, form, fields.length]);
 
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -245,7 +256,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-2xl border-none bg-background shadow-neumorphic sm:max-w-[480px]">
+      <DialogContent className="rounded-2xl border-none bg-background shadow-neumorphic sm:max-w-xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-foreground/80">{dialogTitle}</DialogTitle>
           <DialogDescription className="text-base text-muted-foreground">
@@ -313,35 +324,66 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                 )}
               />
 
-              {/* Simplified Variant Section */}
-              <div className="space-y-2 rounded-lg border p-4">
-                <h4 className="font-semibold">Varian Produk</h4>
-                 <FormField
-                    control={form.control}
-                    name={`variants.0.price`}
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Harga (Rp)</FormLabel>
-                        <FormControl>
-                        <Input type="number" placeholder="1200000" {...field} disabled={watchedIsSambatan} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring disabled:opacity-50" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name={`variants.0.stock`}
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Stok</FormLabel>
-                        <FormControl>
-                        <Input type="number" placeholder="10" {...field} disabled={watchedIsSambatan} className="rounded-xl border-none bg-background shadow-neumorphic-inset focus:ring-2 focus:ring-ring disabled:opacity-50" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
+              {/* Dynamic Variant Section */}
+              <div className="space-y-4 rounded-lg border p-4">
+                <div className="flex justify-between items-center">
+                    <h4 className="font-semibold text-foreground/80">Varian Produk</h4>
+                    <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => append({ id: `new-${Date.now()}`, name: '', price: 0, stock: 0 })}
+                        disabled={watchedIsSambatan}
+                    >
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Tambah Varian
+                    </Button>
+                </div>
+                {fields.map((field, index) => (
+                    <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 border rounded-lg relative">
+                        <FormField
+                            control={form.control}
+                            name={`variants.${index}.name`}
+                            render={({ field }) => (
+                                <FormItem className="md:col-span-1">
+                                    <FormLabel>Nama Varian</FormLabel>
+                                    <FormControl><Input placeholder="e.g., 50ml" {...field} className="rounded-xl border-none bg-background shadow-neumorphic-inset"/></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name={`variants.${index}.price`}
+                            render={({ field }) => (
+                                <FormItem className="md:col-span-1">
+                                    <FormLabel>Harga (Rp)</FormLabel>
+                                    <FormControl><Input type="number" placeholder="1200000" {...field} disabled={watchedIsSambatan} className="rounded-xl border-none bg-background shadow-neumorphic-inset"/></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                         <FormField
+                            control={form.control}
+                            name={`variants.${index}.stock`}
+                            render={({ field }) => (
+                                <FormItem className="md:col-span-1">
+                                    <FormLabel>Stok</FormLabel>
+                                    <FormControl><Input type="number" placeholder="10" {...field} disabled={watchedIsSambatan} className="rounded-xl border-none bg-background shadow-neumorphic-inset"/></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <div className="md:col-span-1 flex items-end">
+                            {fields.length > 1 && !watchedIsSambatan && (
+                                <Button type="button" variant="destructive" size="icon" className="h-9 w-9" onClick={() => remove(index)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                ))}
+                <FormMessage>{form.formState.errors.variants?.message}</FormMessage>
               </div>
 
 

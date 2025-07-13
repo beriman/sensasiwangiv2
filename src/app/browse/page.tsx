@@ -34,7 +34,7 @@ export default function BrowsePage() {
   const [category, setCategory] = useState<string>('Parfum');
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<Record<string, string[]>>({});
-  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
   useEffect(() => {
     if (brandQuery) {
@@ -185,8 +185,7 @@ export default function BrowsePage() {
           </Collapsible>
 
           <main className={cn(
-            "md:col-span-3",
-            !isFiltersOpen && "md:col-span-4"
+            isFiltersOpen ? "md:col-span-3" : "md:col-span-4"
           )}>
             <ProductGrid products={filteredProducts} />
           </main>

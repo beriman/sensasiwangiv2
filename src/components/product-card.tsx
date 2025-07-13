@@ -43,7 +43,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const handleSellerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation(); // Prevents the main card link from firing
-    router.push(`/?seller=${sellerProfile?.slug}`);
+    router.push(`/browse?seller=${sellerProfile?.slug}`);
   }
 
   const priceDisplay = () => {

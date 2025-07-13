@@ -144,7 +144,7 @@ export default function ProductDetailPage() {
                 <div key={key}>
                   <p className="font-semibold text-muted-foreground">{key}</p>
                   {isPerfumerLink ? (
-                    <Link href={`/?seller=${product.perfumerProfileSlug}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
+                    <Link href={`/browse?seller=${product.perfumerProfileSlug}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
                       {value}
                     </Link>
                   ) : (
@@ -189,7 +189,7 @@ export default function ProductDetailPage() {
 
     return (
       <div className="mt-6">
-        <h3 className="text-base font-semibold text-foreground/80">Select Variant:</h3>
+        <h3 className="text-base font-semibold text-foreground/80">Pilih Varian:</h3>
         <RadioGroup
           value={selectedVariant?.id}
           onValueChange={(variantId) => {
@@ -253,7 +253,7 @@ export default function ProductDetailPage() {
             </h1>
              {seller && (
                 <div className="mt-2">
-                    <Link href={`/?seller=${seller.slug}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent">
+                    <Link href={`/browse?seller=${seller.slug}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent">
                         <Store className="h-4 w-4" />
                         <span>Sold by {seller.name}</span>
                     </Link>
@@ -324,12 +324,12 @@ export default function ProductDetailPage() {
                       {!selectedVariant || selectedVariant.stock === 0 ? (
                         <>
                            <PackageX className="mr-2 h-6 w-6" />
-                           Out of Stock
+                           Stok Habis
                         </>
                       ) : (
                         <>
                             <ShoppingCart className="mr-2 h-6 w-6" />
-                            Add to Cart
+                            Tambah ke Keranjang
                         </>
                       )}
                   </Button>
@@ -343,7 +343,7 @@ export default function ProductDetailPage() {
                 <Button variant="outline" asChild className="mt-4 h-14 rounded-xl shadow-neumorphic">
                     <Link href={`/community/thread/product-${product.id}`}>
                         <MessageSquare className="mr-2 h-5 w-5" />
-                        Product Discussion
+                        Diskusi Produk
                     </Link>
                 </Button>
             )}

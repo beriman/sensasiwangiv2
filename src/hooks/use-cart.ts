@@ -34,8 +34,8 @@ export const useCart = create<CartState>((set, get) => ({
     if (existingItem) {
       if (product.category === 'Course') {
         toast({
-          title: 'Already in Cart',
-          description: `${product.name} is already in your cart.`,
+          title: 'Sudah di Keranjang',
+          description: `${product.name} sudah ada di keranjang Anda.`,
         });
         return; // Prevent adding more than one of the same course
       }
@@ -48,8 +48,8 @@ export const useCart = create<CartState>((set, get) => ({
     
     set({ items: updatedItems, ...updateTotals(updatedItems) });
     toast({
-      title: 'Added to cart',
-      description: `${product.name} (${variant.name}) has been added to your cart.`,
+      title: 'Ditambahkan ke Keranjang',
+      description: `${product.name} (${variant.name}) telah ditambahkan ke keranjang Anda.`,
     });
   },
 
