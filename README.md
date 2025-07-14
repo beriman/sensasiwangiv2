@@ -14,21 +14,23 @@ This application is packed with features designed for various user roles: buyers
 *   **Advanced Product Offerings:**
     *   **Product Variants:** Sellers can offer products in multiple sizes and prices (e.g., 50ml, 100ml).
     *   **Sambatan (Group Buys):** Community-driven purchasing for products at a special price.
-    *   **Services & Custom Orders:** Sellers can offer services (like custom bottle painting) or made-to-order products with unique fulfillment flows.
+    *   **Services, Pre-Orders & Custom Orders:** Sellers can offer services (like custom bottle painting) or made-to-order/pre-order products with unique fulfillment flows.
 *   **AI-Powered Features (`/ai`):**
     *   **Personalized Recommendations:** An AI assistant helps users find products based on their preferences.
     *   **Content Moderation:** AI automatically screens forum posts and user-generated content for safety.
     *   **Curation Screener:** An AI assistant provides an initial assessment of artisan applications for curators.
 *   **Community Forum (`/community`):** A full-fledged forum with categories, threads, replies, voting, and in-line moderation tools for moderators.
 *   **School of Scent (`/school`):** An e-learning module with courses, lessons, and a dynamic progress tracking system for users.
-*   **Nusantarum - The Scent Encyclopedia (`/nusantarum`):** A database to discover and learn about local perfumers, brands, and their creations.
+*   **Nusantarum - The Scent Encyclopedia (`/nusantarum`):** A database to discover and learn about local perfumers, brands, and their creations, complete with a robust, AI-assisted curation system.
 *   **Comprehensive User Dashboards (`/dashboard`):**
     *   **For Buyers:** Manage purchases, wishlist, and messages.
     *   **For Sellers:** Manage products, view incoming orders, and handle shipping.
-*   **Full-Fledged Admin Panel (`/admin`):**
-    *   Manage users, products, and orders.
-    *   View site analytics and sales charts.
-    *   A drag-and-drop Kanban board for managing user feedback.
+*   **Role-Based Access Control:**
+    *   **Admin Panel (`/admin`):** Full control over users, products, orders, site analytics, and user feedback.
+    *   **Marketplace Moderator:** Specialized role to handle order disputes and listing violations.
+    *   **School Moderator:** Role dedicated to approving and managing course content.
+    *   **Forum Moderator:** In-line tools to manage community discussions.
+    *   **Nusantarum Curator:** Access to a special panel to review and verify artisan applications.
 
 ## Tech Stack
 
