@@ -35,7 +35,7 @@ export const forumCategories: ForumCategory[] = [
   },
   {
     id: 'ngobrolin-parfum',
-    name: 'Ngobrolin Parfum',
+    name: 'Review Parfum',
     description: 'Share your thoughts, reviews, and experiences with various perfumes.',
   },
   {
@@ -45,8 +45,8 @@ export const forumCategories: ForumCategory[] = [
   },
   {
     id: 'arena-komunitas',
-    name: 'Arena Komunitas',
-    description: 'Informasi tentang acara, gathering, bazaar, dan workshop. Ayo bertemu dan berbagi cerita!',
+    name: 'Ngobrolin Parfum',
+    description: 'For general discussions, chit-chat, and community events.',
   },
 ];
 
