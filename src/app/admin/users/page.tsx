@@ -1,6 +1,7 @@
 // src/app/admin/users/page.tsx
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import {
   Card,
@@ -17,46 +18,53 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { profiles } from '@/data/profiles';
+import { profiles as initialProfiles, type Profile, type ModeratorRole } from '@/data/profiles';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { MoreHorizontal, Shield } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { ManageRolesDialog } from '@/components/admin/manage-roles-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
-const mockUsers = [
-    ...profiles.map(p => ({ 
-        name: p.name, 
-        email: `${p.slug}@email.com`,
-        role: p.type,
-        status: 'Active',
-        avatar: p.profilePicture,
-        isModerator: p.slug === 'alex-doe', // Alex Doe is now a moderator
-    })),
-    {
-        name: 'John Doe',
-        email: 'john.doe@email.com',
-        role: 'Member',
-        status: 'Active',
-        avatar: 'https://placehold.co/40x40.png',
-        isModerator: false,
-    },
-    {
-        name: 'Jane Smith',
-        email: 'jane.smith@email.com',
-        role: 'Member',
-        status: 'Suspended',
-        avatar: 'https://placehold.co/40x40.png',
-        isModerator: false,
-    }
-]
+const roleColors: Record<ModeratorRole, string> = {
+    Admin: 'bg-destructive text-destructive-foreground',
+    Marketplace: 'bg-blue-100 text-blue-800',
+    School: 'bg-green-100 text-green-800',
+    Forum: 'bg-purple-100 text-purple-800',
+    Curation: 'bg-yellow-100 text-yellow-800',
+}
 
 export default function AdminUsersPage() {
+  const [users, setUsers] = useState<Profile[]>(initialProfiles);
+  const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
+  const [isManageRolesOpen, setIsManageRolesOpen] = useState(false);
+  const { toast } = useToast();
+
+  const handleManageRolesClick = (user: Profile) => {
+    setSelectedUser(user);
+    setIsManageRolesOpen(true);
+  }
+
+  const handleSaveRoles = (userId: string, newRoles: ModeratorRole[]) => {
+    setUsers(currentUsers => currentUsers.map(u => 
+        u.slug === userId ? { ...u, moderatorRoles: newRoles } : u
+    ));
+    toast({
+        title: 'Peran Diperbarui',
+        description: `Peran untuk ${selectedUser?.name} telah berhasil diperbarui.`,
+    })
+    setIsManageRolesOpen(false);
+  }
+
+
   return (
+    <>
     <Card>
       <CardHeader>
-        <CardTitle>Customers</CardTitle>
+        <CardTitle>Customers & Users</CardTitle>
         <CardDescription>
-          Manage your customers and view their information.
+          Manage your users and their roles.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -65,19 +73,18 @@ export default function AdminUsersPage() {
             <TableRow>
               <TableHead>Customer</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockUsers.map((user) => (
+            {users.map((user) => (
               <TableRow key={user.email}>
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <Image
-                      src={user.avatar || 'https://placehold.co/40x40.png'}
+                      src={user.profilePicture || 'https://placehold.co/40x40.png'}
                       alt={user.name}
                       width={40}
                       height={40}
@@ -92,15 +99,14 @@ export default function AdminUsersPage() {
                   </div>
                 </TableCell>
                 <TableCell>
-                    <div className="flex items-center gap-2">
-                        <span>{user.role}</span>
-                        {user.isModerator && <Badge className="bg-blue-100 text-blue-800">Moderator</Badge>}
+                    <div className="flex items-center flex-wrap gap-2">
+                        <Badge variant="secondary">{user.type}</Badge>
+                        {user.moderatorRoles?.map(role => (
+                            <Badge key={role} className={cn(roleColors[role])}>
+                                {role}
+                            </Badge>
+                        ))}
                     </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={user.status === 'Active' ? 'secondary' : 'destructive'}>
-                    {user.status}
-                  </Badge>
                 </TableCell>
                 <TableCell>
                    <DropdownMenu>
@@ -112,8 +118,12 @@ export default function AdminUsersPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
                       <DropdownMenuItem>View Profile</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleManageRolesClick(user)}>
+                        <Shield className="mr-2 h-4 w-4" />
+                        Manage Roles
+                      </DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive">
                         Suspend
                       </DropdownMenuItem>
@@ -126,5 +136,13 @@ export default function AdminUsersPage() {
         </Table>
       </CardContent>
     </Card>
+
+    <ManageRolesDialog 
+        isOpen={isManageRolesOpen}
+        onOpenChange={setIsManageRolesOpen}
+        user={selectedUser}
+        onSave={handleSaveRoles}
+    />
+    </>
   );
 }

@@ -10,6 +10,8 @@ export interface SambatanDetails {
   maxOrder: number;
 }
 
+export type FulfillmentType = 'IN_STOCK' | 'PRE_ORDER' | 'MADE_TO_ORDER';
+
 export interface ProductVariant {
   id: string; // Unique ID for the variant, e.g., product.id + '-' + name
   name: string; // e.g., "50ml", "10ml Decant"
@@ -29,6 +31,8 @@ export interface Product {
   sambatan?: SambatanDetails;
   variants: ProductVariant[]; // Replaces top-level price and stock
   isListed: boolean;
+  fulfillmentType?: FulfillmentType;
+  preorderDate?: string; // ISO 8601 date string for estimated shipping
 }
 
 export interface CartItem extends Product {
@@ -69,3 +73,35 @@ export interface Order {
     buyerConfirmationDeadline?: string; // Optional: for buyer confirmation window
     shippingInfo?: ShippingInfo;
 }
+
+export type ModeratorRole = 'Admin' | 'Marketplace' | 'School' | 'Forum' | 'Curation';
+
+export type ProfileType = 'Perfumer' | 'Brand' | 'Store';
+
+export interface CurationInfo {
+  isCurated: boolean;
+  curatedAt: string; // ISO 8601 date string
+}
+
+export interface Profile {
+    slug: string;
+    type: ProfileType;
+    name: string;
+    username: string;
+    email: string;
+    bio: string;
+    profilePicture?: string;
+    imageHint: string;
+    followers?: number;
+    following?: number;
+    socials: {
+      twitter?: string;
+      instagram?: string;
+      website?: string;
+      tiktok?: string;
+      youtube?: string;
+      facebook?: string;
+    };
+    curation?: CurationInfo;
+    moderatorRoles?: ModeratorRole[];
+  };

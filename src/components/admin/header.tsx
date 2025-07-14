@@ -20,9 +20,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import type { Profile } from '@/lib/types';
 
 interface AdminHeaderProps {
     onLogout: () => void;
+    user: Profile;
 }
 
 const notifications = [
@@ -32,7 +34,7 @@ const notifications = [
     { title: "Your sales report for May is ready.", time: "3 hours ago"},
 ]
 
-export function AdminHeader({ onLogout }: AdminHeaderProps) {
+export function AdminHeader({ onLogout, user }: AdminHeaderProps) {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
        <div className="flex-1">
@@ -75,16 +77,16 @@ export function AdminHeader({ onLogout }: AdminHeaderProps) {
             className="overflow-hidden rounded-full"
           >
             <Image
-              src="https://placehold.co/36x36.png"
+              src={user.profilePicture || "https://placehold.co/36x36.png"}
               width={36}
               height={36}
-              alt="Admin Avatar"
+              alt={user.name}
               className="overflow-hidden rounded-full"
             />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>
             <Settings className="mr-2 h-4 w-4" />

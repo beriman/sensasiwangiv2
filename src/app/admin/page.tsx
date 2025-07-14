@@ -9,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Flame } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { rateLimiter } from '@/lib/rate-limiter';
+import type { Profile } from '@/lib/types';
+import { profiles } from '@/data/profiles';
 
 interface AdminLoginPageProps {
-  onLogin?: () => void;
+  onLogin?: (user: Profile) => void;
 }
 
 export default function AdminLoginPage({ onLogin }: AdminLoginPageProps) {
@@ -20,7 +22,6 @@ export default function AdminLoginPage({ onLogin }: AdminLoginPageProps) {
   const { toast } = useToast();
 
   const handleLoginClick = () => {
-    // Use a generic key for rate limiting the login form
     const limiterKey = 'admin-login';
     if (!rateLimiter(limiterKey)) {
         toast({
@@ -31,8 +32,18 @@ export default function AdminLoginPage({ onLogin }: AdminLoginPageProps) {
         return;
     }
 
-    if (onLogin && email && password) {
-      onLogin();
+    // In a real app, this would be a proper auth check.
+    // For this demo, we'll find a user with the given email who has moderator roles.
+    const user = profiles.find(p => p.email === email && p.moderatorRoles && p.moderatorRoles.length > 0);
+    
+    if (onLogin && user && password) { // Simple password check for demo
+      onLogin(user);
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'Login Gagal',
+            description: 'Kredensial tidak valid atau Anda tidak memiliki hak akses moderator.',
+        });
     }
   };
 
@@ -40,12 +51,12 @@ export default function AdminLoginPage({ onLogin }: AdminLoginPageProps) {
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="mx-auto max-w-sm w-full shadow-neumorphic border-none bg-transparent">
         <CardHeader className="text-center">
-          <div className="inline-block bg-background p-3 rounded-full shadow-neumorphic-inset mb-4">
+          <div className="inline-block bg-background p-3 rounded-full shadow-neumorphic-inset mb-4 mx-auto w-fit">
             <Flame className="h-8 w-8 text-accent" />
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground/90">Admin Login</CardTitle>
+          <CardTitle className="text-2xl font-bold text-foreground/90">Moderator/Admin Login</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Enter your credentials to access the dashboard
+            Enter your credentials to access the panel
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -55,7 +66,7 @@ export default function AdminLoginPage({ onLogin }: AdminLoginPageProps) {
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="m@example.com" 
+                placeholder="moderator@example.com" 
                 required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
