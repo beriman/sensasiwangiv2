@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Flame } from 'lucide-react';
+import { Flame, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { rateLimiter } from '@/lib/rate-limiter';
 import type { Profile } from '@/lib/types';
 import { profiles } from '@/data/profiles';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 interface AdminLoginPageProps {
   onLogin?: (user: Profile) => void;
@@ -93,6 +94,16 @@ export default function AdminLoginPage({ onLogin }: AdminLoginPageProps) {
           >
             Login
           </Button>
+
+            <Alert className="mt-6 text-left">
+              <Info className="h-4 w-4" />
+              <AlertTitle>Demo Credentials</AlertTitle>
+              <AlertDescription>
+                <p>Email: <span className="font-semibold text-accent">admin@sensasiwangi.id</span></p>
+                <p>Password: <span className="font-semibold text-accent">password</span> (or any)</p>
+              </AlertDescription>
+            </Alert>
+
         </CardContent>
       </Card>
     </div>
