@@ -1,7 +1,7 @@
 // src/app/admin/orders/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { formatRupiah, cn } from '@/lib/utils';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Search } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +27,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import type { Order, OrderStatus } from '@/lib/types';
 
 // Mock data for demonstration
@@ -97,8 +105,24 @@ const initialOrders: Order[] = [
   },
 ];
 
+const allStatuses: OrderStatus[] = ['Pesanan Diterima', 'Dikirim', 'Selesai', 'Bermasalah', 'Dibatalkan'];
+
 export default function AdminOrdersPage() {
     const [orders, setOrders] = useState(initialOrders);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
+
+
+    const filteredOrders = useMemo(() => {
+        return orders.filter(order => {
+            const searchMatch = order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                order.customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                order.id.toLowerCase().includes(searchTerm.toLowerCase());
+            const statusMatch = statusFilter === 'All' || order.status === statusFilter;
+            return searchMatch && statusMatch;
+        });
+    }, [orders, searchTerm, statusFilter]);
+
 
     const handleMarkAsDisputed = (orderId: string) => {
         setOrders(orders.map(order => 
@@ -137,6 +161,28 @@ export default function AdminOrdersPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 flex items-center gap-4">
+            <div className="relative w-full max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input 
+                    placeholder="Search by customer, email, or order ID..." 
+                    className="pl-10"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="All">All Statuses</SelectItem>
+                    {allStatuses.map(status => (
+                         <SelectItem key={status} value={status}>{status}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -151,7 +197,7 @@ export default function AdminOrdersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <TableRow key={order.id} className={cn(order.status === 'Bermasalah' && 'bg-orange-50')}>
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>
@@ -189,6 +235,11 @@ export default function AdminOrdersPage() {
             ))}
           </TableBody>
         </Table>
+         {filteredOrders.length === 0 && (
+            <div className="text-center p-8 text-muted-foreground">
+                No orders found matching your criteria.
+            </div>
+          )}
       </CardContent>
     </Card>
   );

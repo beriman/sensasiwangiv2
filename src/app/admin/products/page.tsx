@@ -1,6 +1,7 @@
 // src/app/admin/products/page.tsx
 'use client';
 
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import {
   Card,
@@ -19,8 +20,8 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { formatRupiah } from '@/lib/utils';
-import { products } from '@/data/products';
-import { MoreHorizontal } from 'lucide-react';
+import { products as allProducts } from '@/data/products';
+import { MoreHorizontal, Search } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,8 +30,26 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { ProductCategory } from '@/lib/types';
+
+
+const allCategories: ProductCategory[] = ['Parfum', 'Raw Material', 'Tools', 'Misc', 'Jasa'];
 
 export default function AdminProductsPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('All');
+  
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter(product => {
+      const searchMatch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const categoryMatch = categoryFilter === 'All' || product.category === categoryFilter;
+      return searchMatch && categoryMatch;
+    });
+  }, [searchTerm, categoryFilter]);
+
+
   return (
     <Card>
       <CardHeader>
@@ -40,6 +59,28 @@ export default function AdminProductsPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 flex items-center gap-4">
+            <div className="relative w-full max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input 
+                    placeholder="Search by product name..." 
+                    className="pl-10"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="All">All Categories</SelectItem>
+                    {allCategories.map(cat => (
+                         <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -56,7 +97,7 @@ export default function AdminProductsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <TableRow key={product.id}>
                 <TableCell className="hidden sm:table-cell">
                   <Image
@@ -73,7 +114,7 @@ export default function AdminProductsPage() {
                     {product.sambatan?.isActive ? 'Sambatan' : 'Active'}
                   </Badge>
                 </TableCell>
-                <TableCell className="hidden md:table-cell">{formatRupiah(product.price)}</TableCell>
+                <TableCell className="hidden md:table-cell">{formatRupiah(product.variants[0].price)}</TableCell>
                 <TableCell className="hidden md:table-cell">{product.category}</TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -97,6 +138,11 @@ export default function AdminProductsPage() {
             ))}
           </TableBody>
         </Table>
+        {filteredProducts.length === 0 && (
+            <div className="text-center p-8 text-muted-foreground">
+                No products found matching your criteria.
+            </div>
+        )}
       </CardContent>
     </Card>
   );

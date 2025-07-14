@@ -1,7 +1,7 @@
 // src/app/admin/users/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import {
   Card,
@@ -20,9 +20,10 @@ import {
 } from '@/components/ui/table';
 import { profiles as initialProfiles, type Profile, type ModeratorRole } from '@/data/profiles';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Shield } from 'lucide-react';
+import { MoreHorizontal, Shield, Search } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { ManageRolesDialog } from '@/components/admin/manage-roles-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -40,6 +41,14 @@ export default function AdminUsersPage() {
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [isManageRolesOpen, setIsManageRolesOpen] = useState(false);
   const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredUsers = useMemo(() => {
+    return users.filter(user =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [users, searchTerm]);
 
   const handleManageRolesClick = (user: Profile) => {
     setSelectedUser(user);
@@ -68,6 +77,17 @@ export default function AdminUsersPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 flex items-center gap-4">
+            <div className="relative w-full max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input 
+                    placeholder="Search by name or email..." 
+                    className="pl-10"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -79,7 +99,7 @@ export default function AdminUsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <TableRow key={user.email}>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -134,6 +154,11 @@ export default function AdminUsersPage() {
             ))}
           </TableBody>
         </Table>
+         {filteredUsers.length === 0 && (
+            <div className="text-center p-8 text-muted-foreground">
+                No users found matching your search.
+            </div>
+          )}
       </CardContent>
     </Card>
 
