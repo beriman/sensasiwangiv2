@@ -2,6 +2,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Card,
   CardContent,
@@ -28,13 +31,15 @@ import {
   } from '@/components/ui/dropdown-menu';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from "@/components/ui/label";
 import { MoreHorizontal, ArrowUpDown, BadgeCheck } from 'lucide-react';
 import { curationApplications as initialApplications, CurationApplication, CurationStatus } from '@/data/curation-applications';
 import { cn } from '@/lib/utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 
 function CurationLoginPage({ onLogin }: { onLogin: () => void }) {
   const [email, setEmail] = useState('');
@@ -98,6 +103,10 @@ function CurationLoginPage({ onLogin }: { onLogin: () => void }) {
   );
 }
 
+const rejectionFormSchema = z.object({
+  reason: z.string().min(20, { message: 'Alasan penolakan harus minimal 20 karakter.' }),
+});
+
 
 export default function CurationDashboardPage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -105,8 +114,14 @@ export default function CurationDashboardPage() {
     const [selectedApp, setSelectedApp] = useState<CurationApplication | null>(null);
     const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-    const [confirmAction, setConfirmAction] = useState<{ type: 'Approve' | 'Reject' | null }>({ type: null });
+    const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+    const [confirmAction, setConfirmAction] = useState<{ type: 'Approve' | null }>({ type: null });
     const { toast } = useToast();
+
+    const rejectionForm = useForm<z.infer<typeof rejectionFormSchema>>({
+      resolver: zodResolver(rejectionFormSchema),
+      defaultValues: { reason: '' },
+    });
 
     // In a real app, this would come from the authenticated user's session
     const MOCK_CURATOR_NAME = "Curator A";
@@ -132,16 +147,23 @@ export default function CurationDashboardPage() {
       setSelectedApp(app);
       if (actionType === 'View') {
         setIsViewDialogOpen(true);
-      } else if (actionType === 'Approve' || actionType === 'Reject') {
+      } else if (actionType === 'Approve') {
         setConfirmAction({ type: actionType });
         setIsConfirmDialogOpen(true);
+      } else if (actionType === 'Reject') {
+        rejectionForm.reset();
+        setIsRejectDialogOpen(true);
       } else if (actionType === 'Request Info') {
         updateApplicationStatus(app.id, 'More Info Required');
       }
     };
 
-    const updateApplicationStatus = (appId: string, status: CurationStatus) => {
-        setApplications(prev => prev.map(app => app.id === appId ? { ...app, status, lastUpdatedBy: MOCK_CURATOR_NAME } : app));
+    const updateApplicationStatus = (appId: string, status: CurationStatus, reason?: string) => {
+        setApplications(prev => prev.map(app => 
+            app.id === appId 
+            ? { ...app, status, lastUpdatedBy: MOCK_CURATOR_NAME, rejectionReason: reason || app.rejectionReason } 
+            : app
+        ));
         toast({
             title: 'Status Updated',
             description: `Application from ${selectedApp?.applicantName} is now "${status}".`,
@@ -149,13 +171,21 @@ export default function CurationDashboardPage() {
     };
 
     const handleConfirm = () => {
-        if (selectedApp && confirmAction.type) {
-            updateApplicationStatus(selectedApp.id, confirmAction.type === 'Approve' ? 'Approved' : 'Rejected');
+        if (selectedApp && confirmAction.type === 'Approve') {
+            updateApplicationStatus(selectedApp.id, 'Approved');
         }
         setIsConfirmDialogOpen(false);
         setSelectedApp(null);
         setConfirmAction({ type: null });
     };
+
+    const handleRejectSubmit = (values: z.infer<typeof rejectionFormSchema>) => {
+        if (selectedApp) {
+            updateApplicationStatus(selectedApp.id, 'Rejected', values.reason);
+        }
+        setIsRejectDialogOpen(false);
+        setSelectedApp(null);
+    }
 
     if (!isLoggedIn) {
         return <CurationLoginPage onLogin={() => setIsLoggedIn(true)} />;
@@ -223,7 +253,7 @@ export default function CurationDashboardPage() {
                       <DropdownMenuItem onClick={() => handleActionClick(app, 'Request Info')}>
                         Request Info
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive" onClick={() => handleActionClick(app, 'Reject')}>
+                      <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive" onClick={() => handleActionClick(app, 'Reject')}>
                         Reject
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -257,29 +287,74 @@ export default function CurationDashboardPage() {
                         </p>
                     </div>
                 </div>
+                 {selectedApp?.rejectionReason && (
+                  <div>
+                    <h3 className="font-semibold">Rejection Reason</h3>
+                    <p className="text-sm p-4 bg-red-50 text-red-900 rounded-md whitespace-pre-wrap border border-red-200">
+                      {selectedApp.rejectionReason}
+                    </p>
+                  </div>
+                )}
             </div>
         </DialogContent>
     </Dialog>
 
-    {/* Confirmation Dialog */}
+    {/* Approval Confirmation Dialog */}
     <AlertDialog open={isConfirmDialogOpen} onOpenChange={setIsConfirmDialogOpen}>
         <AlertDialogContent>
             <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                    You are about to change the status of the application from{' '}
-                    <span className="font-bold">{selectedApp?.applicantName}</span> to{' '}
-                    <span className="font-bold">{confirmAction.type}</span>. This action can be reversed, but please confirm.
+                    You are about to <span className="font-bold text-green-600">Approve</span> the application from{' '}
+                    <span className="font-bold">{selectedApp?.applicantName}</span>. This action can be reversed, but please confirm.
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleConfirm} className={confirmAction.type === 'Reject' ? buttonVariants({ variant: 'destructive'}) : ''}>
-                    Confirm
+                <AlertDialogAction onClick={handleConfirm} className="bg-green-600 hover:bg-green-700">
+                    Confirm Approval
                 </AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
+
+    {/* Rejection Dialog */}
+    <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Reject Application: {selectedApp?.applicantName}</DialogTitle>
+                <DialogDescription>
+                    Provide a clear reason for the rejection. This feedback will be recorded and can be sent to the applicant.
+                </DialogDescription>
+            </DialogHeader>
+            <Form {...rejectionForm}>
+                <form onSubmit={rejectionForm.handleSubmit(handleRejectSubmit)} className="space-y-4">
+                    <FormField
+                        control={rejectionForm.control}
+                        name="reason"
+                        render={({ field }) => (
+                            <FormItem>
+                                <Label htmlFor="reason">Rejection Reason</Label>
+                                <FormControl>
+                                    <Textarea
+                                        id="reason"
+                                        placeholder="e.g., 'The statement indicates the use of pre-made fragrance oils (bibit parfum), which does not align with our artisan perfumery standards. We require formulation from raw materials...'"
+                                        className="min-h-[120px]"
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                     <DialogFooter>
+                        <Button type="button" variant="ghost" onClick={() => setIsRejectDialogOpen(false)}>Cancel</Button>
+                        <Button type="submit" variant="destructive">Submit Rejection</Button>
+                    </DialogFooter>
+                </form>
+            </Form>
+        </DialogContent>
+    </Dialog>
     </>
   );
 }

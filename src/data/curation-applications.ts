@@ -16,6 +16,7 @@ export interface CurationApplication {
     aiScore: number;
     statement: string;
     lastUpdatedBy?: string;
+    rejectionReason?: string;
 }
 
 export const curationApplications: CurationApplication[] = [
@@ -38,6 +39,7 @@ export const curationApplications: CurationApplication[] = [
         aiScore: 2,
         statement: 'Kami menyediakan bibit parfum import kualitas terbaik. Wanginya tahan lama dan mirip dengan parfum desainer ternama. Proses kami adalah mencampur bibit dengan pelarut khusus untuk hasil terbaik.',
         lastUpdatedBy: 'Curator B',
+        rejectionReason: 'The statement clearly indicates the use of pre-made fragrance oils ("bibit parfum"), which does not align with our standards for original, artisan creation. We require perfumers to formulate from individual raw materials.'
     },
     {
         id: 'app-003',
