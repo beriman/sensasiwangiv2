@@ -20,7 +20,7 @@ const allNavLinks = [
     { href: '/admin/users', icon: Users, label: 'Users', roles: ['Admin'] },
     { href: '/admin/analytics', icon: LineChart, label: 'Analytics', roles: ['Admin'] },
     { href: '/admin/feedback', icon: MessageSquareWarning, label: 'Feedback', roles: ['Admin', 'Forum'] },
-    { href: '/nusantarum/curation', icon: BadgeCheck, label: 'Curation', roles: ['Admin', 'Curation'] }
+    { href: '/admin/curation', icon: BadgeCheck, label: 'Curation', roles: ['Admin', 'Curation'] }
 ];
 
 interface AdminSidebarProps {
