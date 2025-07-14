@@ -33,13 +33,14 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from "@/components/ui/input";
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from "@/components/ui/label";
-import { MoreHorizontal, ArrowUpDown, BadgeCheck } from 'lucide-react';
+import { MoreHorizontal, ArrowUpDown, BadgeCheck, History } from 'lucide-react';
 import { curationApplications as initialApplications, CurationApplication, CurationStatus } from '@/data/curation-applications';
 import { cn } from '@/lib/utils';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 function CurationLoginPage({ onLogin }: { onLogin: () => void }) {
   const [email, setEmail] = useState('');
@@ -112,6 +113,7 @@ export default function CurationDashboardPage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [applications, setApplications] = useState<CurationApplication[]>(initialApplications);
     const [selectedApp, setSelectedApp] = useState<CurationApplication | null>(null);
+    const [submissionHistory, setSubmissionHistory] = useState<CurationApplication[]>([]);
     const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
     const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
     const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
@@ -146,6 +148,10 @@ export default function CurationDashboardPage() {
     const handleActionClick = (app: CurationApplication, actionType: 'View' | 'Approve' | 'Reject' | 'Request Info') => {
       setSelectedApp(app);
       if (actionType === 'View') {
+        const history = applications.filter(
+          (a) => a.applicantSlug === app.applicantSlug && a.id !== app.id
+        ).sort((a, b) => new Date(b.dateApplied).getTime() - new Date(a.dateApplied).getTime());
+        setSubmissionHistory(history);
         setIsViewDialogOpen(true);
       } else if (actionType === 'Approve') {
         setConfirmAction({ type: actionType });
@@ -268,14 +274,14 @@ export default function CurationDashboardPage() {
 
     {/* View Application Dialog */}
     <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-2xl">
             <DialogHeader>
                 <DialogTitle>Application: {selectedApp?.applicantName}</DialogTitle>
                 <DialogDescription>
                     Full details for curator review.
                 </DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-4">
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-6">
                 <h3 className="font-semibold">Applicant's Statement</h3>
                 <p className="text-sm p-4 bg-muted rounded-md whitespace-pre-wrap">{selectedApp?.statement}</p>
                 <h3 className="font-semibold">AI Analysis</h3>
@@ -293,6 +299,30 @@ export default function CurationDashboardPage() {
                     <p className="text-sm p-4 bg-red-50 text-red-900 rounded-md whitespace-pre-wrap border border-red-200">
                       {selectedApp.rejectionReason}
                     </p>
+                  </div>
+                )}
+                {submissionHistory.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold flex items-center gap-2"><History className="h-5 w-5" /> Riwayat Pengajuan Sebelumnya</h3>
+                    <Accordion type="single" collapsible className="w-full mt-2">
+                      {submissionHistory.map(historyItem => (
+                        <AccordionItem value={historyItem.id} key={historyItem.id} className="border-b">
+                          <AccordionTrigger>
+                            Pengajuan pada {new Date(historyItem.dateApplied).toLocaleDateString()} - Status: {historyItem.status}
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            {historyItem.rejectionReason ? (
+                              <div>
+                                <h4 className="font-medium text-destructive">Alasan Penolakan:</h4>
+                                <p className="text-sm text-muted-foreground whitespace-pre-wrap mt-1">{historyItem.rejectionReason}</p>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-muted-foreground">Tidak ada alasan penolakan yang tercatat untuk pengajuan ini.</p>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
                   </div>
                 )}
             </div>
