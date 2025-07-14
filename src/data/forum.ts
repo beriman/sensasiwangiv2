@@ -127,6 +127,15 @@ const manualThreads: Thread[] = [
     ],
   },
   {
+    id: 'patch-2',
+    categoryId: 'jurnal-platform',
+    title: 'Rekap Perkembangan Platform - 14 Juli 2025',
+    author: 'Admin',
+    createdAt: new Date('2025-07-14T09:00:00Z').toISOString(),
+    content: 'Halo komunitas sensasiwangi.id!\n\nSebagai bagian dari transparansi, kami ingin membagikan rekap perkembangan besar yang telah kami implementasikan bersama hingga hari ini:\n\n1.  **Marketplace yang Lebih Dinamis**: Penjual kini dapat menawarkan produk dengan berbagai varian ukuran dan harga, serta opsi pemenuhan seperti Pre-Order dan Made-to-Order.\n\n2.  **School of Scent dengan Pelacakan Progres**: Pengalaman belajar kini lebih interaktif! Sistem secara otomatis melacak pelajaran yang telah Anda selesaikan, lengkap dengan progress bar visual.\n\n3.  **Alur Kurasi Nusantarum Berbasis AI**: Untuk menjaga kualitas, kami telah membangun alur kurasi yang canggih di mana AI membantu tim kurator manusia dalam menyaring aplikasi, memastikan hanya perajin otentik yang mendapatkan lencana verifikasi.\n\n4.  **Dukungan untuk Produk Jasa**: Platform kini secara resmi mendukung penjualan Jasa (seperti lukis botol), dengan alur kerja yang disesuaikan untuk anggota premium/terverifikasi.\n\n5.  **Peningkatan Antarmuka Pengguna**: Halaman utama sekarang menampilkan video loop yang dinamis, dan berbagai perbaikan UI lainnya telah diterapkan di seluruh situs.\n\nTerima kasih atas semua masukan dan dukungan Anda yang telah membantu kami mencapai titik ini!',
+    posts: [],
+  },
+  {
     id: 'event-1',
     categoryId: 'arena-komunitas',
     title: 'Acara Kumpul Komunitas & Bazaar Parfum Lokal - Jakarta, Agustus 2024',
