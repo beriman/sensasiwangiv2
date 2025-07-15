@@ -34,6 +34,24 @@ const getInstagramEmbedUrl = (url: string) => {
 
 const urlRegex = /(https?:\/\/[^\s]+)/g;
 
+// --- Link Censorship ---
+const allowedDomains = [
+  'youtube.com',
+  'youtu.be',
+  'tiktok.com',
+  'instagram.com',
+];
+
+const isUrlAllowed = (url: string) => {
+  try {
+    const hostname = new URL(url).hostname;
+    return allowedDomains.some(domain => hostname.endsWith(domain));
+  } catch (error) {
+    return false; // Invalid URL
+  }
+};
+
+
 export function ContentRenderer({ content }: ContentRendererProps) {
   if (!content) return null;
 
@@ -43,6 +61,10 @@ export function ContentRenderer({ content }: ContentRendererProps) {
     <div className="space-y-4 text-base text-foreground/80 whitespace-pre-wrap">
       {parts.map((part, index) => {
         if (part.match(urlRegex)) {
+            if (!isUrlAllowed(part)) {
+                return <span key={index} className="text-destructive font-semibold">[tautan disensor]</span>;
+            }
+
           const youtubeUrl = getYouTubeEmbedUrl(part);
           if (youtubeUrl) {
             return (
@@ -91,7 +113,7 @@ export function ContentRenderer({ content }: ContentRendererProps) {
               )
           }
 
-          // Fallback to a regular link
+          // Fallback to a regular link for allowed domains that are not embeds
           return <a key={index} href={part} target="_blank" rel="noopener noreferrer" className="text-accent underline hover:text-accent/80">{part}</a>;
 
         }
