@@ -4,12 +4,10 @@
 import { AppHeader } from '@/components/header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { badgeData, BadgeInfo } from '@/data/badges';
-import { Award, BookCopy, Group, Store, BadgeCheck, type LucideIcon } from 'lucide-react';
-
 
 const getThresholdString = (badge: BadgeInfo) => {
     if (badge.levels.length === 1) {
-        return badge.levels[0].threshold;
+        return badge.levels[0].threshold.toString();
     }
     return badge.levels.map(l => l.threshold).join('/');
 };
@@ -17,9 +15,11 @@ const getThresholdString = (badge: BadgeInfo) => {
 const BadgeCategoryCard = ({ badge }: { badge: BadgeInfo }) => {
     const Icon = badge.icon;
     const isCuratedBadge = badge.category === 'curated';
+    
+    // Create a dynamic description based on the levels
     const descriptionTemplate = badge.levels[0].description;
     const thresholdString = getThresholdString(badge);
-    const finalDescription = descriptionTemplate.replace(/(\d+)/, thresholdString.toString());
+    const finalDescription = descriptionTemplate.replace(/(\d+((?:\/\d+)*))/, `**${thresholdString}**`);
 
 
     return (
@@ -31,7 +31,7 @@ const BadgeCategoryCard = ({ badge }: { badge: BadgeInfo }) => {
             </CardHeader>
             <CardContent className="flex flex-grow flex-col">
             <CardTitle className="text-xl font-bold text-foreground/80">{badge.categoryTitle}</CardTitle>
-            <p className="mt-2 flex-grow text-muted-foreground">{finalDescription}</p>
+            <p className="mt-2 flex-grow text-muted-foreground" dangerouslySetInnerHTML={{ __html: finalDescription.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground/80">$1</strong>') }}></p>
             </CardContent>
         </Card>
     )

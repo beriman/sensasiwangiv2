@@ -57,6 +57,7 @@ export interface Profile {
       badges: {
         reviewer: 1,
         student: 1,
+        artisan: 1,
       },
     },
     {
@@ -132,9 +133,7 @@ export interface Profile {
         profilePicture: 'https://placehold.co/128x128.png?text=BH',
         imageHint: 'profile man',
         socials: {},
-        badges: {
-            collector: 1,
-        },
+        badges: {},
     },
     {
         slug: 'citra-lestari',

@@ -1,7 +1,7 @@
 // src/data/badges.ts
-import { Award, BookCopy, Group, Store, BadgeCheck, type LucideIcon } from 'lucide-react';
+import { Award, BookCopy, Group, Palette, BadgeCheck, type LucideIcon } from 'lucide-react';
 
-export type BadgeCategory = 'curated' | 'reviewer' | 'student' | 'collector' | 'sambatan';
+export type BadgeCategory = 'curated' | 'reviewer' | 'student' | 'artisan' | 'sambatan';
 
 export interface BadgeLevel {
   level: number;
@@ -64,7 +64,7 @@ export const badgeData: Record<BadgeCategory, BadgeInfo> = {
       {
         level: 1,
         title: 'Murid Teladan',
-        description: 'Selesaikan 1 kursus di School of Scent.',
+        description: 'Selesaikan 1/5/10 kursus di School of Scent.',
         threshold: 1,
       },
        {
@@ -73,24 +73,36 @@ export const badgeData: Record<BadgeCategory, BadgeInfo> = {
         description: 'Selesaikan 5 kursus di School of Scent.',
         threshold: 5,
       },
+       {
+        level: 3,
+        title: 'Sarjana Aroma',
+        description: 'Selesaikan 10 kursus di School of Scent.',
+        threshold: 10,
+      },
     ],
   },
-  collector: {
-    category: 'collector',
-    categoryTitle: 'Scent Collector',
-    icon: Store,
+  artisan: {
+    category: 'artisan',
+    categoryTitle: 'Artisan',
+    icon: Palette,
     levels: [
       {
         level: 1,
-        title: 'Kolektor Pemula',
-        description: 'Tambahkan 5 parfum ke "Lemari Parfum" virtual.',
-        threshold: 5,
+        title: 'Artisan I',
+        description: 'Daftarkan 1/5/10 produk di marketplace.',
+        threshold: 1,
       },
        {
         level: 2,
-        title: 'Kolektor Antusias',
-        description: 'Tambahkan 25 parfum ke "Lemari Parfum" virtual.',
-        threshold: 25,
+        title: 'Artisan II',
+        description: 'Daftarkan 5 produk di marketplace.',
+        threshold: 5,
+      },
+       {
+        level: 3,
+        title: 'Artisan III',
+        description: 'Daftarkan 10 produk di marketplace.',
+        threshold: 10,
       },
     ],
   },
