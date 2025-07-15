@@ -18,7 +18,8 @@ import { Cart } from '@/components/cart';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
-
+import AuthComponent from './auth';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 
 const navLinks = [
   { href: '/browse', label: 'Marketplace' },
@@ -35,15 +36,20 @@ const userNotifications = [
 
 export function AppHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const session = useSession();
+  const supabase = useSupabaseClient();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
 
   const UserMenu = () => (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-full">
             <Avatar>
-                <AvatarImage src="https://placehold.co/40x40.png" alt="Alex Doe" />
-                <AvatarFallback>AD</AvatarFallback>
+                <AvatarImage src={session?.user?.user_metadata?.avatar_url} alt={session?.user?.email} />
+                <AvatarFallback>{session?.user?.email?.[0].toUpperCase()}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
@@ -56,12 +62,12 @@ export function AppHeader() {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/profile/alex-doe">
+            <Link href={`/profile/${session?.user?.id}`}>
                 Profile
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>
+          <DropdownMenuItem onClick={handleLogout}>
             Logout
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -129,18 +135,13 @@ export function AppHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-            {isLoggedIn ? (
-               <>
+            {session ? (
+              <>
                 <NotificationBell />
                 <UserMenu />
-               </>
+              </>
             ) : (
-                 <Button 
-                    onClick={() => setIsLoggedIn(true)}
-                    className="rounded-xl px-6 shadow-neumorphic transition-all hover:shadow-neumorphic-active"
-                >
-                    Login
-                </Button>
+              <AuthComponent />
             )}
             <Cart />
         </div>
@@ -148,7 +149,6 @@ export function AppHeader() {
         {/* Mobile Navigation */}
         <div className="flex items-center gap-2 md:hidden">
           <Cart />
-          {isLoggedIn && <NotificationBell />}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -176,25 +176,14 @@ export function AppHeader() {
                       {link.label}
                     </Link>
                   ))}
-                  {isLoggedIn && (
-                     <Link
-                        href="/dashboard/my-products"
-                        className="rounded-lg p-3 text-lg font-medium text-foreground/80 transition-colors hover:bg-accent/50"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                        Dashboard
-                    </Link>
-                  )}
                 </div>
-                <Button 
-                    onClick={() => {
-                        setIsLoggedIn(!isLoggedIn);
-                        setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full rounded-xl py-6 text-lg shadow-neumorphic"
-                    >
-                    {isLoggedIn ? 'Logout' : 'Login'}
-                </Button>
+                {session ? (
+                  <div className="mt-auto">
+                    <UserMenu />
+                  </div>
+                ) : (
+                  <AuthComponent />
+                )}
               </nav>
             </SheetContent>
           </Sheet>

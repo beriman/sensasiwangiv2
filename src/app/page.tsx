@@ -5,15 +5,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowRight, BookOpen, MessageSquare, Users } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { ArrowRight, BookOpen } from 'lucide-react';
 import { ProductCard } from '@/components/product-card';
 import { products } from '@/data/products';
 import { courses } from '@/data/courses';
 import { allThreads } from '@/data/forum';
 import { profiles } from '@/data/profiles';
+import { useSession } from '@supabase/auth-helpers-react';
+import AuthComponent from '@/components/auth';
 
 export default function LandingPage() {
+  const session = useSession();
   const featuredProducts = products.filter(p => p.isListed).slice(0, 4);
   const featuredCourse = courses[0];
   const recentThreads = allThreads.slice(0, 3);
@@ -39,9 +42,13 @@ export default function LandingPage() {
                 <p className="mt-4 max-w-2xl text-lg md:text-xl text-white/90">
                     Platform komunitas untuk para pecinta, perajin, dan penjelajah dunia wewangian di Indonesia.
                 </p>
-                <Button asChild size="lg" className="mt-8 h-14 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active">
-                    <Link href="/browse">Mulai Menjelajah</Link>
-                </Button>
+                {!session ? (
+                  <AuthComponent />
+                ) : (
+                  <Button asChild size="lg" className="mt-8 h-14 rounded-xl bg-accent-gradient px-8 text-lg text-accent-foreground shadow-neumorphic transition-all hover:shadow-neumorphic-active">
+                      <Link href="/browse">Mulai Menjelajah</Link>
+                  </Button>
+                )}
             </div>
         </section>
 
