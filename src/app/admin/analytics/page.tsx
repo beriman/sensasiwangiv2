@@ -9,24 +9,53 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useAnalyticsData } from '@/data-hooks/useAnalyticsData';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
-const salesData = [
-  { date: 'Jan 23', Sales: 2890 },
-  { date: 'Feb 23', Sales: 2756 },
-  { date: 'Mar 23', Sales: 3322 },
-  { date: 'Apr 23', Sales: 3470 },
-  { date: 'May 23', Sales: 3475 },
-  { date: 'Jun 23', Sales: 3129 },
-];
-
-const categoryData = [
-  { name: 'Parfum', value: 9800 },
-  { name: 'Raw Material', value: 4567 },
-  { name: 'Tools', value: 3908 },
-  { name: 'Misc', value: 2400 },
-];
+function AnalyticsSkeleton() {
+    return (
+        <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2 mt-2" />
+                </CardHeader>
+                <CardContent>
+                    <Skeleton className="h-72 w-full" />
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2 mt-2" />
+                </CardHeader>
+                <CardContent className="flex items-center justify-center">
+                    <Skeleton className="h-72 w-72 rounded-full" />
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
 
 export default function AdminAnalyticsPage() {
+  const { salesData, categoryData, loading, error } = useAnalyticsData();
+
+  if (loading) {
+    return <AnalyticsSkeleton />;
+  }
+
+  if (error) {
+    return (
+        <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+        </Alert>
+    );
+  }
+
   return (
     <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
       <Card>
