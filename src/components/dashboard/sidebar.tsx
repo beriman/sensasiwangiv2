@@ -4,7 +4,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Package, MessageSquare, Heart, Settings, ShoppingBag, Truck } from 'lucide-react';
+import { Package, MessageSquare, Heart, Settings, ShoppingBag, Truck, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
@@ -12,6 +12,7 @@ const navLinks = [
     { href: '/dashboard/orders', icon: Truck, label: 'Pesanan Masuk' }, // For sellers
     { href: '/dashboard/purchases', icon: ShoppingBag, label: 'Pembelian Saya' }, // For buyers
     { href: '/dashboard/messages', icon: MessageSquare, label: 'Pesan' },
+    { href: '/dashboard/notifications', icon: Bell, label: 'Notifikasi' },
     { href: '/dashboard/wishlist', icon: Heart, label: 'Wishlist' },
     { href: '/dashboard/settings', icon: Settings, label: 'Pengaturan Akun' },
 ];
