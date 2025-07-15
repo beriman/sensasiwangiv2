@@ -46,41 +46,7 @@ const productFormSchema = z.object({
 });
 
 
-import { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Upload } from 'lucide-react';
-import type { Product } from '@/lib/types';
-import { useToast } from '@/hooks/use-toast';
-import { createClient } from '@/lib/supabase';
 
-const productCategories: string[] = ['Parfum', 'Raw Material', 'Tools', 'Misc'];
-
-const productFormSchema = z.object({
-  name: z.string().min(3, { message: 'Nama harus minimal 3 karakter.' }),
-  description: z.string().min(10, { message: 'Deskripsi harus minimal 10 karakter.' }),
-  price: z.coerce.number().min(0, 'Harga harus positif.'),
-  stock: z.coerce.number().int().min(0, 'Stok harus angka bulat positif.'),
-  category: z.enum(productCategories as [string, ...string[]], {
-    required_error: "Anda harus memilih kategori produk.",
-  }),
-  image_url: z.string().optional(),
-});
 
 interface ProductFormDialogProps {
   isOpen: boolean;
