@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { EditProfileDialog, type ProfileData } from '@/components/edit-profile-dialog';
 import { CurationDialog } from '@/components/curation-dialog';
-import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck, Ribbon, Star, Store, Palette } from 'lucide-react';
+import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck, Ribbon, Star, Store, Palette, Award, BookCopy, Group } from 'lucide-react';
 import { Badge as UiBadge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +21,38 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProductGrid } from '@/components/product-grid';
 import { ReviewCard } from '@/components/review-card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
+
+type BadgeType = 'curated' | 'reviewer' | 'student' | 'collector' | 'sambatan';
+
+const badgeInfo: Record<BadgeType, { icon: React.ElementType; title: string; description: string }> = {
+  curated: {
+    icon: BadgeCheck,
+    title: 'Nusantarum Verified',
+    description: 'Telah terverifikasi sebagai perajin atau brand otentik oleh tim kurasi Nusantarum.',
+  },
+  reviewer: {
+    icon: Award,
+    title: 'Ulasan Terpercaya',
+    description: 'Telah memberikan 10+ ulasan bermanfaat untuk komunitas.',
+  },
+  student: {
+    icon: BookCopy,
+    title: 'Murid Teladan',
+    description: 'Telah menyelesaikan setidaknya satu kursus di School of Scent.',
+  },
+  collector: {
+    icon: Store,
+    title: 'Kolektor Pemula',
+    description: 'Memiliki 5+ parfum dalam koleksi "Lemari Parfum" virtual.',
+  },
+  sambatan: {
+    icon: Group,
+    title: 'Partisipan Aktif',
+    description: 'Telah berpartisipasi dalam 3+ Sambatan (group buy).',
+  },
+};
 
 
 const TikTokIcon = () => (
@@ -90,6 +122,16 @@ export default function ProfilePage() {
         </div>
     );
   }
+  
+  // Combine badges from curation and gamification
+  const userBadges: BadgeType[] = [];
+  if (profile.curation?.isCurated) {
+      userBadges.push('curated');
+  }
+  if (profile.badges) {
+      userBadges.push(...profile.badges);
+  }
+
 
   const profileDataForDialog: ProfileData = {
     ...profile,
@@ -123,12 +165,6 @@ export default function ProfilePage() {
                         <h1 className="text-2xl font-bold text-foreground md:text-3xl">{profile.name}</h1>
                         <UiBadge variant="outline">{profile.type}</UiBadge>
                     </div>
-                    {profile.curation?.isCurated && (
-                      <div className="flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800">
-                        <BadgeCheck className="h-4 w-4" />
-                        Terverifikasi oleh Nusantarum
-                      </div>
-                    )}
                   </div>
                   <p className="text-md text-muted-foreground">{profile.username}</p>
                    <div className="mt-3 flex justify-center gap-4 text-sm sm:justify-start">
@@ -176,12 +212,40 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
-              <p className="mt-6 text-base text-foreground/80">{profile.bio}</p>
-              {profile.curation?.isCurated && (
-                  <p className="mt-4 text-center text-xs text-muted-foreground sm:text-left">
-                      Disetujui pada: {format(new Date(profile.curation.curatedAt), 'dd MMMM yyyy')}
-                  </p>
+
+              {userBadges.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-center text-sm font-semibold uppercase text-muted-foreground tracking-wider sm:text-left">Pencapaian</h3>
+                  <div className="mt-2 flex flex-wrap justify-center gap-3 sm:justify-start">
+                    <TooltipProvider delayDuration={100}>
+                    {userBadges.map((badgeKey) => {
+                       const badge = badgeInfo[badgeKey];
+                       const Icon = badge.icon;
+                       const isCuratedBadge = badgeKey === 'curated';
+                        return(
+                        <Tooltip key={badgeKey}>
+                            <TooltipTrigger asChild>
+                                <div className={cn(
+                                    "flex h-12 w-12 items-center justify-center rounded-full shadow-neumorphic-inset transition-all",
+                                    isCuratedBadge ? 'bg-blue-100 text-blue-700' : 'bg-background'
+                                    )}>
+                                    <Icon className="h-6 w-6" />
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p className="font-bold">{badge.title}</p>
+                                <p>{badge.description}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        )
+                    })}
+                    </TooltipProvider>
+                  </div>
+                </div>
               )}
+
+              <p className="mt-6 text-base text-foreground/80">{profile.bio}</p>
+              
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
                 {isOwnProfile ? (
                   <>
