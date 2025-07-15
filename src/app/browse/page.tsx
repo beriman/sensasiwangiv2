@@ -6,7 +6,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import type { Product } from '@/lib/types';
-import { products as allProducts } from '@/data/products';
+import { createClient } from '@/lib/supabase';
 import { AppHeader } from '@/components/header';
 import { ProductGrid } from '@/components/product-grid';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
@@ -15,7 +15,6 @@ import { Leaf, FlaskConical, Wrench, Search, ShoppingBag } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-
 
 const categories = [
   { name: 'Parfum', icon: Leaf },
@@ -30,47 +29,35 @@ export default function BrowsePage() {
 
   const [category, setCategory] = useState<string>('Parfum');
   const [searchTerm, setSearchTerm] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const supabase = createClient();
 
   useEffect(() => {
-    // When a seller is queried, reset other filters
-    if (sellerQuery) {
-      setSearchTerm('');
-    }
-  }, [sellerQuery]);
+    const fetchProducts = async () => {
+      let query = supabase.from('products').select('*');
 
-
-  const filteredProducts = useMemo(() => {
-    return allProducts.filter((product) => {
-      // Only show listed products in the marketplace
-      if (!product.isListed) {
-        return false;
-      }
-      
-      // If a Sambatan is active, check if its deadline has passed.
-      if (product.sambatan?.isActive) {
-        const deadline = new Date(product.sambatan.deadline);
-        if (deadline < new Date()) {
-          return false; // Automatically unlist expired Sambatan
+      if (sellerQuery) {
+        query = query.eq('seller_id', sellerQuery);
+      } else {
+        if (searchTerm) {
+          query = query.ilike('name', `%${searchTerm}%`);
+        }
+        if (category) {
+          query = query.eq('category', category);
         }
       }
-      
-      // Handle seller filter first, as it's a primary view
-      if (sellerQuery) {
-        return product.perfumerProfileSlug === sellerQuery;
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error fetching products:', error);
+      } else {
+        setProducts(data as Product[]);
       }
+    };
 
-      const categoryMatch = category === 'All' || product.category === category;
-      
-      const searchTermMatch =
-        searchTerm.trim() === '' ||
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-
-      return categoryMatch && searchTermMatch;
-    });
-  }, [category, searchTerm, sellerQuery]);
-  
+    fetchProducts();
+  }, [searchTerm, sellerQuery, category, supabase]);
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -78,7 +65,7 @@ export default function BrowsePage() {
       <div className="container mx-auto px-4 py-8">
         {sellerQuery ? (
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-foreground/90">Produk oleh {sellerQuery}</h1>
+            <h1 className="text-3xl font-bold text-foreground/90">Produk oleh Penjual</h1>
             <p className="mt-1 text-muted-foreground">Menjelajahi semua penawaran dari satu penjual.</p>
             <Button asChild variant="link" className="mt-2">
               <Link href="/browse">Hapus Filter Penjual</Link>
@@ -120,7 +107,7 @@ export default function BrowsePage() {
 
         <div className="relative">
           <main>
-            <ProductGrid products={filteredProducts} />
+            <ProductGrid products={products} />
           </main>
           <PersonalizedRecommendations category={category} activeFilters={{}} />
         </div>

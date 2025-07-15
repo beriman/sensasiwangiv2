@@ -27,12 +27,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const isCurated = sellerProfile?.curation?.isCurated;
 
   // Client-side check to avoid hydration mismatch
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  
-  const inWishlist = isClient && isInWishlist(product.id);
+  const inWishlist = isInWishlist(product.id);
 
   const handleWishlistClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -47,14 +42,14 @@ export function ProductCard({ product }: ProductCardProps) {
   }
 
   const priceDisplay = () => {
-    if (isSambatan) {
+    if (product.sambatan?.isActive) {
       return formatRupiah(product.sambatan.sambatanPrice);
     }
-    if (product.variants.length > 1) {
-      const minPrice = Math.min(...product.variants.map(v => v.price));
+    if (product.product_variants && product.product_variants.length > 1) {
+      const minPrice = Math.min(...product.product_variants.map((v: ProductVariant) => v.price));
       return `${formatRupiah(minPrice)}+`;
     }
-    return formatRupiah(product.variants[0]?.price || 0);
+    return formatRupiah(product.product_variants?.[0]?.price || 0);
   };
 
   return (

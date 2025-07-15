@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { products } from '@/data/products';
+import supabase from '@/lib/supabase';
 import { profiles } from '@/data/profiles';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -87,26 +87,39 @@ export default function ProductDetailPage() {
   const { toast } = useToast();
   const params = useParams();
   const productId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const product = products.find((p) => p.id === productId);
+  const [product, setProduct] = useState<any>(null);
   const seller = profiles.find(p => p.slug === product?.perfumerProfileSlug);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!productId) return;
+      const { data, error } = await supabase
+        .from('products')
+        .select('*, product_variants(*)')
+        .eq('id', productId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching product:', error);
+        notFound();
+      } else {
+        setProduct(data);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
   
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(product?.variants[0]);
-  const { toggleWishlist, isInWishlist } = useWishlist();
-
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(undefined);
 
   useEffect(() => {
-    // Ensure a default variant is selected when the product loads
-    if (product && !selectedVariant) {
-      setSelectedVariant(product.variants[0]);
+    if (product && product.product_variants && product.product_variants.length > 0) {
+      setSelectedVariant(product.product_variants[0]);
     }
-  }, [product, selectedVariant]);
+  }, [product]);
 
 
-  if (!product || !product.isListed) {
+  if (!product || !product.is_listed) {
     notFound();
   }
 
@@ -133,8 +146,8 @@ export default function ProductDetailPage() {
   };
 
 
-  const sambatanProgress = isSambatan ? (product.sambatan.currentParticipants / product.sambatan.targetParticipants) * 100 : 0;
-  const inWishlist = isClient && isInWishlist(product.id);
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const inWishlist = isInWishlist(product.id);
 
   const renderProductProperties = () => {
     const propertiesToShow = { ...product.properties };
@@ -189,7 +202,7 @@ export default function ProductDetailPage() {
   }
 
   const renderVariantSelector = () => {
-    if (isSambatan || product.variants.length <= 1) return null;
+    if (isSambatan || product.product_variants.length <= 1) return null;
 
     return (
       <div className="mt-6">
@@ -197,11 +210,11 @@ export default function ProductDetailPage() {
         <RadioGroup
           value={selectedVariant?.id}
           onValueChange={(variantId) => {
-            setSelectedVariant(product.variants.find(v => v.id === variantId));
+            setSelectedVariant(product.product_variants.find(v => v.id === variantId));
           }}
           className="mt-2 flex flex-wrap gap-3"
         >
-          {product.variants.map((variant) => (
+          {product.product_variants.map((variant) => (
             <div key={variant.id} className="flex items-center">
               <RadioGroupItem value={variant.id} id={variant.id} className="sr-only" />
               <Label

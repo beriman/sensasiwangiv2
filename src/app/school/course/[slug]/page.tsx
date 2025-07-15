@@ -50,14 +50,14 @@ export default function CourseDetailPage() {
         id: `course-${course.slug}`,
         name: `${productType}: ${course.title}`,
         description: `Akses untuk ${course.title}`,
-        variants: [{ id: `course-${course.slug}-variant`, name: 'Full Access', price: course.price, stock: 1 }],
+        product_variants: [{ id: `course-${course.slug}-variant`, name: 'Full Access', price: course.price, stock: 1 }],
         category: 'Course',
         imageUrl: course.imageUrl,
         imageHint: course.imageHint,
         properties: { Instructor: course.instructor, Level: course.level },
         isListed: true, // Courses should be listable to be bought
     };
-    const variant: ProductVariant = courseAsProduct.variants[0];
+    const variant: ProductVariant = courseAsProduct.product_variants?.[0];
     addItem(courseAsProduct, variant);
   }
   

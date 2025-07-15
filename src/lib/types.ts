@@ -31,8 +31,9 @@ export interface Product {
   properties: Record<string, string>;
   perfumerProfileSlug?: string;
   sambatan?: SambatanDetails;
-  variants: ProductVariant[]; // Replaces top-level price and stock
-  isListed: boolean;
+  product_variants?: ProductVariant[]; // Replaces top-level price and stock
+  is_listed: boolean;
+  created_by?: string;
   fulfillmentType?: FulfillmentType;
   preorderDate?: string; // ISO 8601 date string for estimated shipping
 }

@@ -1,18 +1,39 @@
 'use client';
 
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { createClient } from '@/lib/supabase';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { User } from '@supabase/supabase-js';
 
 export default function AuthComponent() {
-  const session = useSession();
-  const supabase = useSupabaseClient();
+  const [user, setUser] = useState<User | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const supabase = createClient();
 
-  if (!session) {
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Fetch initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
+  if (!user) {
     return (
       <>
         <Button onClick={() => setIsOpen(true)}>Login</Button>
@@ -34,6 +55,6 @@ export default function AuthComponent() {
   }
 
   return (
-    <Button onClick={() => supabase.auth.signOut()}>Logout</Button>
+    <Button onClick={handleLogout}>Logout</Button>
   );
 }

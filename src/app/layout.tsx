@@ -1,12 +1,7 @@
-'use client';
-
 import './globals.css';
 import { PT_Sans } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster";
 import { AppFooter } from '@/components/footer';
-import { useState } from 'react';
-import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs';
-import { SessionContextProvider } from '@supabase/auth-helpers-react';
 
 const ptSans = PT_Sans({
   subsets: ['latin'],
@@ -19,8 +14,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [supabaseClient] = useState(() => createPagesBrowserClient());
-
   return (
     <html lang="en" className="antialiased">
       <head>
@@ -31,16 +24,11 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <body className={`${ptSans.variable} font-body flex flex-col min-h-screen`}>
-        <SessionContextProvider
-          supabaseClient={supabaseClient}
-          initialSession={null}
-        >
           <div className="flex-grow">
             {children}
           </div>
           <AppFooter />
           <Toaster />
-        </SessionContextProvider>
       </body>
     </html>
   );

@@ -35,19 +35,19 @@ export default function ThreadPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const threadId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const threadId = Array.isArray(params.id) ? params.id[0] : params.id || '';
   
   // For simulation, we assume the logged-in user is 'Alex Doe', who is a moderator.
   const MOCK_CURRENT_USER_NAME = 'Alex Doe';
   const MOCK_IS_MODERATOR = MOCK_CURRENT_USER_NAME === 'Alex Doe';
 
   // Use a state for thread data to allow modifications
-  const [threadData, setThreadData] = useState(() => getThreadById(threadId));
+  const [threadData, setThreadData] = useState<Thread | undefined | null>(() => getThreadById(threadId));
 
   const handleVote = (postIndex: number, voteType: 'up' | 'down') => {
     if (!threadData) return;
 
-    setThreadData(currentThread => {
+    setThreadData((currentThread: Thread | undefined | null) => {
         if (!currentThread) return null;
         const newPosts = [...currentThread.posts];
         const post = newPosts[postIndex];
@@ -64,7 +64,7 @@ export default function ThreadPage() {
     if (!threadData) return;
 
     const postAuthor = threadData.posts[postIndex].author;
-    setThreadData(currentThread => {
+    setThreadData((currentThread: Thread | undefined | null) => {
         if (!currentThread) return null;
         const newPosts = currentThread.posts.filter((_, index) => index !== postIndex);
         return { ...currentThread, posts: newPosts };

@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { ProductCard } from '@/components/product-card';
-import { products } from '@/data/products';
+import { useEffect, useState } from 'react';
+import supabase from '@/lib/supabase';
+import type { Product } from '@/lib/types';
 import { courses } from '@/data/courses';
 import { allThreads } from '@/data/forum';
 import { profiles } from '@/data/profiles';
@@ -17,7 +19,25 @@ import AuthComponent from '@/components/auth';
 
 export default function LandingPage() {
   const session = useSession();
-  const featuredProducts = products.filter(p => p.isListed).slice(0, 4);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_listed', true)
+        .limit(4);
+
+      if (error) {
+        console.error('Error fetching products:', error);
+      } else {
+        setFeaturedProducts(data);
+      }
+    };
+
+    fetchProducts();
+  }, []);
   const featuredCourse = courses[0];
   const recentThreads = allThreads.slice(0, 3);
   const featuredPerfumers = profiles.filter(p => p.type === 'Perfumer').slice(0, 3);

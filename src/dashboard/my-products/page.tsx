@@ -4,8 +4,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { AppHeader } from '@/components/header';
-import { products as initialProducts, Product } from '@/data/products';
+import { Product } from '@/lib/types';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -39,18 +41,35 @@ import { formatRupiah } from '@/lib/utils';
 
 
 // In a real app, you'd get this from user authentication
-const MOCK_USER_ID = 'alex-doe';
-const MOCK_PERFUMER_PROFILE_SLUG = 'alex-doe';
-
-
 export default function MyProductsPage() {
-  const [products, setProducts] = useState(() => initialProducts.filter(p => p.perfumerProfileSlug === MOCK_USER_ID || p.properties.Perfumer === 'Alex Doe'));
+  const session = useSession();
+  const supabase = useSupabaseClient();
+  const [products, setProducts] = useState<Product[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchProducts();
+    }
+  }, [session]);
+
+  const fetchProducts = async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*, product_variants(*)')
+      .eq('created_by', session?.user?.id);
+
+    if (error) {
+      console.error('Error fetching products:', error);
+    } else {
+      setProducts(data as Product[]);
+    }
+  };
 
   const handleAddClick = () => {
     setEditingProduct(null);
@@ -62,22 +81,85 @@ export default function MyProductsPage() {
     setIsFormOpen(true);
   }
   
-  const handleFormSave = (data: Product) => {
-    if (editingProduct) {
-      // Edit logic
-      setProducts(products.map(p => p.id === editingProduct.id ? data : p));
-      toast({ title: "Product Updated", description: `${data.name} has been successfully updated.` });
-    } else {
-      // Add logic
-      const newProduct: Product = {
-        ...data,
-        perfumerProfileSlug: data.perfumerProfileSlug || MOCK_PERFUMER_PROFILE_SLUG,
-      };
-      setProducts([newProduct, ...products]);
-      toast({ title: "Product Added", description: `${data.name} has been successfully added.` });
+  const handleFormSave = async (data: Product) => {
+    if (!session?.user?.id) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'You must be logged in to perform this action.',
+      });
+      return;
     }
-    setIsFormOpen(false);
-    setEditingProduct(null);
+
+    try {
+      const { product_variants, ...productData } = data;
+
+      if (editingProduct) {
+        // Edit logic
+        const { error: productError } = await supabase
+          .from('products')
+          .update({ ...productData, is_listed: productData.is_listed })
+          .eq('id', editingProduct.id);
+
+        if (productError) throw productError;
+
+        // Delete existing variants
+        const { error: deleteVariantsError } = await supabase
+          .from('product_variants')
+          .delete()
+          .eq('product_id', editingProduct.id);
+
+        if (deleteVariantsError) throw deleteVariantsError;
+
+        // Insert new/updated variants
+        if (product_variants && product_variants.length > 0) {
+          const variantsToInsert = product_variants.map((variant: ProductVariant) => ({
+            ...variant,
+            product_id: editingProduct.id,
+          }));
+          const { error: insertVariantsError } = await supabase
+            .from('product_variants')
+            .insert(variantsToInsert);
+
+          if (insertVariantsError) throw insertVariantsError;
+        }
+
+        toast({ title: "Product Updated", description: `${data.name} has been successfully updated.` });
+      } else {
+        // Add logic
+        const { data: newProduct, error: productError } = await supabase
+          .from('products')
+          .insert({ ...productData, created_by: session.user.id, is_listed: productData.is_listed })
+          .select()
+          .single();
+
+        if (productError) throw productError;
+
+        if (product_variants && product_variants.length > 0 && newProduct) {
+          const variantsToInsert = product_variants.map((variant: ProductVariant) => ({
+            ...variant,
+            product_id: newProduct.id,
+          }));
+          const { error: insertVariantsError } = await supabase
+            .from('product_variants')
+            .insert(variantsToInsert);
+
+          if (insertVariantsError) throw insertVariantsError;
+        }
+
+        toast({ title: "Product Added", description: `${data.name} has been successfully added.` });
+      }
+      fetchProducts(); // Refresh the list
+      setIsFormOpen(false);
+      setEditingProduct(null);
+    } catch (error: any) {
+      console.error('Error saving product:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: `Failed to save product: ${error.message || 'Unknown error'}`,
+      });
+    }
   }
 
   const handleDeleteClick = (productId: string) => {
@@ -85,12 +167,28 @@ export default function MyProductsPage() {
     setIsDeleteDialogOpen(true);
   }
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (selectedProductId) {
-      setProducts(products.filter(p => p.id !== selectedProductId));
-      toast({ title: "Product Deleted", description: "The product has been permanently deleted." });
-      setIsDeleteDialogOpen(false);
-      setSelectedProductId(null);
+      try {
+        const { error } = await supabase
+          .from('products')
+          .delete()
+          .eq('id', selectedProductId);
+
+        if (error) throw error;
+
+        toast({ title: "Product Deleted", description: "The product has been permanently deleted." });
+        fetchProducts(); // Refresh the list
+        setIsDeleteDialogOpen(false);
+        setSelectedProductId(null);
+      } catch (error: any) {
+        console.error('Error deleting product:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: `Failed to delete product: ${error.message || 'Unknown error'}`,
+        });
+      }
     }
   }
 
@@ -151,7 +249,7 @@ export default function MyProductsPage() {
                     {product.sambatan?.isActive ? (
                         <span className="text-accent">{formatRupiah(product.sambatan.sambatanPrice)}</span>
                     ) : (
-                        formatRupiah(product.price)
+                        formatRupiah(product.product_variants?.[0]?.price || 0)
                     )}
                   </TableCell>
                   <TableCell>
@@ -161,7 +259,7 @@ export default function MyProductsPage() {
                             Sambatan
                         </Badge>
                     ) : (
-                        <Badge variant="outline">Listed</Badge>
+                        <Badge variant="outline">{product.is_listed ? 'Listed' : 'Unlisted'}</Badge>
                     )}
                   </TableCell>
                   <TableCell>
