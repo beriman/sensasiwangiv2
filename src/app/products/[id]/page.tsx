@@ -240,15 +240,17 @@ export default function ProductDetailPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-12">
           {/* Product Image */}
-          <div className="relative min-h-[300px] md:min-h-[500px]">
-            <Card className="h-full w-full overflow-hidden rounded-2xl border-none shadow-neumorphic">
-                <Image
-                src={product.imageUrl}
-                alt={product.name}
-                fill
-                className="object-cover"
-                data-ai-hint={product.imageHint}
-                />
+          <div className="w-full">
+            <Card className="aspect-square w-full overflow-hidden rounded-2xl border-none shadow-neumorphic">
+                <div className="relative h-full w-full">
+                    <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    data-ai-hint={product.imageHint}
+                    />
+                </div>
             </Card>
           </div>
 

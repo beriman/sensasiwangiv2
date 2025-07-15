@@ -61,7 +61,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`} className="block h-full">
       <Card className="group relative flex h-full transform-gpu flex-col overflow-hidden rounded-2xl border-none bg-transparent shadow-neumorphic transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg">
         <CardHeader className="relative p-0">
-          <div className="relative h-48 w-full">
+          <div className="relative w-full aspect-square">
             <Image
               src={product.imageUrl}
               alt={product.name}

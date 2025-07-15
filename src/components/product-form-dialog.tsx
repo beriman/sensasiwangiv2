@@ -270,7 +270,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2 max-h-[70vh] overflow-y-auto pr-2">
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="relative mx-auto h-48 w-48 shrink-0">
                 {isImageLoading ? (
                   <Skeleton className="h-full w-full rounded-xl" />
@@ -301,6 +301,7 @@ export function ProductFormDialog({ isOpen, onOpenChange, onSave, productData }:
                     <Upload className="mr-2 h-5 w-5" />
                     Ubah Gambar
                 </Button>
+                <p className="text-xs text-center text-muted-foreground">Rasio gambar yang disarankan adalah 1:1 (persegi).</p>
 
               <FormField
                 control={form.control}
