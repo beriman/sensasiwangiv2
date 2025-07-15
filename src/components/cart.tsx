@@ -102,17 +102,19 @@ export function Cart() {
                 ))}
               </div>
             </ScrollArea>
-            <SheetFooter className="mt-auto flex-col space-y-4 border-t pt-4">
-                <div className="flex justify-between text-lg font-semibold">
-                    <span>Subtotal</span>
-                    <span>{formatRupiah(totalPrice)}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">Taxes and shipping calculated at checkout.</p>
-                <Button onClick={handleCheckout} size="lg" className="h-14 w-full rounded-xl bg-accent-gradient text-lg text-accent-foreground shadow-neumorphic">
-                    <CreditCard className="mr-2 h-6 w-6" />
-                    Proceed to Checkout
-                </Button>
-            </SheetFooter>
+            <SheetFooter className="mt-auto flex flex-col gap-4 border-t pt-4">
+              <div className="flex justify-between text-lg font-semibold">
+                <span>Subtotal</span>
+                <span>{formatRupiah(totalPrice)}</span>
+              </div>
+              <div className="flex flex-col gap-4">
+                  <p className="text-xs text-muted-foreground text-center">Taxes and shipping calculated at checkout.</p>
+                  <Button onClick={handleCheckout} size="lg" className="h-14 w-full rounded-xl bg-accent-gradient text-lg text-accent-foreground shadow-neumorphic">
+                      <CreditCard className="mr-2 h-6 w-6" />
+                      Proceed to Checkout
+                  </Button>
+              </div>
+          </SheetFooter>
           </>
         )}
       </SheetContent>
