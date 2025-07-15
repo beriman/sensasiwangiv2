@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X, User, Bell, Package, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import {
@@ -25,6 +25,12 @@ const navLinks = [
   { href: '/school', label: 'School' },
   { href: '/community', label: 'Community' },
   { href: '/nusantarum', label: 'Nusantarum' },
+];
+
+const userNotifications = [
+    { icon: Package, text: "Pesanan #3207 Anda telah dikirim.", time: "1 jam yang lalu" },
+    { icon: MessageSquare, text: "Antoine Leduc membalas pesan Anda.", time: "3 jam yang lalu" },
+    { icon: Package, text: "Pesanan baru #3210 telah masuk.", time: "1 hari yang lalu" },
 ];
 
 export function AppHeader() {
@@ -62,6 +68,36 @@ export function AppHeader() {
       </DropdownMenu>
   );
 
+  const NotificationBell = () => (
+    <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+             <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-6 w-6" />
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+             </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuLabel>Notifikasi</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {userNotifications.map((notification, index) => {
+                const Icon = notification.icon;
+                return (
+                    <DropdownMenuItem key={index} className="flex items-start gap-3 py-2">
+                        <Icon className="h-5 w-5 text-muted-foreground mt-1" />
+                        <div className="flex flex-col">
+                           <p className="text-sm font-medium leading-snug whitespace-normal">{notification.text}</p>
+                           <p className="text-xs text-muted-foreground">{notification.time}</p>
+                        </div>
+                    </DropdownMenuItem>
+                );
+            })}
+        </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <header className="sticky top-0 z-10 w-full border-b border-border/60 bg-background/80 shadow-neumorphic backdrop-blur-sm">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
@@ -76,7 +112,7 @@ export function AppHeader() {
             <Link
               key={link.label}
               href={link.href}
-              className="text-base font-medium text-foreground/70 transition-colors hover:text-accent-foreground"
+              className="text-base font-medium text-foreground/70 transition-colors hover:text-accent"
             >
               {link.label}
             </Link>
@@ -85,7 +121,10 @@ export function AppHeader() {
 
         <div className="hidden items-center gap-2 md:flex">
             {isLoggedIn ? (
-               <UserMenu />
+               <>
+                <NotificationBell />
+                <UserMenu />
+               </>
             ) : (
                  <Button 
                     onClick={() => setIsLoggedIn(true)}
@@ -100,6 +139,7 @@ export function AppHeader() {
         {/* Mobile Navigation */}
         <div className="flex items-center gap-2 md:hidden">
           <Cart />
+          {isLoggedIn && <NotificationBell />}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">

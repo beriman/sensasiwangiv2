@@ -29,9 +29,9 @@ interface AdminHeaderProps {
 
 const notifications = [
     { title: "New order #3210 has been placed.", time: "5 min ago" },
+    { title: "New Curation Application from 'Scent Solutions'.", time: "15 min ago" },
     { title: "User 'Jane Smith' submitted new feedback.", time: "20 min ago"},
     { title: "Product 'Boisé Mystique' needs approval.", time: "1 hour ago"},
-    { title: "Your sales report for May is ready.", time: "3 hours ago"},
 ]
 
 export function AdminHeader({ onLogout, user }: AdminHeaderProps) {
