@@ -12,6 +12,7 @@ const footerLinks = {
     { href: '/browse', label: 'Marketplace' },
     { href: '/school', label: 'School' },
     { href: '/community', label: 'Community' },
+    { href: '/info/badges', label: 'Katalog Lencana' },
   ],
   support: [
     { href: '/info/faq', label: 'FAQ' },
