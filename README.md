@@ -10,20 +10,30 @@ SensasiWangi.id is more than just a marketplace. It's a comprehensive platform w
 
 This application is packed with features designed for various user roles: buyers, sellers, and administrators.
 
-*   **Dynamic Marketplace (`/browse`):** A clean, searchable marketplace supporting various product types.
+*   **Dynamic Marketplace (`/browse`):** A clean, searchable marketplace supporting various product types and advanced filtering.
 *   **Advanced Product Offerings:**
     *   **Product Variants:** Sellers can offer products in multiple sizes and prices (e.g., 50ml, 100ml).
-    *   **Sambatan (Group Buys):** Community-driven purchasing for products at a special price.
+    *   **Sambatan (Group Buys):** Community-driven purchasing for products at a special price, complete with a **dedicated discussion space** for each Sambatan to facilitate coordination among participants.
     *   **Services, Pre-Orders & Custom Orders:** Sellers can offer services (like custom bottle painting) or made-to-order/pre-order products with unique fulfillment flows.
+*   **Seller Reputation & Review System:**
+    *   Buyers can leave detailed written reviews and star ratings for sellers after a completed transaction.
+    *   Seller profiles prominently display their average rating and total number of reviews, building trust within the community.
 *   **AI-Powered Features (`/ai`):**
     *   **Personalized Recommendations:** An AI assistant helps users find products based on their preferences.
     *   **Content Moderation:** AI automatically screens forum posts and user-generated content for safety.
     *   **Curation Screener:** An AI assistant provides an initial assessment of artisan applications for curators.
 *   **Community Forum (`/community`):** A full-fledged forum with categories, threads, replies, voting, and in-line moderation tools for moderators.
-*   **School of Scent (`/school`):** An e-learning module with courses, lessons, and a dynamic progress tracking system for users.
+*   **School of Scent (`/school`):** An e-learning module with courses and lessons.
+    *   **Live Events & Workshops:** Supports scheduled online events like workshops and webinars.
+    *   **Calendar Integration:** Users can easily add scheduled events to their Google Calendar or download an `.ics` file.
+    *   **Dynamic Progress Tracking:** The system automatically tracks completed lessons for self-paced courses.
+*   **Gamification & Badges:**
+    *   A comprehensive **badge system** to reward user participation and achievements across the platform.
+    *   Badges have multiple levels (e.g., "Trusted Reviewer I, II, III") to encourage long-term engagement.
+    *   A dedicated **Badge Catalog page** (`/info/badges`) explains how to earn each achievement.
 *   **Nusantarum - The Scent Encyclopedia (`/nusantarum`):** A database to discover and learn about local perfumers, brands, and their creations, complete with a robust, AI-assisted curation system.
 *   **Comprehensive User Dashboards (`/dashboard`):**
-    *   **For Buyers:** Manage purchases, wishlist, and messages.
+    *   **For Buyers:** Manage purchases, wishlist, messages, and view a persistent **notification log**.
     *   **For Sellers:** Manage products, view incoming orders, and handle shipping.
 *   **Role-Based Access Control:**
     *   **Admin Panel (`/admin`):** Full control over users, products, orders, site analytics, and user feedback.
