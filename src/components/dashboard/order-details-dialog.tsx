@@ -16,7 +16,7 @@ import { formatRupiah, cn } from '@/lib/utils';
 import type { Order, OrderStatus } from '@/lib/types';
 import { ScrollArea } from '../ui/scroll-area';
 import { differenceInHours, parseISO } from 'date-fns';
-import { AlertTriangle, Package, Truck, CheckCircle, Copy } from 'lucide-react';
+import { AlertTriangle, Package, Truck, CheckCircle, Copy, MessageSquare, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface OrderDetailsDialogProps {
@@ -25,10 +25,11 @@ interface OrderDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirmDelivery?: () => void;
   onReportProblem?: () => void;
+  onReview?: (order: Order) => void;
   isSellerView: boolean;
 }
 
-export function OrderDetailsDialog({ order, isOpen, onOpenChange, onConfirmDelivery, onReportProblem, isSellerView }: OrderDetailsDialogProps) {
+export function OrderDetailsDialog({ order, isOpen, onOpenChange, onConfirmDelivery, onReportProblem, onReview, isSellerView }: OrderDetailsDialogProps) {
   const { toast } = useToast();
   
   if (!order) {
@@ -75,6 +76,7 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange, onConfirmDeliv
   
   const canConfirmDelivery = !isSellerView && order.status === 'Dikirim' && onConfirmDelivery;
   const canReportProblem = !isSellerView && (order.status === 'Dikirim' || order.status === 'Pesanan Diterima') && onReportProblem;
+  const canLeaveReview = !isSellerView && order.status === 'Selesai' && onReview;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -188,6 +190,12 @@ export function OrderDetailsDialog({ order, isOpen, onOpenChange, onConfirmDeliv
                 <Button onClick={onConfirmDelivery} className="bg-green-600 hover:bg-green-700 text-white shadow-neumorphic">
                     <CheckCircle className="mr-2 h-5 w-5"/>
                     Konfirmasi Pesanan Diterima
+                </Button>
+            )}
+            {canLeaveReview && (
+                <Button onClick={() => onReview?.(order)} className="bg-blue-600 hover:bg-blue-700 text-white shadow-neumorphic">
+                    <Star className="mr-2 h-5 w-5"/>
+                    Berikan Ulasan
                 </Button>
             )}
             </div>

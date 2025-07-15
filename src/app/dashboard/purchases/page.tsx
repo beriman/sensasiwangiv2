@@ -23,6 +23,9 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { OrderDetailsDialog } from '@/components/dashboard/order-details-dialog';
 import type { Order, OrderStatus } from '@/lib/types';
+import { products } from '@/data/products';
+import { profiles } from '@/data/profiles';
+import { ReviewDialog } from '@/components/review-dialog';
 
 // Mock data for demonstration purposes. In a real app, this would be fetched for the logged-in user.
 const initialOrders: Order[] = [
@@ -78,6 +81,9 @@ const initialOrders: Order[] = [
 export default function MyPurchasesPage() {
     const [orders, setOrders] = useState(initialOrders);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+    const [orderToReview, setOrderToReview] = useState<Order | null>(null);
+
     const { toast } = useToast();
 
     const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
@@ -93,6 +99,21 @@ export default function MyPurchasesPage() {
     const handleReportProblem = (orderId: string) => {
         handleUpdateStatus(orderId, 'Bermasalah');
     }
+
+    const handleOpenReviewDialog = (order: Order) => {
+        setOrderToReview(order);
+        setIsReviewDialogOpen(true);
+    };
+
+    const getSellerNameForOrder = (order: Order | null) => {
+        if (!order || order.items.length === 0) return undefined;
+        // Assumption: all items in an order are from the same seller.
+        const firstItem = products.find(p => p.id === order.items[0].id);
+        if (!firstItem?.perfumerProfileSlug) return 'Penjual';
+        const sellerProfile = profiles.find(p => p.slug === firstItem.perfumerProfileSlug);
+        return sellerProfile?.name;
+    };
+
 
     const getStatusStyles = (status: OrderStatus) => {
         switch (status) {
@@ -137,7 +158,7 @@ export default function MyPurchasesPage() {
           </TableHeader>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id} className={cn("cursor-pointer", order.status === 'Bermasalah' && 'bg-orange-50/50')} onClick={() => setSelectedOrder(order)}>
+              <TableRow key={order.id} className={cn(order.status === 'Bermasalah' && 'bg-orange-50/50')}>
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
                 <TableCell>
@@ -148,7 +169,12 @@ export default function MyPurchasesPage() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">{formatRupiah(order.total)}</TableCell>
-                <TableCell className="text-center">
+                <TableCell className="text-center space-x-2">
+                    {order.status === 'Selesai' && (
+                        <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleOpenReviewDialog(order)}}>
+                            Beri Ulasan
+                        </Button>
+                    )}
                     <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedOrder(order)}}>
                         Lihat Detail
                     </Button>
@@ -174,7 +200,14 @@ export default function MyPurchasesPage() {
             if(selectedOrder) handleReportProblem(selectedOrder.id);
             setSelectedOrder(null);
         }}
-        isSellerView={false} // This is for the buyer's view
+        isSellerView={false}
+    />
+
+    <ReviewDialog
+        isOpen={isReviewDialogOpen}
+        onOpenChange={setIsReviewDialogOpen}
+        order={orderToReview}
+        sellerName={getSellerNameForOrder(orderToReview)}
     />
     </>
   );

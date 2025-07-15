@@ -6,15 +6,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, useParams } from 'next/navigation';
 import { profiles, type Profile } from '@/data/profiles';
+import { products } from '@/data/products';
+import { reviews as allReviews } from '@/data/reviews';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { EditProfileDialog, type ProfileData } from '@/components/edit-profile-dialog';
 import { CurationDialog } from '@/components/curation-dialog';
-import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck, Ribbon } from 'lucide-react';
+import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck, Ribbon, Star, Store, Palette } from 'lucide-react';
 import { Badge as UiBadge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ProductGrid } from '@/components/product-grid';
+import { ReviewCard } from '@/components/review-card';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+
 
 const TikTokIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
@@ -46,8 +53,14 @@ export default function ProfilePage() {
     }
   }, [slug]);
 
+  const sellerProducts = products.filter(p => p.perfumerProfileSlug === slug);
+  const sellerReviews = allReviews.filter(r => r.sellerSlug === slug);
+  const averageRating = sellerReviews.length > 0
+    ? sellerReviews.reduce((acc, review) => acc + review.rating, 0) / sellerReviews.length
+    : 0;
+
+
   const handleProfileSave = (newProfileData: ProfileData) => {
-    // Simulate database security rules: only the logged-in user can edit their own profile.
     if (profile?.slug !== MOCK_LOGGED_IN_USER_SLUG) {
       toast({
         variant: 'destructive',
@@ -58,8 +71,6 @@ export default function ProfilePage() {
       return;
     }
 
-    // In a real app, you would send this data to your backend to save.
-    // For this demo, we'll just update the local state.
     const updatedProfile: Profile = {
       ...profile,
       ...newProfileData,
@@ -73,7 +84,6 @@ export default function ProfilePage() {
   };
 
   if (!profile) {
-    // You can show a loading spinner here
     return (
         <div className="flex h-screen items-center justify-center bg-background">
             <p>Loading profile...</p>
@@ -81,7 +91,6 @@ export default function ProfilePage() {
     );
   }
 
-  // This maps the Profile to the ProfileData expected by the dialog
   const profileDataForDialog: ProfileData = {
     ...profile,
     profilePicture: profile.profilePicture || 'https://placehold.co/128x128.png',
@@ -95,8 +104,8 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-background font-body">
         <AppHeader />
         <main className="container mx-auto px-4 py-8">
-          <Card className="mx-auto max-w-2xl rounded-2xl border-none bg-transparent shadow-neumorphic">
-            <CardContent className="p-6 md:p-10">
+          <Card className="mx-auto max-w-4xl rounded-2xl border-none bg-transparent p-6 shadow-neumorphic md:p-10">
+            <CardContent className="p-0">
               <div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left">
                 <div className="relative mb-4 h-24 w-24 shrink-0 sm:mb-0 sm:mr-8 md:h-32 md:w-32">
                   <Image
@@ -122,18 +131,17 @@ export default function ProfilePage() {
                     )}
                   </div>
                   <p className="text-md text-muted-foreground">{profile.username}</p>
-                   {profile.type === 'Perfumer' && (
-                      <div className="mt-3 flex justify-center gap-4 text-sm sm:justify-start">
+                   <div className="mt-3 flex justify-center gap-4 text-sm sm:justify-start">
+                      <div className="text-foreground/90 flex items-center gap-1">
+                          <Star className="h-4 w-4 text-yellow-400" fill="currentColor" />
+                          <span className="font-bold">{averageRating.toFixed(1)}</span>
+                          <span className="text-muted-foreground">({sellerReviews.length} ulasan)</span>
+                      </div>
                       <div className="text-foreground/90">
                           <span className="font-bold">{profile.followers?.toLocaleString()}</span>
-                          <span className="text-muted-foreground"> Followers</span>
+                          <span className="text-muted-foreground"> Pengikut</span>
                       </div>
-                      <div className="text-foreground/90">
-                          <span className="font-bold">{profile.following?.toLocaleString()}</span>
-                          <span className="text-muted-foreground"> Following</span>
-                      </div>
-                      </div>
-                   )}
+                  </div>
                   <div className="mt-4 flex flex-wrap justify-center gap-4 sm:justify-start">
                     {profile.socials.twitter && (
                       <a href={profile.socials.twitter} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent">
@@ -207,6 +215,34 @@ export default function ProfilePage() {
               </div>
             </CardContent>
           </Card>
+          
+          <Tabs defaultValue="products" className="mt-10 mx-auto max-w-4xl">
+            <TabsList className="grid w-full grid-cols-2 rounded-xl bg-transparent p-1 shadow-neumorphic-inset">
+                <TabsTrigger value="products" className="h-full rounded-lg text-lg text-foreground/70 transition-all duration-300 data-[state=active]:bg-accent-gradient data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active">
+                    <Store className="mr-2 h-5 w-5"/> Produk
+                </TabsTrigger>
+                <TabsTrigger value="reviews" className="h-full rounded-lg text-lg text-foreground/70 transition-all duration-300 data-[state=active]:bg-accent-gradient data-[state=active]:text-accent-foreground data-[state=active]:shadow-neumorphic-active">
+                    <Palette className="mr-2 h-5 w-5"/> Ulasan ({sellerReviews.length})
+                </TabsTrigger>
+            </TabsList>
+            <TabsContent value="products" className="mt-6">
+                <ProductGrid products={sellerProducts} />
+            </TabsContent>
+            <TabsContent value="reviews" className="mt-6">
+                <div className="space-y-6">
+                    {sellerReviews.map(review => (
+                        <ReviewCard key={review.id} review={review} />
+                    ))}
+                    {sellerReviews.length === 0 && (
+                        <div className="text-center py-16 text-muted-foreground rounded-xl shadow-neumorphic-inset">
+                            <p className="text-lg">Belum ada ulasan.</p>
+                            <p>Penjual ini belum menerima ulasan apa pun.</p>
+                        </div>
+                    )}
+                </div>
+            </TabsContent>
+          </Tabs>
+
         </main>
       </div>
 

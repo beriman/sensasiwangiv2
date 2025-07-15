@@ -1,6 +1,6 @@
 // src/data/profiles.ts
 
-export type ProfileType = 'Perfumer' | 'Brand' | 'Store';
+export type ProfileType = 'Perfumer' | 'Brand' | 'Store' | 'Buyer';
 export type ModeratorRole = 'Admin' | 'Marketplace' | 'School' | 'Forum' | 'Curation';
 
 
@@ -112,5 +112,29 @@ export interface Profile {
       socials: {
         instagram: 'https://instagram.com/foretnoire',
       },
+    },
+    {
+        slug: 'budi-hartono',
+        type: 'Buyer',
+        name: 'Budi Hartono',
+        username: '@budi_scent',
+        email: 'budi.h@example.com',
+        bio: 'Scent enthusiast and collector from Jakarta.',
+        profilePicture: 'https://placehold.co/128x128.png?text=BH',
+        imageHint: 'profile man',
+        socials: {},
+    },
+    {
+        slug: 'citra-lestari',
+        type: 'Buyer',
+        name: 'Citra Lestari',
+        username: '@citralestari',
+        email: 'citra.l@example.com',
+        bio: 'Learning to make my own perfumes. Excited to be part of this community!',
+        profilePicture: 'https://placehold.co/128x128.png?text=CL',
+        imageHint: 'profile woman',
+        socials: {
+          instagram: 'https://instagram.com/citralestari'
+        },
     },
   ];
