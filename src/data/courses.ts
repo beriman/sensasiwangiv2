@@ -1,6 +1,7 @@
 // src/data/courses.ts
 
 export type LessonType = 'video' | 'text';
+export type EventType = 'Workshop' | 'Webinar' | 'Self-Paced';
 
 export interface Lesson {
   id: string;
@@ -21,7 +22,7 @@ export interface Course {
   title: string;
   instructor: string;
   level: 'Beginner' | 'Intermediate' | 'Advanced';
-  category: 'Perfumery Basics' | 'Raw Materials' | 'Formulation Techniques';
+  category: 'Perfumery Basics' | 'Raw Materials' | 'Formulation Techniques' | 'Live Event';
   description: string;
   longDescription: string;
   imageUrl: string;
@@ -29,7 +30,17 @@ export interface Course {
   previewVideoUrl?: string;
   modules: Module[];
   price?: number; // Optional price for paid courses
+  
+  // New properties for scheduled events
+  eventType?: EventType;
+  eventDate?: string; // ISO 8601 string, e.g., '2024-08-17T14:00:00Z'
+  eventDuration?: number; // Duration in minutes
+  eventLocation?: string; // e.g., 'Online via Google Meet' or a physical address
 }
+
+const nextMonth = new Date();
+nextMonth.setMonth(nextMonth.getMonth() + 1);
+nextMonth.setHours(14, 0, 0, 0); // Set time to 14:00
 
 export const courses: Course[] = [
   {
@@ -42,6 +53,7 @@ export const courses: Course[] = [
     longDescription: 'Dive into the art and science of natural perfumery. This course covers the history of perfume, safety guidelines, understanding scent families, and how to build a basic fragrance accord. Perfect for absolute beginners with a passion for scent.',
     imageUrl: 'https://placehold.co/600x400.png',
     imageHint: 'natural ingredients herbs',
+    eventType: 'Self-Paced',
     modules: [
       {
         id: 'm1',
@@ -74,6 +86,7 @@ export const courses: Course[] = [
     imageHint: 'perfume lab chemistry',
     previewVideoUrl: 'https://videos.pexels.com/video-files/4051443/4051443-hd_1920_1080_25fps.mp4',
     price: 1500000,
+    eventType: 'Self-Paced',
     modules: [
         {
           id: 'm1',
@@ -84,6 +97,23 @@ export const courses: Course[] = [
           ],
         },
       ],
+  },
+  {
+    slug: 'live-distillation-workshop',
+    title: 'Live Distillation Workshop',
+    instructor: 'Antoine Leduc',
+    level: 'Intermediate',
+    category: 'Live Event',
+    description: 'Join a live online session and learn the art of steam distillation to extract essential oils.',
+    longDescription: 'In this interactive workshop, Antoine Leduc will guide you through the process of steam distilling fresh plant material. You will learn how to set up the equipment, the principles behind the process, and how to separate your hydrosol and essential oil. This is a hands-on, live experience where you can ask questions in real-time.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'distillation equipment science',
+    price: 750000,
+    modules: [], // No pre-defined lessons for live event
+    eventType: 'Workshop',
+    eventDate: nextMonth.toISOString(),
+    eventDuration: 120, // 2 hours
+    eventLocation: 'Online via Google Meet',
   },
 ];
 

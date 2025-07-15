@@ -8,10 +8,11 @@ import { AppHeader } from '@/components/header';
 import { courses, Course } from '@/data/courses';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, CalendarClock } from 'lucide-react';
 
 function CourseCard({ course }: { course: Course }) {
   const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
+  const isEvent = course.eventType && course.eventType !== 'Self-Paced';
 
   return (
     <Link href={`/school/course/${course.slug}`} className="block h-full">
@@ -25,6 +26,12 @@ function CourseCard({ course }: { course: Course }) {
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               data-ai-hint={course.imageHint}
             />
+             {isEvent && (
+                <Badge className="absolute top-2 right-2 bg-accent-gradient text-accent-foreground">
+                  <CalendarClock className="mr-1.5 h-3 w-3" />
+                  Acara Terjadwal
+                </Badge>
+            )}
           </div>
         </CardHeader>
         <CardContent className="flex-grow p-4">
@@ -39,10 +46,14 @@ function CourseCard({ course }: { course: Course }) {
           </CardDescription>
         </CardContent>
         <div className="flex items-center justify-between p-4 pt-0 text-sm text-muted-foreground">
-            <span>{course.modules.length} Modules</span>
+            { isEvent && course.eventDate ? (
+                <span className="font-semibold text-accent">{new Date(course.eventDate).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+            ) : (
+                <span>{course.modules.length} Modules</span>
+            )}
             <div className="flex items-center gap-1.5">
                 <BookOpen className="h-4 w-4" />
-                <span>{totalLessons} Lessons</span>
+                <span>{totalLessons > 0 ? `${totalLessons} Lessons` : course.eventType}</span>
             </div>
         </div>
       </Card>
@@ -59,7 +70,7 @@ export default function SchoolPage() {
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-foreground/90">School of Scent</h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            Expand your knowledge, from beginner basics to advanced techniques.
+            Expand your knowledge, from self-paced courses to live interactive workshops.
           </p>
         </div>
 
