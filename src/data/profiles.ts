@@ -1,8 +1,8 @@
 // src/data/profiles.ts
+import type { BadgeCategory } from './badges';
 
 export type ProfileType = 'Perfumer' | 'Brand' | 'Store' | 'Buyer';
 export type ModeratorRole = 'Admin' | 'Marketplace' | 'School' | 'Forum' | 'Curation';
-export type BadgeType = 'reviewer' | 'student' | 'collector' | 'sambatan';
 
 export interface CurationInfo {
   isCurated: boolean;
@@ -30,7 +30,8 @@ export interface Profile {
     };
     curation?: CurationInfo;
     moderatorRoles?: ModeratorRole[];
-    badges?: BadgeType[];
+    // Represents the user's achieved level for each badge category
+    badges?: Partial<Record<BadgeCategory, number>>;
   };
   
   export const profiles: Profile[] = [
@@ -53,7 +54,10 @@ export interface Profile {
         youtube: 'https://www.youtube.com/@fragrancereviews',
       },
       moderatorRoles: ['Admin', 'Forum'],
-      badges: ['reviewer', 'student'],
+      badges: {
+        reviewer: 1,
+        student: 1,
+      },
     },
     {
         slug: 'antoine-leduc',
@@ -71,7 +75,9 @@ export interface Profile {
           website: 'https://leducparfums.com',
           facebook: 'https://www.facebook.com/leducparfums',
         },
-        badges: ['sambatan'],
+        badges: {
+            sambatan: 1,
+        },
     },
     {
       slug: 'curator-a',
@@ -126,7 +132,9 @@ export interface Profile {
         profilePicture: 'https://placehold.co/128x128.png?text=BH',
         imageHint: 'profile man',
         socials: {},
-        badges: ['collector'],
+        badges: {
+            collector: 1,
+        },
     },
     {
         slug: 'citra-lestari',

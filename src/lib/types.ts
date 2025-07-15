@@ -1,3 +1,5 @@
+import type { BadgeCategory } from "@/data/badges";
+
 export type ProductCategory = 'Parfum' | 'Raw Material' | 'Tools' | 'Misc' | 'Course' | 'Jasa';
 
 export interface SambatanDetails {
@@ -77,7 +79,6 @@ export interface Order {
 export type ModeratorRole = 'Admin' | 'Marketplace' | 'School' | 'Forum' | 'Curation';
 
 export type ProfileType = 'Perfumer' | 'Brand' | 'Store' | 'Buyer';
-export type BadgeType = 'reviewer' | 'student' | 'collector' | 'sambatan';
 
 export interface CurationInfo {
   isCurated: boolean;
@@ -105,5 +106,5 @@ export interface Profile {
     };
     curation?: CurationInfo;
     moderatorRoles?: ModeratorRole[];
-    badges?: BadgeType[];
+    badges?: Partial<Record<BadgeCategory, number>>;
   };

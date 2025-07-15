@@ -13,9 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { EditProfileDialog, type ProfileData } from '@/components/edit-profile-dialog';
 import { CurationDialog } from '@/components/curation-dialog';
-import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck, Ribbon, Star, Store, Palette, Award, BookCopy, Group } from 'lucide-react';
+import { Twitter, Instagram, Link as LinkIcon, UserPlus, UserCheck, MessageSquare, Youtube, Facebook, BadgeCheck, Ribbon, Star, Store, Palette } from 'lucide-react';
 import { Badge as UiBadge } from '@/components/ui/badge';
-import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProductGrid } from '@/components/product-grid';
@@ -23,45 +22,7 @@ import { ReviewCard } from '@/components/review-card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-
-type BadgeType = 'curated' | 'reviewer' | 'student' | 'collector' | 'sambatan';
-
-const badgeInfo: Record<BadgeType, { icon: React.ElementType; title: string; description: string }> = {
-  curated: {
-    icon: BadgeCheck,
-    title: 'Nusantarum Verified',
-    description: 'Telah terverifikasi sebagai perajin atau brand otentik oleh tim kurasi Nusantarum.',
-  },
-  reviewer: {
-    icon: Award,
-    title: 'Ulasan Terpercaya',
-    description: 'Telah memberikan 10+ ulasan bermanfaat untuk komunitas.',
-  },
-  student: {
-    icon: BookCopy,
-    title: 'Murid Teladan',
-    description: 'Telah menyelesaikan setidaknya satu kursus di School of Scent.',
-  },
-  collector: {
-    icon: Store,
-    title: 'Kolektor Pemula',
-    description: 'Memiliki 5+ parfum dalam koleksi "Lemari Parfum" virtual.',
-  },
-  sambatan: {
-    icon: Group,
-    title: 'Partisipan Aktif',
-    description: 'Telah berpartisipasi dalam 3+ Sambatan (group buy).',
-  },
-};
-
-
-const TikTokIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-        <path d="M21 7.333a4.23 4.23 0 0 0-3.18-3.181A4.23 4.23 0 0 0 16.667 3h-3.334a.5.5 0 0 0-.5.5v11.167a3.333 3.333 0 1 1-2.222-3.142" />
-        <path d="M13.833 8.333a3.333 3.333 0 1 1 4.518 4.518" />
-    </svg>
-);
-
+import { badgeData, BadgeCategory } from '@/data/badges';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -124,12 +85,9 @@ export default function ProfilePage() {
   }
   
   // Combine badges from curation and gamification
-  const userBadges: BadgeType[] = [];
+  const userBadges = profile.badges ? { ...profile.badges } : {};
   if (profile.curation?.isCurated) {
-      userBadges.push('curated');
-  }
-  if (profile.badges) {
-      userBadges.push(...profile.badges);
+    userBadges.curated = 1;
   }
 
 
@@ -213,28 +171,38 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {userBadges.length > 0 && (
+              {Object.keys(userBadges).length > 0 && (
                 <div className="mt-6">
                   <h3 className="text-center text-sm font-semibold uppercase text-muted-foreground tracking-wider sm:text-left">Pencapaian</h3>
                   <div className="mt-2 flex flex-wrap justify-center gap-3 sm:justify-start">
                     <TooltipProvider delayDuration={100}>
-                    {userBadges.map((badgeKey) => {
-                       const badge = badgeInfo[badgeKey];
-                       const Icon = badge.icon;
+                    {Object.entries(userBadges).map(([badgeKey, level]) => {
+                       const category = badgeData[badgeKey as BadgeCategory];
+                       if (!category) return null;
+                       const achievedLevel = category.levels.find(l => l.level === level);
+                       if (!achievedLevel) return null;
+                       
+                       const Icon = category.icon;
                        const isCuratedBadge = badgeKey === 'curated';
+
                         return(
                         <Tooltip key={badgeKey}>
                             <TooltipTrigger asChild>
                                 <div className={cn(
-                                    "flex h-12 w-12 items-center justify-center rounded-full shadow-neumorphic-inset transition-all",
+                                    "relative flex h-12 w-12 items-center justify-center rounded-full shadow-neumorphic-inset transition-all",
                                     isCuratedBadge ? 'bg-blue-100 text-blue-700' : 'bg-background'
                                     )}>
                                     <Icon className="h-6 w-6" />
+                                     {!isCuratedBadge && (
+                                        <span className="absolute -bottom-1 -right-1 rounded-full bg-accent-gradient px-1.5 py-0.5 text-xs font-bold text-accent-foreground shadow-sm">
+                                            Lv.{level}
+                                        </span>
+                                    )}
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p className="font-bold">{badge.title}</p>
-                                <p>{badge.description}</p>
+                                <p className="font-bold">{achievedLevel.title}</p>
+                                <p>{achievedLevel.description}</p>
                             </TooltipContent>
                         </Tooltip>
                         )
@@ -325,3 +293,10 @@ export default function ProfilePage() {
     </>
   );
 }
+
+const TikTokIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+        <path d="M21 7.333a4.23 4.23 0 0 0-3.18-3.181A4.23 4.23 0 0 0 16.667 3h-3.334a.5.5 0 0 0-.5.5v11.167a3.333 3.333 0 1 1-2.222-3.142" />
+        <path d="M13.833 8.333a3.333 3.333 0 1 1 4.518 4.518" />
+    </svg>
+);
