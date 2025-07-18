@@ -1,61 +1,21 @@
-
 // src/app/nusantarum/page.tsx
 'use client';
 
 import { useState, useMemo } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { AppHeader } from '@/components/header';
 import { products } from '@/data/products';
-import { profiles, Profile } from '@/data/profiles';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Users, Bot, Building, BadgeCheck, Search } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { profiles } from '@/data/profiles';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Users, Bot, Building, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+
+import { PerfumersTabContent } from '@/components/nusantarum/perfumers-tab-content';
+import { BrandsTabContent } from '@/components/nusantarum/brands-tab-content';
+import { ParfumsTabContent } from '@/components/nusantarum/parfums-tab-content';
 
 const allParfums = products.filter(p => p.category === 'Parfum');
 const allPerfumers = profiles.filter(p => p.type === 'Perfumer');
 const allBrands = profiles.filter(p => p.type === 'Brand');
-
-function PerfumerCard({ perfumer }: { perfumer: Profile }) {
-  return (
-    <Card className="flex flex-col rounded-2xl border-none bg-transparent shadow-neumorphic transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-lg">
-      <CardHeader className="flex flex-row items-center gap-4">
-        <Avatar className="h-16 w-16">
-          <AvatarImage src={perfumer.profilePicture} alt={perfumer.name} data-ai-hint={perfumer.imageHint}/>
-          <AvatarFallback>{perfumer.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div>
-          <CardTitle className="text-xl font-bold text-foreground/80">{perfumer.name}</CardTitle>
-          <CardDescription>{perfumer.username}</CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent className="flex-grow">
-        <p className="text-muted-foreground line-clamp-3">{perfumer.bio}</p>
-      </CardContent>
-      <div className="flex items-center justify-between p-4">
-        <div className="text-sm text-muted-foreground">
-            {perfumer.followers ? 
-              `${perfumer.followers.toLocaleString()} Followers` :
-              perfumer.curation?.isCurated ? (
-                 <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-800">
-                    <BadgeCheck className="h-4 w-4" />
-                    Terverifikasi
-                </div>
-              ) : ''
-            }
-        </div>
-        <Link href={`/profile/${perfumer.slug}`} className="flex items-center text-sm font-semibold text-accent hover:underline">
-          View Profile
-          <ArrowRight className="ml-1 h-4 w-4" />
-        </Link>
-      </div>
-    </Card>
-  );
-}
 
 export default function NusantarumPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -129,63 +89,15 @@ export default function NusantarumPage() {
           </TabsList>
           
           <TabsContent value="perfumers" className="mt-8">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredPerfumers.map(perfumer => (
-                <PerfumerCard key={perfumer.slug} perfumer={perfumer} />
-              ))}
-            </div>
-             {filteredPerfumers.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">No perfumers found.</div>
-             )}
+            <PerfumersTabContent perfumers={filteredPerfumers} />
           </TabsContent>
           
           <TabsContent value="brands" className="mt-8">
-             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredBrands.map(brand => (
-                <PerfumerCard key={brand.slug} perfumer={brand} />
-              ))}
-            </div>
-             {filteredBrands.length === 0 && (
-                <div className="text-center py-12 text-muted-foreground">No brands found.</div>
-             )}
+             <BrandsTabContent brands={filteredBrands} />
           </TabsContent>
 
           <TabsContent value="parfums" className="mt-8">
-            <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic">
-                <CardHeader>
-                    <CardTitle className="text-xl font-bold text-foreground/80">All Parfums</CardTitle>
-                    <CardDescription>A complete list of all perfumes in our database.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                            <TableHead>Perfume</TableHead>
-                            <TableHead>Brand</TableHead>
-                            <TableHead>Scent Profile</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredParfums.map(parfum => (
-                            <TableRow key={parfum.id}>
-                                <TableCell className="font-medium">
-                                    <Link href={`/products/${parfum.id}`} className="hover:text-accent hover:underline">
-                                        {parfum.name}
-                                    </Link>
-                                </TableCell>
-                                <TableCell>{parfum.properties.Brand}</TableCell>
-                                <TableCell>
-                                    <Badge variant="secondary">{parfum.properties['Scent Profile']}</Badge>
-                                </TableCell>
-                            </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                    {filteredParfums.length === 0 && (
-                        <div className="text-center py-12 text-muted-foreground">No parfums found.</div>
-                    )}
-                </CardContent>
-            </Card>
+            <ParfumsTabContent parfums={filteredParfums} />
           </TabsContent>
         </Tabs>
       </main>

@@ -6,8 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { WandSparkles, Loader2 } from 'lucide-react';
 import type { Product } from '@/lib/types';
-import { getPersonalizedRecommendations } from '@/ai/flows/personalized-recommendations';
-import { products as allProducts } from '@/data/products';
+
 
 import { Button } from '@/components/ui/button';
 import {
@@ -29,17 +28,11 @@ interface PersonalizedRecommendationsProps {
   activeFilters: Record<string, string[]>;
 }
 
-const recommendationsFormSchema = z.object({
-  preferences: z.string().min(10, {
-    message: 'Please describe your preferences in at least 10 characters.',
-  }),
-});
+import { recommendationsFormSchema } from '@/lib/recommendations-form-schema';
 
 export function PersonalizedRecommendations({ category, activeFilters }: PersonalizedRecommendationsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [recommendations, setRecommendations] = useState<Product[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { isLoading, recommendations, error, getRecommendations, resetRecommendations } = usePersonalizedRecommendations({ category, activeFilters });
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof recommendationsFormSchema>>({
@@ -49,54 +42,15 @@ export function PersonalizedRecommendations({ category, activeFilters }: Persona
     },
   });
 
-  const handleReset = () => {
-    setRecommendations(null);
-    setError(null);
-    form.reset();
-  };
-
   const onSubmit = async (values: z.infer<typeof recommendationsFormSchema>) => {
-    setIsLoading(true);
-    setRecommendations(null);
-    setError(null);
-
-    try {
-      const browsingHistory = `The user is currently browsing the "${category}" category with the following filters applied: ${JSON.stringify(activeFilters)}.`;
-      
-      const result = await getPersonalizedRecommendations({
-        browsingHistory,
-        preferences: values.preferences,
-      });
-
-      if (result && result.recommendations) {
-        const recommendedProducts = allProducts.filter(p => result.recommendations.includes(p.name));
-        setRecommendations(recommendedProducts);
-        if (recommendedProducts.length === 0) {
-            toast({
-                title: "No specific products found",
-                description: "We couldn't find exact matches for our recommendations, but feel free to browse our collection!",
-            });
-        }
-      } else {
-        throw new Error('No recommendations returned from the AI.');
-      }
-    } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-      setError('Failed to get recommendations. Please try again later.');
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: errorMessage,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    await getRecommendations(values.preferences);
   };
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
     if (!open) {
-      handleReset();
+      resetRecommendations();
+      form.reset();
     }
   };
 

@@ -2,42 +2,29 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
-import { useCart } from '@/hooks/use-cart';
+import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, Trash2, Minus, Plus, CreditCard, PartyPopper } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { formatRupiah } from '@/lib/utils';
+import { useCart } from '@/hooks/use-cart';
+
+import { CartItem } from '@/components/cart-item';
+import { CartCheckoutSection, OrderProcessingDisplay } from '@/components/cart-checkout-section';
 
 export function Cart() {
-  const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
+  const { items, totalItems, totalPrice } = useCart();
   const [isCheckout, setIsCheckout] = useState(false);
-  const { toast } = useToast();
 
-  const handleCheckout = () => {
-    // In a real app, this would redirect to a payment gateway
-    setIsCheckout(true);
-    // Simulate order processing
-    setTimeout(() => {
-        toast({
-            title: "Order Placed!",
-            description: "Thank you for your purchase. Your order is on its way!",
-        });
-        clearCart();
-        //setIsCheckout(false); // Can be removed if sheet is closed on completion
-    }, 2000);
-  };
-  
   const onOpenChange = (open: boolean) => {
     if(!open) {
       setIsCheckout(false);
     }
   }
+
+  const handleCheckoutComplete = () => {
+    setIsCheckout(false); // Reset checkout state when complete
+  };
 
   return (
     <Sheet onOpenChange={onOpenChange}>
@@ -57,11 +44,7 @@ export function Cart() {
           <SheetTitle className="text-2xl font-bold text-foreground/80">{isCheckout ? 'Checkout' : 'Your Cart'}</SheetTitle>
         </SheetHeader>
         {isCheckout ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-                <PartyPopper className="h-24 w-24 text-accent" />
-                <h2 className="text-2xl font-bold">Processing Your Order!</h2>
-                <p className="text-muted-foreground">Please wait while we confirm your purchase. Thank you for shopping with us!</p>
-            </div>
+            <OrderProcessingDisplay />
         ) : items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
             <ShoppingCart className="h-24 w-24 text-muted-foreground/30" />
@@ -73,48 +56,11 @@ export function Cart() {
             <ScrollArea className="flex-1 pr-4">
               <div className="flex flex-col gap-4 py-4">
                 {items.map((item) => (
-                  <div key={item.variant.id} className="flex items-start gap-4">
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md">
-                      <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold">{item.name}</h4>
-                      <p className="text-sm text-muted-foreground">{item.variant.name}</p>
-                      <p className="text-sm font-semibold mt-1">{formatRupiah(item.variant.price)}</p>
-                      {item.category !== 'Course' ? (
-                         <div className="mt-2 flex items-center">
-                            <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.variant.id, item.quantity - 1)}>
-                            <Minus className="h-4 w-4" />
-                            </Button>
-                            <Input type="number" value={item.quantity} readOnly className="h-6 w-12 border-0 bg-transparent text-center shadow-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
-                            <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQuantity(item.variant.id, item.quantity + 1)}>
-                            <Plus className="h-4 w-4" />
-                            </Button>
-                        </div>
-                      ) : (
-                        <Badge variant="secondary" className="mt-2">Akses Selamanya</Badge>
-                      )}
-                    </div>
-                    <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive" onClick={() => removeItem(item.variant.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <CartItem key={item.variant.id} item={item} updateQuantity={updateQuantity} removeItem={removeItem} />
                 ))}
               </div>
             </ScrollArea>
-            <SheetFooter className="mt-auto flex flex-col gap-4 border-t pt-4">
-              <div className="flex justify-between text-lg font-semibold">
-                <span>Subtotal</span>
-                <span>{formatRupiah(totalPrice)}</span>
-              </div>
-              <div className="flex flex-col gap-4">
-                  <p className="text-xs text-muted-foreground text-center">Taxes and shipping calculated at checkout.</p>
-                  <Button onClick={handleCheckout} size="lg" className="h-14 w-full rounded-xl bg-accent-gradient text-lg text-accent-foreground shadow-neumorphic">
-                      <CreditCard className="mr-2 h-6 w-6" />
-                      Proceed to Checkout
-                  </Button>
-              </div>
-          </SheetFooter>
+            <CartCheckoutSection totalPrice={totalPrice} onCheckoutComplete={handleCheckoutComplete} />
           </>
         )}
       </SheetContent>

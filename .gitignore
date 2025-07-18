@@ -1,7 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-.gemini/
 /node_modules
 /.pnp
 .pnp.*
@@ -11,6 +10,7 @@
 !.yarn/releases
 !.yarn/versions
 .error.md
+.refaktor.md
 
 # testing
 /coverage

@@ -5,33 +5,14 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useState, useEffect } from 'react';
-import { User } from '@supabase/supabase-js';
+import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+
+const supabase = createClient();
 
 export default function AuthComponent() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const supabase = createClient();
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    // Fetch initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-  };
 
   if (!user) {
     return (
@@ -55,6 +36,6 @@ export default function AuthComponent() {
   }
 
   return (
-    <Button onClick={handleLogout}>Logout</Button>
+    <Button onClick={signOut}>Logout</Button>
   );
 }

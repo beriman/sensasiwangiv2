@@ -4,21 +4,22 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { profiles } from '@/data/profiles'; // We will show the first perfumer as the default
+import { useAuth } from '@/context/AuthContext';
 
 export default function ProfileRedirectPage() {
   const router = useRouter();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    // Redirect to the first perfumer's profile, or a default user profile.
-    // In a real app, this would redirect to the logged-in user's profile.
-    if (profiles.length > 0) {
-      router.replace(`/profile/${profiles[0].slug}`);
-    } else {
-      // Fallback if no perfumers exist
-      router.replace('/');
+    if (!loading) {
+      if (user) {
+        router.replace(`/profile/${user.slug}`);
+      } else {
+        // If no user is logged in, redirect to home or login page
+        router.replace('/');
+      }
     }
-  }, [router]);
+  }, [router, user, loading]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-background">

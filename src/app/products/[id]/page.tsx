@@ -1,12 +1,11 @@
-
 // src/app/products/[id]/page.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import supabase from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
+const supabase = createClient();
 import { profiles } from '@/data/profiles';
 import { AppHeader } from '@/components/header';
 import { Button } from '@/components/ui/button';
@@ -14,110 +13,37 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { ShoppingCart, Star, Leaf, Trees, Citrus, Sparkles, Waves, Flame, Users, Clock, MessageSquare, Heart, PackageCheck, PackageX, Store, Handshake } from 'lucide-react';
+import { ShoppingCart, Star, Users, MessageSquare, Heart, Handshake } from 'lucide-react';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 import { useCart } from '@/hooks/use-cart';
-import { formatRupiah, cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useWishlist } from '@/hooks/use-wishlist';
-import type { ProductVariant } from '@/lib/types';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Textarea } from '@/components/ui/textarea';
 
-const scentProfileIcons: { [key: string]: React.ElementType } = {
-  Floral: Leaf,
-  Woody: Trees,
-  Citrus: Citrus,
-  Oriental: Sparkles,
-  Fresh: Waves,
-  Spicy: Flame,
-};
-
-const CountdownTimer = ({ deadline }: { deadline: string }) => {
-    const calculateTimeLeft = () => {
-        const difference = +new Date(deadline) - +new Date();
-        let timeLeft = {};
-
-        if (difference > 0) {
-            timeLeft = {
-                days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-                minutes: Math.floor((difference / 1000 / 60) % 60),
-            };
-        }
-        return timeLeft;
-    };
-
-    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setTimeLeft(calculateTimeLeft());
-        }, 1000);
-        return () => clearTimeout(timer);
-    });
-
-    const timerComponents: any[] = [];
-    Object.keys(timeLeft).forEach((interval) => {
-        if (!timeLeft[interval as keyof typeof timeLeft]) {
-            return;
-        }
-        timerComponents.push(
-            <span key={interval}>
-                {timeLeft[interval as keyof typeof timeLeft]}
-                {interval.substring(0,1)}
-            </span>
-        );
-    });
-    
-    return (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="h-4 w-4" />
-            {timerComponents.length ? timerComponents.reduce((prev, curr) => [prev, ' ', curr]) : <span>Time's up!</span>}
-        </div>
-    );
-};
-
+import { useProductDetails } from '@/hooks/use-product-details';
+import { CountdownTimer } from '@/components/countdown-timer';
+import { ProductProperties } from '@/components/product-details/product-properties';
+import { ProductPriceSection } from '@/components/product-details/product-price-section';
+import { ProductStockInfo } from '@/components/product-details/product-stock-info';
+import { ProductVariantSelector } from '@/components/product-details/product-variant-selector';
+import { SambatanDiscussion } from '@/components/product-details/sambatan-discussion';
 
 export default function ProductDetailPage() {
   const { addItem } = useCart();
   const { toast } = useToast();
   const params = useParams();
   const productId = Array.isArray(params.id) ? params.id[0] : params.id;
-  const [product, setProduct] = useState<any>(null);
+  const { product, selectedVariant, setSelectedVariant, loading, error } = useProductDetails(productId);
   const seller = profiles.find(p => p.slug === product?.perfumerProfileSlug);
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      if (!productId) return;
-      const { data, error } = await supabase
-        .from('products')
-        .select('*, product_variants(*)')
-        .eq('id', productId)
-        .single();
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading product...</div>; // Or a skeleton loader
+  }
 
-      if (error) {
-        console.error('Error fetching product:', error);
-        notFound();
-      } else {
-        setProduct(data);
-      }
-    };
-
-    fetchProduct();
-  }, [productId]);
-  
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(undefined);
-
-  useEffect(() => {
-    if (product && product.product_variants && product.product_variants.length > 0) {
-      setSelectedVariant(product.product_variants[0]);
-    }
-  }, [product]);
-
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center text-destructive">Error: {error}</div>;
+  }
 
   if (!product || !product.is_listed) {
     notFound();
@@ -145,107 +71,8 @@ export default function ProductDetailPage() {
     }
   };
 
-
   const { toggleWishlist, isInWishlist } = useWishlist();
   const inWishlist = isInWishlist(product.id);
-
-  const renderProductProperties = () => {
-    const propertiesToShow = { ...product.properties };
-    return (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
-        {Object.entries(propertiesToShow).map(([key, value]) => {
-            const Icon = key === 'Scent Profile' ? scentProfileIcons[value] : null;
-            const isPerfumerLink = key === 'Perfumer' && product.perfumerProfileSlug;
-
-            return(
-                <div key={key}>
-                  <p className="font-semibold text-muted-foreground">{key}</p>
-                  {isPerfumerLink ? (
-                    <Link href={`/browse?seller=${product.perfumerProfileSlug}`} className="flex items-center gap-2 text-foreground/90 underline hover:text-accent">
-                      {value}
-                    </Link>
-                  ) : (
-                    <div className="flex items-center gap-2 text-foreground/90">
-                      {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
-                      <span>{value}</span>
-                    </div>
-                  )}
-                </div>
-            )
-        })}
-        </div>
-    );
-  };
-  
-  const renderPriceSection = () => {
-    if (isSambatan) {
-      return (
-        <div className="mt-4">
-            <p className="text-3xl font-bold text-accent">{formatRupiah(product.sambatan.sambatanPrice)} <span className="text-lg font-normal text-muted-foreground">/ slot</span></p>
-            <Badge variant="secondary" className="mt-2 bg-accent/20 text-accent">Harga Sambatan</Badge>
-        </div>
-      )
-    }
-    return <p className="mt-4 text-3xl font-bold text-foreground/80">{formatRupiah(selectedVariant?.price ?? 0)}</p>
-  }
-  
-  const renderStockInfo = () => {
-    if (isSambatan || isService) return null; // Stock info not shown for Sambatan or Service
-    const stock = selectedVariant?.stock ?? 0;
-    if (stock > 10) {
-        return <div className="flex items-center gap-2 text-sm text-green-600"><PackageCheck className="h-4 w-4" /> In Stock</div>
-    }
-    if (stock > 0) {
-        return <div className="flex items-center gap-2 text-sm text-yellow-600"><PackageCheck className="h-4 w-4" /> {stock} items left</div>
-    }
-    return <div className="flex items-center gap-2 text-sm text-destructive"><PackageX className="h-4 w-4" /> Out of Stock</div>
-  }
-
-  const renderVariantSelector = () => {
-    if (isSambatan || product.product_variants.length <= 1) return null;
-
-    return (
-      <div className="mt-6">
-        <h3 className="text-base font-semibold text-foreground/80">Pilih Varian:</h3>
-        <RadioGroup
-          value={selectedVariant?.id}
-          onValueChange={(variantId) => {
-            setSelectedVariant(product.product_variants.find(v => v.id === variantId));
-          }}
-          className="mt-2 flex flex-wrap gap-3"
-        >
-          {product.product_variants.map((variant) => (
-            <div key={variant.id} className="flex items-center">
-              <RadioGroupItem value={variant.id} id={variant.id} className="sr-only" />
-              <Label
-                htmlFor={variant.id}
-                className={cn(
-                  "cursor-pointer rounded-lg border px-4 py-2 text-center transition-all",
-                  "shadow-neumorphic-inset data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground data-[state=checked]:shadow-neumorphic-active",
-                  selectedVariant?.id === variant.id ? 'bg-accent text-accent-foreground shadow-neumorphic-active' : 'bg-background'
-                )}
-              >
-                {variant.name}
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
-      </div>
-    );
-  }
-
-  const sambatanDiscussion = [
-      {
-          author: profiles.find(p => p.slug === 'alex-doe')!,
-          timestamp: '2 jam yang lalu',
-          comment: 'Apa ada yang tahu apakah ini cocok untuk pemula? Saya baru mau coba.',
-      },
-      {
-          author: profiles.find(p => p.slug === 'antoine-leduc')!,
-          timestamp: '1 jam yang lalu',
-          comment: 'Sangat cocok! Ini bahan baku yang bagus untuk memulai. Saya ikut 1 slot juga.',
-      }
-  ]
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -292,7 +119,7 @@ export default function ProductDetailPage() {
                 </div>
             )}
             
-            {renderPriceSection()}
+            <ProductPriceSection isSambatan={isSambatan} product={product} selectedVariant={selectedVariant} />
             
             <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -303,10 +130,10 @@ export default function ProductDetailPage() {
                     </div>
                     <span className="text-sm text-muted-foreground">(123 reviews)</span>
                 </div>
-                {renderStockInfo()}
+                <ProductStockInfo isSambatan={isSambatan} isService={isService} selectedVariant={selectedVariant} />
             </div>
             
-            {renderVariantSelector()}
+            <ProductVariantSelector isSambatan={isSambatan} productVariants={product.product_variants} selectedVariant={selectedVariant} setSelectedVariant={setSelectedVariant} />
 
             <p className="mt-6 text-base text-foreground/80">{product.description}</p>
             
@@ -331,7 +158,7 @@ export default function ProductDetailPage() {
                                 <span>Partisipan Terkumpul</span>
                                 <span>{product.sambatan.currentParticipants} / {product.sambatan.targetParticipants}</span>
                             </div>
-                            <Progress value={sambatanProgress} className="mt-2 h-3" />
+                            <Progress value={product.sambatan.currentParticipants / product.sambatan.targetParticipants * 100} className="mt-2 h-3" />
                         </div>
                         <div className="flex items-center justify-between text-sm">
                             <span className="font-semibold text-muted-foreground">Batas Waktu:</span>
@@ -347,7 +174,7 @@ export default function ProductDetailPage() {
                 <>
                     <h3 className="text-lg font-semibold text-foreground/80">Details</h3>
                     <div className="mt-4">
-                        {renderProductProperties()}
+                        <ProductProperties properties={product.properties} perfumerProfileSlug={product.perfumerProfileSlug} />
                     </div>
                 </>
             )}
@@ -398,44 +225,7 @@ export default function ProductDetailPage() {
         </div>
         
         {isSambatan && (
-            <section className="mt-12">
-                <Card className="rounded-2xl border-none bg-transparent shadow-neumorphic p-6">
-                    <CardHeader className="p-0">
-                        <CardTitle>Diskusi Sambatan</CardTitle>
-                        <CardDescription>Punya pertanyaan? Tanyakan di sini atau koordinasi dengan calon pembeli lain.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-0 mt-6">
-                        <div className="space-y-6">
-                           {sambatanDiscussion.map((item, index) => (
-                               <div key={index} className="flex items-start gap-4">
-                                   <Avatar>
-                                       <AvatarImage src={item.author.profilePicture} alt={item.author.name} />
-                                       <AvatarFallback>{item.author.name.charAt(0)}</AvatarFallback>
-                                   </Avatar>
-                                   <div className="flex-1">
-                                       <div className="flex items-center gap-2">
-                                           <p className="font-semibold text-foreground/90">{item.author.name}</p>
-                                           <p className="text-xs text-muted-foreground">{item.timestamp}</p>
-                                       </div>
-                                       <p className="text-foreground/80">{item.comment}</p>
-                                   </div>
-                               </div>
-                           ))}
-
-                           <div className="flex items-start gap-4">
-                                <Avatar>
-                                   <AvatarImage src="https://placehold.co/40x40.png" alt="Alex Doe" />
-                                   <AvatarFallback>AD</AvatarFallback>
-                               </Avatar>
-                               <div className="w-full">
-                                    <Textarea placeholder="Tulis komentar Anda..." className="rounded-xl border-none bg-background shadow-neumorphic-inset" />
-                                    <Button className="mt-2">Kirim Komentar</Button>
-                               </div>
-                           </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </section>
+            <SambatanDiscussion />
         )}
         
         <PersonalizedRecommendations category={product.category} activeFilters={{}} />

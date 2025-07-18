@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "supabase-mcp": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@supabase-community/supabase-mcp",
+        "--key",
+        "9f01d890-44f3-40e9-a230-3e7c6d1dc11d",
+        "--profile",
+        "occupational-buzzard-gMzbNR"
+      ]
+    },
+     "context7": {
+      "httpUrl": "https://mcp.context7.com/mcp"
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    }
+  }
+}
